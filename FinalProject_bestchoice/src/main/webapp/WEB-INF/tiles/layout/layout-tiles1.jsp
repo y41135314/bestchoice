@@ -20,9 +20,9 @@
 	<style type="text/css">
 		
 		#tile1_container {
-			width: 80%;
+			
 			/* border: solid 1px black; */
-			margin: 0 auto;
+			
 		}
 		
 		#tile1_header {
@@ -31,6 +31,8 @@
 		
 		#tile1_content {
 			/* border: solid 1px blue; */
+			margin: 0 auto;
+			width: 80%;
 		}
 		
 		

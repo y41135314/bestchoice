@@ -19,8 +19,7 @@
 	<style type="text/css">
 	
 		#tile2_container {
-			width: 80%;
-			margin: 0 auto;
+			
 		}
 		
 		#tile2_header {
@@ -29,14 +28,14 @@
 		
 		#tile2_sideinfo {
 			width: 25%;
-		    float: left;
+		    display:inline-block;
 		   /*  border: solid 1px blue; */
 		}
 		
 		#tile2_content {
 			width: 74%;
 			/* border: solid 1px red; */
-			float: left;
+			 display:inline-block;
 		}
 		
 		#tile2_footer {
@@ -53,12 +52,14 @@
 			<tiles:insertAttribute name="header" />
 		</div>
 		
-		<div id="tile2_sideinfo">
-			<tiles:insertAttribute name="sideinfo" />
-		</div>
-		
-		<div id="tile2_content">
-			<tiles:insertAttribute name="content" />
+		<div style="width: 80%; margin: 0 auto;">
+			<div id="tile2_sideinfo">
+				<tiles:insertAttribute name="sideinfo" />
+			</div>
+			
+			<div id="tile2_content">
+				<tiles:insertAttribute name="content" />
+			</div>
 		</div>
 		
 		<div id="tile2_footer">
