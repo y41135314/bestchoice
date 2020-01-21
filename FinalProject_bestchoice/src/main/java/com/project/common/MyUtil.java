@@ -33,6 +33,25 @@ public class MyUtil {
 			return result;
 		}
 		
+		// 스마트 에디터용 시큐어 코드 메소드
+		public static String replaceSmartEditor(String param) {
+			
+			String result = param;
+			if(param != null) {
+				result = result.replaceAll( "" , "&lt;script" );
+			}
+			return result;
+		}
+		
+		// 스마트 에디터용 시큐어 코드 해제 메소드
+		public static String reverseSmartEditor(String param) {
+			
+			String result = param;
+			if(param != null) {
+				result = result.replaceAll( "&lt;script" , "<script" );
+			}
+			return result;
+		}
 		
 		
 		
