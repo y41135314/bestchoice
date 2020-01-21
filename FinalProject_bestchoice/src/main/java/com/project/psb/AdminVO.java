@@ -1,7 +1,7 @@
 package com.project.psb;
 
 public class AdminVO {
-	private String seq;          
+	private String admin_idx;          
 	private String adminId;   
 	private String adminPwd;        
 	private String name;   
@@ -10,11 +10,11 @@ public class AdminVO {
 	private int status;
 	private int grade;
 	
-	public String getSeq() {
-		return seq;
+	public String getAdmin_idx() {
+		return admin_idx;
 	}
-	public void setSeq(String seq) {
-		this.seq = seq;
+	public void setAdmin_idx(String admin_idx) {
+		this.admin_idx = admin_idx;
 	}
 	public String getAdminId() {
 		return adminId;
@@ -61,10 +61,10 @@ public class AdminVO {
 	
 	public AdminVO() {}
 	
-	public AdminVO(String seq, String adminId, String adminPwd, String name, String registerday, String email, int status,
+	public AdminVO(String admin_idx, String adminId, String adminPwd, String name, String registerday, String email, int status,
 			int grade) {
 		super();
-		this.seq = seq;
+		this.admin_idx = admin_idx;
 		this.adminId = adminId;
 		this.adminPwd = adminPwd;
 		this.name = name;
