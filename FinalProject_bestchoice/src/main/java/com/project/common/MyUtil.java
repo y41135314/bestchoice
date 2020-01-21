@@ -38,7 +38,7 @@ public class MyUtil {
 			
 			String result = param;
 			if(param != null) {
-				result = result.replaceAll( "" , "&lt;script" );
+				result = result.replaceAll( "<script" , "&lt;script" );
 			}
 			return result;
 		}
