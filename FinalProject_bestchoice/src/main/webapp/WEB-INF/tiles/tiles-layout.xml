@@ -46,4 +46,53 @@
 	
 	<!-- ==== tiles 를 사용하는 레이아웃1 설정 끝 ==== -->
 
+  <!-- ==== 관리자페이지(박수빈) 설정 시작 ==== -->
+	<definition name="layout-tilesSBM" template="/WEB-INF/tiles/layout/tilesSB/layout-tilesAdmin.jsp"> 
+		<put-attribute name="header" value="/WEB-INF/tiles/layout/tilesSB/header.jsp" />
+		<put-attribute name="header2" value="/WEB-INF/tiles/layout/tilesSB/adminHeader2M.jsp" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="sideinfo" value="/WEB-INF/tiles/layout/tilesSB/adimnSideinfoM.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/layout/tilesSB/footer.jsp" />
+	</definition>
+
+	<definition name="*/*.tilesSBM" extends="layout-tilesSBM">  
+		<put-attribute name="content" value="/WEB-INF/views/psb/{1}/{2}.jsp"/>
+	</definition>
+	
+	<definition name="*/*/*.tilesSBM" extends="layout-tilesSBM">  
+		<put-attribute name="content" value="/WEB-INF/views/psb/{1}/{2}/{3}.jsp"/>
+	</definition>
+	
+	<definition name="layout-tilesSBS" template="/WEB-INF/tiles/layout/tilesSB/layout-tilesAdmin.jsp"> 
+		<put-attribute name="header" value="/WEB-INF/tiles/layout/tilesSB/header.jsp" />
+		<put-attribute name="header2" value="/WEB-INF/tiles/layout/tilesSB/adminHeader2S.jsp" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="sideinfo" value="/WEB-INF/tiles/layout/tilesSB/adimnSideinfoS.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/layout/tilesSB/footer.jsp" />
+	</definition>
+
+	<definition name="*/*.tilesSBS" extends="layout-tilesSBS">  
+		<put-attribute name="content" value="/WEB-INF/views/psb/{1}/{2}.jsp"/>
+	</definition>
+	
+	<definition name="*/*/*.tilesSBS" extends="layout-tilesSBS">  
+		<put-attribute name="content" value="/WEB-INF/views/psb/{1}/{2}/{3}.jsp"/>
+	</definition>
+	
+	<definition name="layout-tilesSBSAT" template="/WEB-INF/tiles/layout/tilesSB/layout-tilesAdminSAT.jsp"> 
+		<put-attribute name="header" value="/WEB-INF/tiles/layout/tilesSB/header.jsp" />
+		<put-attribute name="header2" value="/WEB-INF/tiles/layout/tilesSB/adminHeader2SAT.jsp" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/layout/tilesSB/footer.jsp" />
+	</definition>
+
+	<definition name="*/*.tilesSBSAT" extends="layout-tilesSBSAT">  
+		<put-attribute name="content" value="/WEB-INF/views/psb/{1}/{2}.jsp"/>
+	</definition>
+	
+	<definition name="*/*/*.tilesSBSAT" extends="layout-tilesSBSAT">  
+		<put-attribute name="content" value="/WEB-INF/views/psb/{1}/{2}/{3}.jsp"/>
+	</definition>
+	
+	<!-- ====  ==== -->
 </tiles-definitions>       
