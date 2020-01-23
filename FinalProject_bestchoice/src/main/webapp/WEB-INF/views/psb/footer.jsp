@@ -1,8 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
-</div>
 
+<style>
+.footer {
+
+width: 100%;
+}
+
+</style>
 <div class="footer">
 
 	<a>회사소개</a> | <a>이용약관</a> | <a>개인정보처리방침</a> | <a>사업자 정보확인</a> | <a>콘텐츠산업진흥에의한 표시</a> 
