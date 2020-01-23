@@ -5,7 +5,22 @@
 
 <!-- 루트 엘리먼트 & 네임 스페이스 설정 ( 프로젝트 전체 내에서 유일해야 한다.) -->
 <!-- namespace 는 보통 파일명 ( 프로젝트 내에서 고유해야 한다. ) -->
-<mapper namespace="smhMapper" >
+<mapper namespace="smhMapper">
+
+	<!-- 회원가입   -->
+	<insert id="memberInsert" parameterType="com.project.smh.SmhMemberVO">
+	insert into tbl_here_member(member_idx, email, pwd, name, nickname, hp1, hp2, hp3, gender, birthday, registerday, lastLoginDate, lastpwdChangeDate)
+	values(seq_here_member.nextval, #{email}, #{pwd}, #{name}, #{nickname}, #{hp1}, #{hp2}, #{hp3},#{gender}, #{birthday}, sysdate, sysdate, sysdate)
+	</insert>
+	
+	<!--로그인처리   -->
+	<select id="getLoginMember" resultType="com.project.smh.SmhMemberVO" parameterType="HashMap">
+	select member_idx, email, name, pwd
+	from tbl_here_member
+			 where mstatus = 1 and 
+		     email = #{email} and
+		     pwd = #{pwd}
+	</select>
 
 
 </mapper>

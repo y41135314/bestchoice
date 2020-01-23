@@ -29,6 +29,7 @@ body {
 	top: 0;
 	height: 80px;
 	padding: 20px 5% ;   
+	z-index: 10;
 }
 
 #logo {  
@@ -190,12 +191,14 @@ body {
 		</td>
 		
 		<c:if test="${sessionScope.loginuser == null && sessionScope.loginseller == null && sessionScope.loginadmin == null}">  
-			<td width="5%"><a href="#">로그인</a></td>
-			<td width="6%"><a href="#">회원가입</a></td>
+			<td width="5%"><a href="<%=ctxPath%>/userLogin.bc">로그인</a></td>
+			<td width="6%"><a href="<%=ctxPath%>/userRegisterForm.bc">회원가입</a></td>
+			
 		</c:if>
 		
 		<c:if test="${sessionScope.loginuser != null }">  
 			<td width="5%">
+		
 				<div class="dropdown">
 	            <button class="dropbtn"><img class="loginIcon" src="./resources/images/ico_사용자.png">
 	               <i class="fa fa-caret-down"></i>
@@ -208,9 +211,9 @@ body {
 			      <a href="#">최근 본 숙소</a>
 			    </div>
 			</div>
-			</td>
-			
-			<td width="6%"><a class="logout" href="<%=ctxPath%>/main_logout.bc">로그아웃</a></td>
+			</td>		
+				<td><a href="#" >${(sessionScope.loginuser).name}</a></td>
+			<td width="6%"><a href="<%=ctxPath%>/main_logout.bc">로그아웃</a></td>
 		</c:if>
 		
 		<c:if test="${sessionScope.loginseller != null }">  
@@ -251,4 +254,4 @@ body {
    </table> 
 </div>   
 
-<div style="margin-top: 80px; height: 1000px; padding: 0 5%;">
+<div style="margin-top: 80px;">
