@@ -13,27 +13,23 @@
 <title>여기는어때</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   
 <style type="text/css">
-body {
+.psb body {
 	font-family: Arial, Helvetica, sans-serif, 돋움;
 }  
-
 .navbar { 
 	overflow: hidden;
 	background-color: white;
 	/* border: solid 1px black; */
 	position: fixed;   
 	top: 0;
-	height: 80px;
 	padding: 20px 5% ;   
 	z-index: 10;
 }
-
 #logo {  
-	height: 35px;    
+	height: 45px;    
 	width: 150px;
 }   
 /*   
@@ -54,7 +50,6 @@ body {
 	text-decoration: none;
 	font-weight: bold; 
 }    
-
 #headertbl td > a:hover {     
 	font-weight: bold;          
 }   
@@ -63,11 +58,9 @@ body {
   overflow: hidden;
   font-weight: bold; 
 }   
-
 .dropdown:hover{
   font-weight: bold;
 }
-
 .dropdown .dropbtn {
   border: none;  
   outline: none;
@@ -76,9 +69,8 @@ body {
   font-family: inherit;             
   margin: 0;
   font-size: 16px !important;
+  font-weight: bold;
 }
-
-
 .dropdown-content {
   display: none;
  /* position: absolute; */
@@ -88,7 +80,6 @@ body {
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
 }
-
 .dropdown-content a {
   float: none;
   color: #404040;
@@ -97,12 +88,10 @@ body {
   display: block;
   text-align: left;  
 }
-
 .dropdown-content a:hover {
   background-color: white;
   color: #ffb3b3;
 }
-
 .dropdown:hover .dropdown-content {
   display: block;
 }
@@ -126,14 +115,10 @@ body {
 	color: #ccc;
 	text-decoration: none;
 }
-
 .footer a:hover {
 	cursor: pointer;
 }
-
-
 /* ////////////////////////////////////////// */
-
 </style>      
     
 <script type="text/javascript" src="<%=ctxPath%>/resources/js/jquery-3.3.1.min.js"></script>
@@ -152,14 +137,17 @@ body {
 
 </head>
 
-<body>                  
+<body class="psb">                  
    
 <div class="navbar" id="navbar">
  <table id="headertbl">
       <tr>
 		<td><a href="main.bc"><img id="logo" src="./resources/images/로고.PNG"></a></td>
-		
+
 	  	<td width="70%"></td>
+	  
+	     
+	     
 	     
 		<td width="6%"><a href="#">내주변</a></td>
 		
@@ -204,7 +192,8 @@ body {
 	               <i class="fa fa-caret-down"></i>
 	            </button>  
 			    <div class="dropdown-content">
-			      <a href="#">내정보</a>
+			      <a>${(sessionScope.loginuser).name}님</a>
+			      <a href="<%=ctxPath%>/myPage.bc">내정보</a>
 			      <a href="#">포인트</a>
 			      <a href="#">쿠폰함</a>
 			      <a href="#">예약내역</a>
@@ -212,8 +201,8 @@ body {
 			    </div>
 			</div>
 			</td>		
-				<td><a href="#" >${(sessionScope.loginuser).name}</a></td>
-			<td width="6%"><a href="<%=ctxPath%>/main_logout.bc">로그아웃</a></td>
+
+			<td width="6%"><a href="<%=ctxPath%>/logout.bc">로그아웃</a></td>
 		</c:if>
 		
 		<c:if test="${sessionScope.loginseller != null }">  

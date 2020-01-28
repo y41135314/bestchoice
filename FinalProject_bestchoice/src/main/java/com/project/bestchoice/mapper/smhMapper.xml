@@ -22,6 +22,16 @@
 		     pwd = #{pwd}
 	</select>
 
+	<!-- 마지막으로 로그인한 날짜 변경하기  -->
+	<update id="setLastLoginDate" parameterType="HashMap">
+	 update tbl_here_member set lastLoginDate = sysdate
+	 where email = #{email}
+	</update>
+
+	<!-- 이메일 중복체크    -->
+	<select id="userEmailCheck" resultType="int" parameterType="String">
+	select count(*) from tbl_here_member where email = #{email}
+	</select>
 
 </mapper>
 

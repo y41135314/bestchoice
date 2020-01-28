@@ -17,12 +17,20 @@ private String registerday;        // 가입일자
 private String lastLoginDate;      // 마지막으로 로그인 한 날짜시간 기록용
 private String lastpwdChangeDate;  // 마지막으로 암호를 변경한 날짜시간 기록용
 
+
+
+
 private boolean requirePwdChange = false; 
 // 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 6개월이 지났으면 true
 // 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 6개월이 지나지 않았으면 false 
 
+
 /////////////////////////////////////////////////////////////////// 추가 
 private String age;
+private int totalPrice;
+private int totalCount;
+private int lastlogindategap;  // 로그인시 현재날짜와 최근 마지막으로 로그인한 날짜와의 개월수 차이 (12개월 동안 로그인을 안 했을 경우 해당 로그인계정을 비활성화 시키려고 함) 
+private int pwdchangegap;      // 로그인시 현재날짜와 최근 마지막으로 암호를 변경한 날짜와의 개월수 차이 (3개월 동안 암호를 변경 안 했을시 암호를 변경하라는 메시지를 보여주기 위함) 
 
    public String getAge() {
       return age;
@@ -35,11 +43,6 @@ private String age;
    public String getAllHp() {
       return hp1+"-"+hp2+"-"+hp3;
    }
-
-private int totalPrice;
-private int totalCount;
-
-
 
    public int getTotalPrice() {
       return totalPrice;
@@ -57,6 +60,21 @@ private int totalCount;
       this.totalCount = totalCount;
    }
 
+   public int getLastlogindategap() {
+		return lastlogindategap;
+	}
+
+	public void setLastlogindategap(int lastlogindategap) {
+		this.lastlogindategap = lastlogindategap;
+	}
+
+	public int getPwdchangegap() {
+		return pwdchangegap;
+	}
+
+	public void setPwdchangegap(int pwdchangegap) {
+		this.pwdchangegap = pwdchangegap;
+	}
 /////////////////////////////////////////////////////////////////// 추가 
 
 
@@ -67,9 +85,11 @@ private int totalCount;
    public SmhMemberVO() {}
    
    public SmhMemberVO(int member_idx, String email, String pwd, String name, String nickname, String hp1, String hp2,
-         String hp3, String gender, String birthday, int mstatus, String registerday,
-         String lastLoginDate, String lastpwdChangeDate, boolean requirePwdChange, String age, int totalPrice ,int totalCount) {
-      super();                                  /////////////////////////////////////////////////////////////////// 추가 
+		   			  String hp3, String gender, String birthday, int mstatus, String registerday,String lastLoginDate,
+		   			  String lastpwdChangeDate, boolean requirePwdChange, String age, int totalPrice ,int totalCount,
+		   			  int getLastlogindategap, int getPwdchangegap) {
+     
+	  super();                                  
       this.member_idx = member_idx;
       this.email = email;
       this.pwd = pwd;
@@ -85,10 +105,13 @@ private int totalCount;
       this.lastLoginDate = lastLoginDate;
       this.lastpwdChangeDate = lastpwdChangeDate;
       this.requirePwdChange = requirePwdChange;
-        /////////////////////////////////////////////////////////////////// 추가 
+      
+      /////////////////////////////////////////////////////////////////// 추가 
       this.age = age;
       this.totalPrice = totalPrice;
       this.totalCount = totalCount;
+      this.lastlogindategap = lastlogindategap;
+      this.pwdchangegap = pwdchangegap;
    }
 
    public void setMember_idx(int member_idx) {

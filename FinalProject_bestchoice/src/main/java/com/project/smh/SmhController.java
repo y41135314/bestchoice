@@ -1,12 +1,15 @@
 package com.project.smh;
 
 import java.util.HashMap;
+import java.util.Random;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.GenericTypeAwareAutowireCandidateResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.project.common.SHA256;
+
+import sun.security.action.GetIntegerAction;
+
 import com.project.common.AES256;
 //=== #30. 컨트롤러 선언 ===
 @Component
@@ -75,20 +81,19 @@ public class SmhController {
 		
 	 	String email = request.getParameter("email");
 	 	String pwd = request.getParameter("pwd");
-	 	
+
 	 	HashMap<String, String> paraMap = new HashMap<String, String>(); 
 	 	paraMap.put("email", email);
 		paraMap.put("pwd",  SHA256.encrypt(pwd));  // 단방향 암호화를 시켰다. 
-	 	// paraMap.put("pwd",  pwd);
 		
-		
+
 		SmhMemberVO loginuser = service.getLoginMember(paraMap); // 암호화가 되어진상태에서 mapper로 간다. 
-		// service에서 보내주고있다.
-		
-		System.out.println("loginuser : " + loginuser);
+	
+		// 확인용 
+		// System.out.println("loginuser : " + loginuser);
 		
 		HttpSession session = request.getSession();
-		
+
 		if(loginuser == null) {
 			String msg = "아이디 또는 암호가 틀립니다.";
 			String loc = "javascript:history.back()";
@@ -97,19 +102,203 @@ public class SmhController {
 			mav.addObject("loc", loc);
 			
 			mav.setViewName("msg");
-			
-			//  src/main/webapp/WEB-INF/views/msg.jsp 파일을 생성한다.
-		}
-		
-	
+						
+		}	
 		else {
-			session.setAttribute("loginuser", loginuser);
-			mav.setViewName("smh/loginEnd");
-		}
+			if(loginuser.isRequirePwdChange() == true) {
+				// 암호를 최근 6개월 동안 변경하지 않은 경우
+				session.setAttribute("loginuser", loginuser);
+				
+				String msg = "암호를 최근 6개월 동안 변경하지 않으셨습니다. 암호변경을 위해 나의정보 페이지로 이동합니다."; 
+				String loc = request.getContextPath()+"/myinfo.bc"; // 만들어야함 
+				
+				mav.addObject("msg", msg);
+				mav.addObject("loc", loc);
+				
+				mav.setViewName("msg");
+			}
+			else {
+				// 아무런 이상없이 로그인 하는 경우
+				session.setAttribute("loginuser", loginuser);
+				
+				if(session.getAttribute("gobackURL") != null) {
+				// 세션에 저장된 돌아갈 페이지의 주소(gobackURL)이 있다라면
+					
+					String gobackURL = (String) session.getAttribute("gobackURL");
+					mav.addObject("gobackURL", gobackURL); // request 영역에 저장시키는 것이다.
+					
+					session.removeAttribute("gobackURL");  //session을 없앤다.
+				}
+				
+				mav.setViewName("smh/loginEnd");				
+			}
+		}	
+		return mav;			
+	  }
+	
+	// 이메일(id)중복검사
+	@RequestMapping(value = "/userEmailCheck.bc", method = RequestMethod.GET)
+	@ResponseBody
+	public String emailCheck(HttpServletRequest request) {
 		
-		return mav;
+		String email = request.getParameter("email");
+		int result = service.userEmailCheck(email);
+		System.out.println("컨트롤러 result(email)=>  "+ result);
+		return Integer.toString(result);
 	}
 	
-		
+	// 임시비밀번호 발송 (비밀번호찾기 )
+	@RequestMapping(value = "/findPwd.bc" /*, method={RequestMethod.POST}*/ )
+	public String userFindPwd(HttpServletRequest request, HttpServletResponse response) throws Exception{
 	
+		
+		return "/smh/userFindPwd";
+	}
+	
+	// 회원정보보기(mypage)
+	@RequestMapping(value="/myPage.bc")
+	public ModelAndView myPage(ModelAndView mav, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		
+		mav.setViewName("smh/myPage");
+		return mav;
+	}	
+	
+	/*// 임시비밀번호 발송 (비밀번호찾기 )
+	@RequestMapping(value = "/findPwd.bc", method={RequestMethod.POST} )
+	public String userFindPwd(HttpServletRequest request, HttpServletResponse response) throws Exception{
+					
+		String method = request.getMethod();
+		
+		if("POST".equalsIgnoreCase(method)) {
+			
+			String email = request.getParameter("email");
+			
+			HashMap<String, String> paraMap  = new HashMap<String, String>();			
+
+			paraMap.put("email", email); //암호를 변경하고자 하는 email주소 
+			
+			boolean isUserExist = service.isUserExist(paraMap);
+			//boolean isUserExist = smhdao.isUserExist(paraMap);
+			int n = 0;
+			
+			if(isUserExist) {
+				//회원으로 존재하는 경우 인증메일을 보내겠다.
+				
+				n= 1; //회원이 존재하는 경우 에는 1 
+				
+				GoogleMail mail = new GoogleMail();
+				
+				// 인증키를 랜덤하게 생성하도록 한다.
+				Random rnd = new Random();
+				//math.random도 있지만 보안적으로 약하기때문에
+				String certificationCode = "";
+				// certificationCode => "swfet0933651"
+				
+				char randchar = ' '; // 공백이 기본값이다.
+				for(int i=0; i<5; i++) {
+										
+				 	//min 부터 max 사이의 값으로 랜덤한 정수를 얻으려면
+				 	//int rndum = rnd.nextInt(max - min + 1) + min;
+				 	//영문 소문자 'a' 부터 'z' 까지 랜덤하게1개를 만든다.
+				 
+					
+				// char타입이 정수와 사칙연산을 만나면 자동적으로 int로 바뀐다.
+					randchar = (char) (rnd.nextInt('z' - 'a' + 1) + 'a');
+					
+					certificationCode += randchar;					
+				}
+					
+					int randnum = 0;
+					for(int i=0; i<7; i++) {
+						randnum = rnd.nextInt(9-0+1) + 0;
+						certificationCode += randnum;
+					}				
+					System.out.println("확인용 certificationCode =>"+ certificationCode);
+				   
+										
+					// 랜덤하게 생성한 인정코드를 비밀번호 찾기를 하고자 하는 사용자의 email로 전송시킨다.
+					HttpSession session = request.getSession();
+					
+					try {
+						   mail.sendmail(email, certificationCode);
+						   
+						   session.setAttribute("certificationCode", certificationCode);
+						   // 발급한 인증코드를 세션에 저장.
+						   
+						   request.setAttribute("email", email); //("/WEB-INF/login/pwdFind.jsp"); 보내어 진다.
+						   
+					}catch (Exception e) {
+						e.printStackTrace(); 
+						
+						n= - 1;	//인증메일을 보내는 google계정이 잘못되었다면.		
+					}
+			}//end of if--------------
+			else {
+				//회원으로 존재하지 않는 경우
+				n = 0; //n의 값이 0이라면 회원은 없다. 
+				
+			}// end of else
+			
+				request.setAttribute("n", n);
+			
+				request.setAttribute("email", email);
+				// 비밀번호 찾기한 userid를 받아와서 view단으로 넘어간다.
+			
+		}// end of if("POST".equalsIgnoreCase(method))
+		request.setAttribute("method", method); // 메소드는 get이나 post 상관없이 넘어간다
+		
+		return "/smh/userFindPwd"; //ifram 속에 들어가는것
+	}
+		
+
+	//  비밀번호  인증
+	@RequestMapping(value="/pwdUpdateFront.bc", method= {RequestMethod.POST} )
+	public ModelAndView pwdUpdateFront(HttpServletRequest request, ModelAndView mav) { 
+		
+		String email = request.getParameter("email");
+		String userCertificationCode = request.getParameter("userCertificationCode");
+		// 유저가 이메일 확인 후 입력한 인증코드
+		
+		HttpSession session = request.getSession();
+		String certificationCode = (String)session.getAttribute("certificationCode");
+		// 랜덤하게 발생되어 세션에 저장된 인증코드
+		
+		String message = "";
+		String loc = "";
+		int verifiedResult = 0;
+		
+		if( certificationCode.equals(userCertificationCode) ) {
+			verifiedResult = 1;
+			
+			session.setAttribute("verifiedResult", verifiedResult);
+			session.setAttribute("email", email);
+			message = "인증에 성공하였습니다.";
+			loc = request.getContextPath() + "/pwdUpdateFront.bc";
+			request.setAttribute("message", message);
+			request.setAttribute("loc", loc);
+			session.setAttribute("email", email);
+			
+			// *** 중요 *** //
+			// 세션에 저장된 인증코드 삭제하기 //
+			session.removeAttribute("certificationCode");
+			
+			
+			mav.setViewName("/WEB-INF/msg.jsp");
+			return mav;
+			
+		} else {
+			message = "인증에 실패하셨습니다. 인증코드를 재발급받으세요.";
+			loc = request.getContextPath() + "/main.bc";
+			request.setAttribute("message", message);
+			request.setAttribute("loc", loc);
+			
+
+
+			mav.setViewName("/WEB-INF/msg.jsp");
+			mav.setViewName("msg");
+			
+			return mav;
+		}
+	}*/
 }

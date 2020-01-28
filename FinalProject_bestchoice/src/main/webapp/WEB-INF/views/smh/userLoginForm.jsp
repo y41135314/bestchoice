@@ -47,7 +47,7 @@ font-size: 14pt;
     text-align: center;
     width: 336px;
     height: 56px;
-    font-size: 18px;   
+    font-size: 16px;   
 }
 
 .layer_fix .btn_naver {
@@ -222,6 +222,8 @@ $(document).ready(function(){
 			}
 	 }); // end of $("#pwd").keydown();-----------------------	
 	 
+	
+	 
 }); // end of $(document).ready()---------------------------	 
 
 
@@ -272,10 +274,12 @@ function here_Login() {
                        data-msg-required="비밀번호를 입력해 주세요."/>
             </div> 
             <button class="here_login_btn" id="btnLOGIN"><span>로그인</span></button>
+             <button class="here_login_btn" style="background-color: "><span>판매자 로그인</span></button>
                <div class="link_half">
-                    <div><span><a href="<%=ctxPath%>/userRegisterForm.bc">회원가입</a></span></div>
+                    <div><span ><a id="findPwd" href="<%=ctxPath%>/findPwdForm.bc">비밀번호 재설정</a></span></div>
                     <div><span><a href="#">판매자 회원가입</a></span></div>
                </div>
+               
                 </form>
                </section>
               </div>
