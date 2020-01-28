@@ -192,12 +192,12 @@
 		(
 		select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
 		        trunc(age,-1) AS age,
-		        mstatus, clientip, registerday, lastlogindate, lastpwdchangedate
+		        mstatus, registerday, lastlogindate, lastpwdchangedate
 		from 
 		    (
 		    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
 		            extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
-		            mstatus, clientip, to_char(registerday,'yyyymmdd') AS registerday, lastlogindate, lastpwdchangedate
+		            mstatus, to_char(registerday,'yyyymmdd') AS registerday, lastlogindate, lastpwdchangedate
 		    from tbl_here_member
 		    )
 		  
@@ -238,17 +238,17 @@
       <select id="memberListWithPaging"  parameterType="HashMap" resultType="com.project.smh.SmhMemberVO">
      	select rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
 		        age, 
-		        mstatus, clientip, to_char(registerday,'yyyy-mm-dd') AS registerday, lastlogindate, lastpwdchangedate
+		        mstatus, to_char(registerday,'yyyy-mm-dd') AS registerday, lastlogindate, lastpwdchangedate
 		from
 		(
 		select rownum AS rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
 		       age, 
-		        mstatus, clientip, registerday, lastlogindate, lastpwdchangedate
+		        mstatus, registerday, lastlogindate, lastpwdchangedate
 		from 
 		    (
 		    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
 		            extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
-		            mstatus, clientip, registerday, lastlogindate, lastpwdchangedate
+		            mstatus, registerday, lastlogindate, lastpwdchangedate
 		    from tbl_here_member
 		    )
 		  
