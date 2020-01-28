@@ -9,10 +9,13 @@ public class MyUtil {
 			String result = param;
 			
 			if(param != null) {
-				result = result.replaceAll("<", "&lt;");
+				 // 관리자 게시판 
+			/*	result = result.replaceAll("<", "&lt;");
 				result = result.replaceAll(">", "&gt;");
 				// result = result.replaceAll("&", "&amp;");
 				result = result.replaceAll("\"", "&quot;");
+				*/
+				result = result.replaceAll("<script","&lt;script");
 			}
 
 			return result;

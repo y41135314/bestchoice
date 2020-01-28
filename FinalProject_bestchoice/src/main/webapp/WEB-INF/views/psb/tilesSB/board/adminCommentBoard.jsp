@@ -32,7 +32,15 @@
  	text-align: center;
  }
  
-</style>
+ .boardWriter:hover {
+ 	font-weight: bold;
+ 	cursor: pointer;
+ }
+ 
+ .adminIdHidden { display:none; }
+ .adminIdShow { display:block; }
+ 
+</style>              
 
 <script>
 	$(document).ready(function(){
@@ -62,6 +70,32 @@
 				goSearch();
 			} 
 		});
+		
+
+		$(".boardWriter").click(function(){
+			// 해당 작성자 아이디 가져오기 
+		    var writerId = $(this).attr('id');
+			
+			var layer = $("#layer");
+			
+			var html=""
+			$("#layer").html("ID : " + writerId);
+			
+			if (layer.is(":visible")){
+				layer.hide();   
+			}
+			else {
+			
+			var pos = $(this).offset();     
+				
+				layer.css('position','absolute');
+				layer.css('top', pos.top);    // 레이어 위치 지정
+				layer.css('left', pos.left*1.07);
+				
+				layer.show();
+			}
+		})  
+		
 	})
 	
 	function goView( adminBoard_idx,rno) {
@@ -98,13 +132,13 @@
 	</form>	
 	<table id="adminCommentTable" >
 		<tr style="background-color: #FAFAFA;">
-			<th>번호</th>
-			<th style="width: 30%;">제목</th>
+			<th style="width: 5%;">번호</th>
+			<th style="width: 40%;">제목</th>
 			<th>작성자</th>
 			<th>판매자</th>
 			<th>호텔명</th>
-			<th>작성일자</th>
-		</tr>   
+			<th style="width: 20%;">작성일자</th>
+		</tr>      
 		
 		<c:if test="${ boardList == null }">
 			<tr>   
@@ -113,21 +147,23 @@
 	   </c:if>
 	   
 		<c:if test="${ boardList != null }">   
-	      <c:forEach var="boardvo" items="${boardList}" varStatus="status"> 
+	      <c:forEach var="boardvo" items="${boardList}" varStatus="status" > 
 		   	   <tr>
 					<td align="center">${boardvo.rno}</td>
 					
-					<td align="center"> 
+					<td align="left"> 
 			   	  		<c:if test="${boardvo.depthno == 0}">
 				   	   		 <c:if test="${boardvo.commentCount > 0}">	 
 						    	<c:if test="${boardvo.fileName == null }">	 
 						   	    	<span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
-						   	    	  ${boardvo.title}&nbsp;<span style="vertical-align: super;">[<span style="color: red; font-size: 9pt; font-style: italic; font-weight: bold;">${boardvo.commentCount}</span>]</span></span>
+						   	    	  ${boardvo.title}&nbsp;
+						   	      	  <span style="color: #F7323F; font-size: 9pt;">[${boardvo.commentCount}]</span>
+						   	    	  </span>
 						    	</c:if>
 						    	<c:if test="${boardvo.fileName != null }">	 
 						   	    	 <span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
-						   	    	 ${boardvo.title}&nbsp;<span style="vertical-align: super;">[<span style="color: red; font-size: 9pt; font-style: italic; font-weight: bold;">${boardvo.commentCount}</span>]</span>
-						    		  <img src="<%= request.getContextPath()%>/resources/images/disk.gif" />
+						   	    	 ${boardvo.title} <img src="<%= request.getContextPath()%>/resources/images/disk.gif" />
+						   	    	 &nbsp;<span style="color: #F7323F; font-size: 9pt;">[${boardvo.commentCount}]</span>
 						    		  </span>
 						    	</c:if>
 						     </c:if>
@@ -148,42 +184,67 @@
 					     <c:if test="${boardvo.depthno > 0}">
 					   	     <c:if test="${boardvo.commentCount > 0}">	 <%-- 댓글쓰기게시판 ==> 댓글유무 --%>
 						   	    <c:if test="${boardvo.fileName == null }">	 
-						   	    	<span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');" style="color:red; font-style: italic; padding-left: ${boardvo.depthno * 20 }px;">
-						   	    	└RE&nbsp;&nbsp;</span>${boardvo.title}&nbsp;
-						   	    	<span style="vertical-align: super;">[<span style="color: red; font-size: 9pt; font-style: italic; font-weight: bold;">${boardvo.commentCount}</span>] </span>
+						   	    	<span  style="color:#F7323F; font-style: italic; padding-left: ${boardvo.depthno * 10 }px;">└
+							   	    	<c:forEach begin="1" end="${boardvo.depthno}" >
+							   	    	RE: <%-- └RE${boardvo.depthno} --%>
+							   	    	</c:forEach>
+						   	    	</span>
+							   	    <span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');" >	 
+							   	    	&nbsp;${boardvo.title}&nbsp;
+							   	    	<span style="color: #F7323F; font-size: 9pt;">[${boardvo.commentCount}]</span>
+						    		</span>
 						    	</c:if>
-						    	<c:if test="${boardvo.fileName != null }">	 
-						   	    	 <span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');" style="color:red; font-style: italic; padding-left: ${boardvo.depthno * 20 }px;">
-						   	    	 └RE&nbsp;&nbsp;</span>${boardvo.title}&nbsp;
-						   	    	  <img src="<%= request.getContextPath()%>/resources/images/disk.gif" />
-						   	    	 <span style="vertical-align: super;">[<span style="color: red; font-size: 9pt; font-style: italic; font-weight: bold;">${boardvo.commentCount}</span>] </span>
+						    	<c:if test="${boardvo.fileName != null }">
+					    			<span  style="color:red; font-style: italic; padding-left: ${boardvo.depthno * 10 }px;">└
+							   	    	<c:forEach begin="1" end="${boardvo.depthno}">
+							   	    	RE: <%-- └RE${boardvo.depthno} --%>
+							   	    	</c:forEach>
+						   	    	</span>
+						   	    	<span  class="title"  onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');" >	 
+							   	    	 &nbsp;${boardvo.title}
+							   	    	<img src="<%= request.getContextPath()%>/resources/images/disk.gif" />
+							   	    	&nbsp;<span style="color: #F7323F; font-size: 9pt;">[${boardvo.commentCount}]</span>
+						    		</span>
 						    	</c:if>
 						     </c:if>
 						     
 						     <c:if test="${boardvo.commentCount == 0}">
 						     	  <c:if test="${boardvo.fileName == null }">	 
-						     	  	<span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
-						   	   			<span style="color:red; font-style: italic; padding-left: ${boardvo.depthno * 20 }px;">└RE&nbsp;&nbsp;</span>${boardvo.title}&nbsp;
+					     	  		<span  style="color:red; font-style: italic; padding-left: ${boardvo.depthno * 10 }px;">└
+							   	    	<c:forEach begin="1" end="${boardvo.depthno}" >
+							   	    	RE: <%-- └RE${boardvo.depthno} --%>
+							   	    	</c:forEach>
+						   	    	</span> 
+							   	    <span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
+						   	   			&nbsp;&nbsp;${boardvo.title}&nbsp;
 						    		</span>
 						     	  </c:if>
 						     	  <c:if test="${boardvo.fileName != null }">	
-						     	  	<span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
-						   	   			<span style="color:red; font-style: italic; padding-left: ${boardvo.depthno * 20 }px;">└RE&nbsp;&nbsp;</span>${boardvo.title}&nbsp;
+						     	  		<span style="color:red; font-style: italic; padding-left: ${boardvo.depthno * 10 }px;">└
+						   	   				<c:forEach begin="1" end="${boardvo.depthno}" >
+								   	    	RE: <%-- └RE${boardvo.depthno} --%>
+								   	    	</c:forEach>
+								   	    <span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
+						   	   				&nbsp;&nbsp;${boardvo.title}&nbsp;
+						   	   			</span>
 						    			 <img src="<%= request.getContextPath()%>/resources/images/disk.gif" />
 						    		</span> 
 						     	  </c:if>
 						    </c:if>
 					     </c:if>
 					</td>              
-					<td align="center">${boardvo.name}</td>
+					<td align="center"><span id="${boardvo.fk_adminId}" class="boardWriter">${boardvo.name}</span> </td>
 					<td align="center">${boardvo.fk_sellerName}</td>
 					<td align="center">${boardvo.fk_hotelName}</td>
 					<td align="center">${boardvo.registerday}</td>
 				</tr>	
-				</c:forEach>					
+			</c:forEach>					
 		   </c:if>
 	</table>
-	
+	<div id="layer"  style="display: none; z-index: 9999; font-size: 8pt; background-color: white; border: solid 1px #ccc;">
+	</div>   	     
+				
+				
 	<%-- === #126. 페이지바 보여주기 === --%> 
 	<br/>
 	<div align="center">
@@ -196,4 +257,5 @@
 	</form>
 
 	<input type="button" value="글쓰기" onclick="location.href='<%=request.getContextPath()%>/adminWrite.bc'" style="font-size: 8pt; z-index: -1;" /> 
+
 </div>   

@@ -2,6 +2,7 @@ package com.project.psb;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -859,9 +861,10 @@ public class PsbController {
 		return mav;
 	}
 	
-	///////////////////////////================================================/////////////////////////////////
-	//////////////////// 관리자 게시판 ///////////////////////////
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+						//////////////////// 관리자 게시판 ///////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
 	@RequestMapping(value="/adminCommentBoard.bc")
 	public ModelAndView adminCommentBoard(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		
@@ -960,8 +963,8 @@ public class PsbController {
 				pagebar += "&nbsp;<span style='color: red; border: 1px solid gray; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";
 			}
 			else {
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+pageNo+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord+"'>"+pageNo+"</a>&nbsp;"; 
-			// ""+1+"&nbsp;"+2+"&nbsp;"+3+"&nbsp;"+......+10+"&nbsp;"
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+pageNo+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord+"'>"+pageNo+"</a>&nbsp;"; 
+				// ""+1+"&nbsp;"+2+"&nbsp;"+3+"&nbsp;"+......+10+"&nbsp;"
 			}
 			
 			loop++;
@@ -993,6 +996,7 @@ public class PsbController {
 		return mav;
 	}
 	
+	
 	@RequestMapping(value="/adCommentDetail.bc")
 	public ModelAndView adminCommentDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		
@@ -1007,15 +1011,18 @@ public class PsbController {
 		boardvo = service.getViewWithNoAddCount(adminBoard_idx);
 		
 		// === 댓글쓰기가 있는 게시판의 경우, 원글의 내용과 원글에 달린 댓글의 내용도 함께 보여준다. === // 
-		/*List<CommentVO> commentList = service.getCommentList(adminBoard_idx);  // 원글에 달린 댓글 조회 
-		mav.addObject("commentList", commentList);*/
+		List<CommentVO> commentList = service.getCommentList(adminBoard_idx);  // 원글에 달린 댓글 조회 
+		
+		mav.addObject("commentList", commentList);
+		
 		/////////////////////////////////////////////	
+		
 		mav.addObject("boardvo", boardvo);
 		mav.addObject("rno", rno);
 		mav.setViewName("tilesSB/board/adCommentDetail.tilesSBS");
 		return mav;
 	}
-	
+
 	// 관리자 게시판 글쓰기
 	@RequestMapping(value="/adminWrite.bc")
 	public ModelAndView adminWrite(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
@@ -1033,6 +1040,60 @@ public class PsbController {
 		return mav;
 	}
 
+	// 스마트에디터 사진 업로 
+	@RequestMapping(value="/admin/multiplePhotoUpload.bc", method={RequestMethod.POST})
+	public void multiplePhotoUpload(HttpServletRequest req, HttpServletResponse res) {
+		HttpSession session = req.getSession();
+		String root = session.getServletContext().getRealPath("/"); 
+		String path = root + "resources"+File.separator+"photo_upload";
+		
+		File dir = new File(path);
+		if(!dir.exists())
+		    dir.mkdirs();
+			
+		String strURL = "";
+			
+		try {
+			if(!"OPTIONS".equals(req.getMethod().toUpperCase())) {
+			    String filename = req.getHeader("file-name"); //파일명을 받는다 - 일반 원본파일명
+		    		
+		        // System.out.println(">>>> 확인용 filename ==> " + filename); 
+		        // >>>> 확인용 filename ==> berkelekle%ED%8A%B8%EB%9E%9C%EB%94%9405.jpg
+		    		
+		    	   InputStream is = req.getInputStream();
+		    	/*
+		          요청 헤더의 content-type이 application/json 이거나 multipart/form-data 형식일 때,
+		          혹은 이름 없이 값만 전달될 때 이 값은 요청 헤더가 아닌 바디를 통해 전달된다. 
+		          이러한 형태의 값을 'payload body'라고 하는데 요청 바디에 직접 쓰여진다 하여 'request body post data'라고도 한다.
+	
+	               	  서블릿에서 payload body는 Request.getParameter()가 아니라 
+	            	  Request.getInputStream() 혹은 Request.getReader()를 통해 body를 직접 읽는 방식으로 가져온다. 	
+		    	*/
+		    	   String newFilename = fileManager.doFileUpload(is, filename, path);
+		    	
+			   int width = fileManager.getImageWidth(path+File.separator+newFilename);
+				
+			   if(width > 600)
+			      width = 600;
+					 	
+			   String CP = req.getContextPath(); 
+				
+			   strURL += "&bNewLine=true&sFileName="; 
+	            	   strURL += newFilename;
+	            	   strURL += "&sWidth="+width;
+	            	   strURL += "&sFileURL="+CP+"/resources/photo_upload/"+newFilename;
+		    	}
+			
+		    	/// 웹브라우저상에 사진 이미지를 쓰기 ///
+			   PrintWriter out = res.getWriter();
+			   out.print(strURL);
+		} catch(Exception e){
+				e.printStackTrace();
+		}
+	 
+		
+	}
+	
 	// 관리자 게시판 글쓰기 완료 
 	@RequestMapping(value="/adminBoardEnd.bc", method={RequestMethod.POST} )
 	public String addEnd(BoardVO boardvo, MultipartHttpServletRequest mrequest) {	
@@ -1106,7 +1167,7 @@ public class PsbController {
 		mrequest.setAttribute("n", n);
 		return "psb/board/addEnd";
 	}
-	
+
 	// 첨부파일 다운 
 	@RequestMapping(value="/adminDownload.bc", method={RequestMethod.GET} )
 	public void adminDownload(HttpServletRequest request, HttpServletResponse response) {
@@ -1283,16 +1344,16 @@ public class PsbController {
 			
 		mav.addObject("n", n);
 		mav.addObject("msg","글 수정 완료");
-		mav.addObject("loc", mrequest.getContextPath() + "/adCommentDetail.bc?adminBoard_idx="+boardvo.getAdminBoard_idx() );
+		mav.addObject("loc", mrequest.getContextPath() + "/adCommentDetail.bc?adminBoard_idx="+boardvo.getAdminBoard_idx()+"&rno="+mrequest.getParameter("rno") );
 
 		mav.setViewName("psb/msg");
 	
 		return mav;
 	}
-	
+
 	// 글 삭제 페이지 요청
-	@RequestMapping(value="/adCommentDelete.bc", method={RequestMethod.GET} )
-	public ModelAndView adminCommentDelete(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+	@RequestMapping(value="/adBoardDelete.bc", method={RequestMethod.GET} )
+	public ModelAndView adminBoardDelete(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		
 		String adminBoard_idx = request.getParameter("adminBoard_idx");
 		
@@ -1323,6 +1384,106 @@ public class PsbController {
 		return mav;
 	}
 	
-	
+	// 게시판 댓글 등록
+	@ResponseBody
+	@RequestMapping(value="/adComment.bc", method={RequestMethod.POST}, produces="text/plain;charset=UTF-8" )
+	public String adCommentAdd(CommentVO commentvo) {
+		String jsonStr = "";
+		
+		try {
+			int n = service.addComment(commentvo);
+			
+			if(n==1) {  // 댓글쓰기가 insert & 원게시물 tblBoard 테이블의 댓글갯수는 +1 ==> 성공
+				        // 원글에 달린 댓글 조회 
+				List<CommentVO> commentList = service.getCommentList(commentvo.getFk_parentIdx()); 
+				
+				JSONArray jsonArr = new JSONArray();
+				for( CommentVO cmtvo : commentList ) {
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("name", cmtvo.getName());
+					jsonObj.put("fk_adminId", cmtvo.getFk_adminId());
+					jsonObj.put("content", cmtvo.getContent());
+					jsonObj.put("registerday", cmtvo.getRegisterday());
+					
+					jsonArr.put(jsonObj);
+				}
+				jsonStr = jsonArr.toString();
+				
+			  } // end of if(n==1)============================
+			
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return jsonStr;
+	}
+	 
+	// 게시판 댓글 삭제 
+	@ResponseBody
+	@RequestMapping(value="/adDelComment.bc", method={RequestMethod.POST}, produces="text/plain;charset=UTF-8" )
+	public String adDelComment(String adminComment_idx, String fk_parentIdx) {
+		String jsonStr = "";
+		
+		try {
+			
+			CommentVO commentvo = service.getViewComment(adminComment_idx);
+			
+			int n = service.adDelComment(adminComment_idx,fk_parentIdx);
+			
+			if(n==1) {  // 댓글쓰기가 insert & 원게시물 tblBoard 테이블의 댓글갯수는 +1 ==> 성공
+				        // 원글에 달린 댓글 조회 
+				List<CommentVO> commentList = service.getCommentList(commentvo.getFk_parentIdx()); 
+				
+				JSONArray jsonArr = new JSONArray();
+				for( CommentVO cmtvo : commentList ) {
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("name", cmtvo.getName());
+					jsonObj.put("fk_adminId", cmtvo.getFk_adminId());
+					jsonObj.put("content", cmtvo.getContent());
+					jsonObj.put("registerday", cmtvo.getRegisterday());
+					
+					jsonArr.put(jsonObj);
+				}
+				jsonStr = jsonArr.toString();
+				
+			  } // end of if(n==1)============================
+			
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return jsonStr;
+	}
+		
+	// 게시판 댓글 수정  upComment
+	@ResponseBody
+	@RequestMapping(value="/upComment.bc", method={RequestMethod.POST}, produces="text/plain;charset=UTF-8" )
+	public String upComment(String adminComment_idx, String content, String fk_parentIdx) {
+		String jsonStr = "";
+		
+		try {
+			int n = service.updateComment(adminComment_idx, content);
+			
+			if(n==1) {  
+				
+				List<CommentVO> commentList = service.getCommentList(fk_parentIdx); 
+				
+				JSONArray jsonArr = new JSONArray();
+				for( CommentVO cmtvo : commentList ) {
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("name", cmtvo.getName());
+					jsonObj.put("fk_adminId", cmtvo.getFk_adminId());
+					jsonObj.put("content", cmtvo.getContent());
+					jsonObj.put("registerday", cmtvo.getRegisterday());
+					
+					jsonArr.put(jsonObj);
+				}
+				jsonStr = jsonArr.toString();
+				
+			  } // end of if(n==1)============================
+			
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return jsonStr;
+	}
 	
 }	

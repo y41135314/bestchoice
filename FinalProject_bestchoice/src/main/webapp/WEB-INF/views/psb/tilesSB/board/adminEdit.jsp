@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>      
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>   
+
+<%
+	String rno = request.getParameter("rno");
+%>   
 <style type="text/css">
  #adminWrite {
  	/* border: solid 1px black; */
@@ -96,7 +100,7 @@
 			// 폼을 submit
 			var frm = document.adminEditFrm;
 			frm.method = "POST";
-			frm.action = "<%= request.getContextPath() %>/adBoardEditEnd.bc";
+			frm.action = "<%= request.getContextPath() %>/adBoardEditEnd.bc?rno=<%=rno%>";
 			frm.submit();
 		});
 		

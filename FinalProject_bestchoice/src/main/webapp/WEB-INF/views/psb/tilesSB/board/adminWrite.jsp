@@ -113,8 +113,8 @@
 	<br/>
 	<form name="adminWriteFrm" enctype="multipart/form-data"> 
 	<input type="text" name="name" value="${(sessionScope.loginadmin).name}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly  />  
-	<input type="text" name="fk_sellerName" placeholder="사업자명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly/> 
-	<input type="text" name="fk_hotelName" placeholder="호텔명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"   readonly /> 
+	<input type="text" name="fk_sellerName" placeholder="사업자명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  /> 
+	<input type="text" name="fk_hotelName" placeholder="호텔명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"    /> 
 	<br/>
 	<input type="text" name="title" id="title" placeholder="제목" style="margin: 5px 0;" /><br/>	
 	<textarea name="content" id="content" style="width: 50%;"></textarea>	
