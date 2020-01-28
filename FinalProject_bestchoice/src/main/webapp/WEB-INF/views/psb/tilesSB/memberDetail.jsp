@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <style>
 #memberDetail {
  /* 	border: solid 1px black; */
@@ -20,6 +21,7 @@
  
  #tableMemberDetail tr, #tableMemberDetail th, #tableMemberDetail td  {
  	border: solid 1px black;
+ 	padding: 5px;
  }
  
  #tableMemberDetail th {
@@ -55,9 +57,9 @@
    &nbsp;&nbsp;|&nbsp;&nbsp;
    <input type="button" value="예약내역 보기" onclick="location.href='<%=request.getContextPath()%>/adminReservList.bc'" style="font-size: 8pt;"/> 
 
-   <table id="tableMemberDetail">
-		<tr>
-			<th>ID</th>
+   <table id="tableMemberDetail" style="text-align: center;">
+		<tr style="background-color: #FAFAFA;">
+			<th>회원번호</th>
 			<th>이름</th>
 			<th>이메일</th>
 			<th>휴대폰번호</th>
@@ -71,7 +73,25 @@
 			<th>가입상태</th>
 		</tr>
 		<tr>   
-			<td colspan="12">가입된 회원이 없습니다.</td>
+			<td>${membervo.member_idx}</td>
+			<td>${membervo.name}</td>
+			<td>${membervo.email}</td>
+			<td>${membervo.hp1}-${membervo.hp2}-${membervo.hp3}</td>
+			<td>${membervo.registerday}</td>
+			<td>
+				<c:if test="${membervo.gender == 1}">
+				남
+				</c:if>	
+				<c:if test="${membervo.gender == 2}">
+				여
+				</c:if>	
+			</td>
+			<td>${membervo.age}</td>
+			<td>${membervo.birthday}</td>
+			<td>.</td>
+			<td>.</td>
+			<td>.</td>
+			<td>${membervo.mstatus}</td>
 		</tr>
 	</table>	
 	     
