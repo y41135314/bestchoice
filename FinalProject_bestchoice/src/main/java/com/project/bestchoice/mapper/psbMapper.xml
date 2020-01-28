@@ -291,7 +291,7 @@
       <select id="getOneMember" parameterType="String" resultType="com.project.smh.SmhMemberVO">
       	 select member_idx, name, email, to_char(registerday,'yyyy-mm-dd') AS registerday,
       	        gender,  extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
-      	        birthday ,mstatus
+      	        birthday ,mstatus,hp1,hp2,hp3
       	 from tbl_here_member
       	 where member_idx = #{member_idx}
       </select>
