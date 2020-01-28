@@ -340,10 +340,10 @@ function joinRegister() {
 
             	<b class="register_title">성별</b>
 				<div class="female_select" style="display: inline-block;">
-				   <input type="radio" id="female" name="gender" value="1" />
+				   <input type="radio" id="female" name="gender" value="2" />
 				   <label class="register-label" for="female">여성</label>
 
-				   <input type="radio" id="male" name="gender" value="2"  />
+				   <input type="radio" id="male" name="gender" value="1"  />
 				   <label class="register-label" for="male" >남성</label>
 				</div>
 			</div>
