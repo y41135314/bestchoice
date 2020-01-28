@@ -28,7 +28,8 @@ body {
 	position: fixed;   
 	top: 0;
 	height: 80px;
-	padding: 20px 5% 0 5% ;   
+	padding: 20px 5% 0 5% ;  
+	z-index: 1;   
 }
 
 #logo {  

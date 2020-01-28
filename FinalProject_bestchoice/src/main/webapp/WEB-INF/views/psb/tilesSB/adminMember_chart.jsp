@@ -1966,7 +1966,7 @@
 					        align: 'right',
 					        x: -30,
 					        verticalAlign: 'top',
-					        y: 25,
+					        y: -10,  
 					        floating: true,
 					        backgroundColor:
 					            Highcharts.defaultOptions.legend.backgroundColor || 'white',
@@ -2441,7 +2441,7 @@
 					        align: 'right',
 					        x: -30,
 					        verticalAlign: 'top',
-					        y: 25,
+					        y: -10,
 					        floating: true,
 					        backgroundColor:
 					            Highcharts.defaultOptions.legend.backgroundColor || 'white',
