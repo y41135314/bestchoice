@@ -3,17 +3,32 @@ package com.project.psb;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,8 +36,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.project.common.FileManager;
 import com.project.common.MyUtil;
+import com.project.smh.SmhMemberVO;
 
 @Controller
 public class PsbController {
@@ -85,17 +104,703 @@ public class PsbController {
 		return mav;
 	}
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////// 회원 리스트  ///////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
 	@RequestMapping(value="/adminMember_list.bc")
 	public ModelAndView adminMember(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+	
+		List<SmhMemberVO> memberList = null;
+		
+		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
+		
+		int totalCount = 0; // 총 게시물 건수
+		int sizePerPage = 5;  // 한 페이지당 보여줄 게시물 수
+		int currentShowPageNO = 0 ;// 현재 보여주는 페이지번호로서, 초기치로는 1페이지로 설정함
+		int totalPage = 0 ; // 총 페이지수(웹브라우저상에 보여줄 총 페이지 갯수, 페이지바)
+		
+		int startRno = 0;  // 시작 행번호
+		int endRno = 0; // 끝 행번호 
+		
+		String gender = request.getParameter("gender");
+		String[] ageArr = request.getParameterValues("age");
+		
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		
+		if(startDate == null) {
+			startDate="";
+		}
+		if(endDate == null) {
+			endDate="";
+		}
+		
+		String searchType = request.getParameter("searchType"); 
+		String searchWord = request.getParameter("searchWord");
+		
+		if(searchWord==null|| searchWord.trim().isEmpty() ) {
+			searchWord = "";
+		}
+		
+		String orderType = request.getParameter("orderType");
+		if(orderType == null) {
+			orderType = "registerday";
+		}
+		
+		String mstatus = request.getParameter("mstatus");
+		
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+		
+		paraMap.put("gender", gender);
+		paraMap.put("searchType", searchType);
+		paraMap.put("searchWord", searchWord);
+		paraMap.put("orderType", orderType);
+		paraMap.put("mstatus", mstatus);
+		paraMap.put("startDate", startDate);
+		paraMap.put("endDate", endDate);
+		paraMap.put("ageArr",ageArr);
+		
+		// System.out.println(startDate);
+		
+		if( ageArr != null ) {
+			String ageStr = Arrays.toString(ageArr);
+			ageStr = ageStr.substring(1, ageStr.length()-1);
+			paraMap.put("ageStr",ageStr);
+		}
+		
+		totalCount = service.getTotalCountMember(paraMap);	
+		mav.addObject("totalCount", totalCount);
+		
+		// 총 회원 수 
+		int totalMember = service.getTotalMember();
+		mav.addObject("totalMember", totalMember);
+		
+		totalPage = (int)Math.ceil( (double)totalCount/sizePerPage );
+		
+		// 게시판에 보여지는 초기화면 
+		if(str_currentShowPageNO == null ) {
+			currentShowPageNO = 1;  // 첫 페이지는 1페이지 
+		}
+		else {
+			try {
+				currentShowPageNO = Integer.parseInt(str_currentShowPageNO);
+			
+				if(currentShowPageNO < 1 || currentShowPageNO > totalPage) {
+					currentShowPageNO = 1;
+				}
+			} catch (NumberFormatException e) {
+				currentShowPageNO = 1;
+			}
+		}
+		
+		startRno = ((currentShowPageNO-1)*sizePerPage) + 1;
+		endRno = startRno + sizePerPage -1;
+		paraMap.put("startRno", String.valueOf(startRno));
+		paraMap.put("endRno", String.valueOf(endRno));
+		
+		// 페이징 처리한 글목록 보여주기 (검색어 유무와는 상관 없음. 모두 포함함)
+		memberList = service.memberListWithPaging(paraMap); 
+		
+		// 검색어 값을 유지시키기 위함 
+		mav.addObject("paraMap",paraMap);
+		
+		// === 페이지바 만들기 === /// 
+		String pagebar = "<ul>";
+		
+		int blockSize = 5;
+		// blockSize 는 1개 블럭(토막)당 보여지는 페이지번호의 갯수 이다.
+		
+		int loop = 1;
+		
+		int pageNo = ((currentShowPageNO - 1)/blockSize) * blockSize + 1;
+		// *** !! 공식이다. !! *** //
+		
+		String url = "adminMember_list.bc";	
+		// *** [이전] 만들기 *** //    
+		if(pageNo != 1) {
+		if( ageArr == null & gender == null & mstatus == null ) {
+		
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+ (pageNo-1)
+			+"&startDate="+startDate+"&endDate="+endDate
+			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+			+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+		}
+		else if( ageArr != null & gender == null & mstatus == null ) {
+			String ageurl = "";
+			for (int i = 0; i < ageArr.length; i++) {
+				ageurl += "&age=" + ageArr[i] ;
+			}
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
+			+ageurl+"&startDate="+startDate+"&endDate="+endDate
+			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+			+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+			
+		}
+		else if( ageArr == null & gender != null & mstatus == null ) {
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
+			+"&startDate="+startDate+"&endDate="+endDate
+			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+			+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+		}
+		else if( ageArr == null & gender == null & mstatus != null ) {
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
+			+"&startDate="+startDate+"&endDate="+endDate
+			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+			+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+			
+		}
+		else if( ageArr != null & gender != null & mstatus == null ) {
+			String ageurl = "";
+			for (int i = 0; i < ageArr.length; i++) {
+				ageurl += "&age=" + ageArr[i] ;
+			}
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
+			+ageurl+"&startDate="+startDate+"&endDate="+endDate
+			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+			+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+		}
+		else if( ageArr != null & gender == null & mstatus != null ) {
+			String ageurl = "";
+			for (int i = 0; i < ageArr.length; i++) {
+				ageurl += "&age=" + ageArr[i] ;
+			}
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
+			+ageurl+"&startDate="+startDate+"&endDate="+endDate
+			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+			+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+		}
+		else if( ageArr == null & gender != null & mstatus != null ) {
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1)  + "&gender="+gender
+			+"&startDate="+startDate+"&endDate="+endDate
+			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+			+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+		}
+		else if( ageArr != null & gender != null & mstatus != null ) {
+			String ageurl = "";
+			for (int i = 0; i < ageArr.length; i++) {
+				ageurl += "&age=" + ageArr[i] ;
+			}
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
+			+ageurl+"&startDate="+startDate+"&endDate="+endDate
+			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+			+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+			}
+		}
+		
+		while( !(loop>blockSize || pageNo>totalPage) ) {
+		
+			if(pageNo == currentShowPageNO) {
+				pagebar += "&nbsp;<span style='color: red; border: 1px solid gray; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";				
+			}
+			else {
+			
+				if( ageArr == null & gender == null & mstatus == null ) {
+				
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+				+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+			}
+			else if( ageArr != null & gender == null & mstatus == null ) {
+				String ageurl = "";
+				for (int i = 0; i < ageArr.length; i++) {
+					ageurl += "&age=" + ageArr[i] ;
+				}
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+				+ageurl+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+			
+			}
+			else if( ageArr == null & gender != null & mstatus == null ) {
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+				+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+			
+			}
+			else if( ageArr == null & gender == null & mstatus != null ) {
+				pagebar += "&nbsp;<a style='color:black;'  href='"+url+"?&currentShowPageNO="+pageNo 
+				+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				
+			}
+			else if( ageArr != null & gender != null & mstatus == null ) {
+				String ageurl = "";
+				for (int i = 0; i < ageArr.length; i++) {
+					ageurl += "&age=" + ageArr[i] ;
+				}
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+				+ageurl+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+			}
+			else if( ageArr != null & gender == null & mstatus != null ) {
+					String ageurl = "";
+				for (int i = 0; i < ageArr.length; i++) {
+					ageurl += "&age=" + ageArr[i] ;
+				}
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
+				+ageurl+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+			}
+			else if( ageArr == null & gender != null & mstatus != null ) {
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo  + "&gender="+gender
+				+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+			}
+			else if( ageArr != null & gender != null & mstatus != null ) {
+				String ageurl = "";
+				for (int i = 0; i < ageArr.length; i++) {
+					ageurl += "&age=" + ageArr[i] ;
+				}
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+				+ageurl+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				}
+			
+			}  
+			loop++;
+			pageNo++;
+		}// end of while---------------------------------
+		
+		// *** [다음] 만들기 *** //
+		if( !(pageNo>totalPage) ) {
+		
+			if( ageArr == null & gender == null & mstatus == null ) {
+			
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+				+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+			}
+			else if( ageArr != null & gender == null & mstatus == null ) {
+				String ageurl = "";
+				for (int i = 0; i < ageArr.length; i++) {
+					ageurl += "&age=" + ageArr[i] ;
+				}
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+				+ageurl+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+			
+			}
+			else if( ageArr == null & gender != null & mstatus == null ) {
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+				+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+				
+			}
+			else if( ageArr == null & gender == null & mstatus != null ) {
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
+				+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+				
+			}
+			else if( ageArr != null & gender != null & mstatus == null ) {
+				String ageurl = "";
+				for (int i = 0; i < ageArr.length; i++) {
+					ageurl += "&age=" + ageArr[i] ;
+				}
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+				+ageurl+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+			}
+			else if( ageArr != null & gender == null & mstatus != null ) {
+				String ageurl = "";
+				for (int i = 0; i < ageArr.length; i++) {
+					ageurl += "&age=" + ageArr[i] ;
+				}
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
+				+ageurl+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+			}
+			else if( ageArr == null & gender != null & mstatus != null ) {
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo  + "&gender="+gender
+				+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+			}
+			else if( ageArr != null & gender != null & mstatus != null ) {
+				String ageurl = "";
+				for (int i = 0; i < ageArr.length; i++) {
+					ageurl += "&age=" + ageArr[i] ;
+				}
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+				+ageurl+"&startDate="+startDate+"&endDate="+endDate
+				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+			}
+		
+		}
+		
+		pagebar += "</ul>";
+		
+		mav.addObject("pagebar", pagebar);
+		
+		///////////////////////////////////////////////////////////////////////////////////
+		
+		String gobackURL = MyUtil.getCurrentURL(request); // 우리가 만든 URL 알아오는 메소드 
+		mav.addObject("gobackURL", gobackURL);
+		
+		///////////////////////////////////////////////////////////////////////////////////
+		mav.addObject("memberList", memberList);
+		
 		mav.setViewName("tilesSB/adminMember_list.tilesSBM");
+		return mav;
+	}
+	
+	// 엑셀 다운 
+	@RequestMapping(value="/memberExcelFile.bc", method= {RequestMethod.POST})
+	public String memberExcelFile(HttpServletRequest request, Model model){
+		List<SmhMemberVO> memberList = null;
+		
+		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
+		
+		int totalCount = 0; // 총 게시물 건수
+		int sizePerPage = 5;  // 한 페이지당 보여줄 게시물 수
+		int currentShowPageNO = 0 ;// 현재 보여주는 페이지번호로서, 초기치로는 1페이지로 설정함
+		int totalPage = 0 ; // 총 페이지수(웹브라우저상에 보여줄 총 페이지 갯수, 페이지바)
+		
+		int startRno = 0;  // 시작 행번호
+		int endRno = 0; // 끝 행번호 
+		
+		String gender = request.getParameter("gender");
+		String[] ageArr = request.getParameterValues("age");
+	
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		
+		if(startDate == null) {
+			startDate="";
+		}
+		if(endDate == null) {
+			endDate="";
+		}
+		
+		String searchType = request.getParameter("searchType"); 
+		String searchWord = request.getParameter("searchWord");
+		
+		if(searchWord==null|| searchWord.trim().isEmpty() ) {
+			searchWord = "";
+		}
+		
+		String orderType = request.getParameter("orderType");
+		if(orderType == null) {
+			orderType = "registerday";
+		}
+			
+		String mstatus = request.getParameter("mstatus");
+		
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+		
+		paraMap.put("gender", gender);
+		paraMap.put("searchType", searchType);
+		paraMap.put("searchWord", searchWord);
+		paraMap.put("orderType", orderType);
+		paraMap.put("mstatus", mstatus);
+		paraMap.put("startDate", startDate);
+		paraMap.put("endDate", endDate);
+		paraMap.put("ageArr",ageArr);
+		paraMap.put("startRno", "");
+		paraMap.put("endRno", "");
+		
+		memberList = service.memberListWithPaging(paraMap);
+		
+		// 엑셀 파일 전체를 워크북이라고 부름
+		SXSSFWorkbook workbook = new SXSSFWorkbook();
+		
+		// 시트 생성
+		SXSSFSheet sheet = workbook.createSheet("여기는어때 회원 리스트"); // "시트 이름 지정"
+		
+		// 시트 열 너비 설정  (원하는 열 개수만큼)
+		sheet.setColumnWidth(0,3000); // 컬럼 인덱스 : 0부터 시작
+		sheet.setColumnWidth(1,4000); 
+		sheet.setColumnWidth(2,8000); 
+		sheet.setColumnWidth(3,4000); 
+		sheet.setColumnWidth(4,3000);
+		sheet.setColumnWidth(5,1500); 
+		sheet.setColumnWidth(6,1500); 
+		sheet.setColumnWidth(7,3000);
+		sheet.setColumnWidth(8,3000); 
+		
+		// 행 위치를 나타내는 변수 선언 (행 인덱스 : 0부터 시작)
+		int rowLocation = 0;
+		
+		/////////////////////////////////////////CELL STYLE///////////////////////////////////////////////
+		// == CellStyle 정렬하기(Alignment) == //
+		// CellStyle 객체를 생성하여 Alignment 세팅하는 메소드를 호출해서 인자값을 넣어준다.
+		// 아래는 HorizontalAlignment(가로)와 VerticalAlignment(세로)를 모두 가운데 정렬 시켰다.
+		CellStyle mergeRowStyle = workbook.createCellStyle();          // 표 제목 단 설정  
+		mergeRowStyle.setAlignment(HorizontalAlignment.CENTER);        // 가로 가운데 정렬 
+		mergeRowStyle.setVerticalAlignment(VerticalAlignment.CENTER);  // 세로 가운데  정렬 
+		// import org.apache.poi.ss.usermodel.VerticalAlignment 으로 해야함.
+		
+		CellStyle headerStyle = workbook.createCellStyle();          // 컬럼명 설정  
+		headerStyle.setAlignment(HorizontalAlignment.CENTER);        // 가로 가운데  정렬 
+		headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);  // 세로  가운데 정렬 
+		
+		// == CellStyle 배경색(ForegroundColor)만들기 == //
+		// setFillForegroundColor 메소드에 IndexedColors Enum인자를 사용한다.
+		// setFillPattern은 해당 색을 어떤 패턴으로 입힐지를 정한다.
+		// mergeRowStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND); 
+		// mergeRowStyle : 표 제목 단  		
+		
+		headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex()); // IndexedColors.LIGHT_YELLOW.getIndex() 는 연한노랑의 인덱스값을 리턴시켜준다.  
+		headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		// mergeRowStyle : 컬럼명  
+		
+		// == Cell 폰트(Font) 설정하기 == //
+		// 폰트 적용을 위해 POI 라이브러리의 Font 객체를 생성해준다.
+		// 해당 객체의 세터를 사용해 폰트를 설정해준다. 대표적으로 글씨체, 크기, 색상, 굵기만 설정한다.
+		// 이후 CellStyle의 setFont 메소드를 사용해 인자로 폰트를 넣어준다.
+		Font mergeRowFont = workbook.createFont(); // import org.apache.poi.ss.usermodel.Font; 으로 한다.
+		mergeRowFont.setFontName("나눔고딕");
+		mergeRowFont.setFontHeight((short)400);
+		mergeRowFont.setColor(IndexedColors.DARK_RED.getIndex());
+		mergeRowFont.setBold(true);
+		
+		mergeRowStyle.setFont(mergeRowFont);   // 표 제목 단에 해당 폰트를 설정한다.
+		
+		
+		// == CellStyle 테두리 Border == //
+		// 테두리는 각 셀마다 상하좌우 모두 설정해준다.
+		// setBorderTop, Bottom, Left, Right 메소드와 인자로 POI라이브러리의 BorderStyle 인자를 넣어서 적용한다.
+		headerStyle.setBorderTop(BorderStyle.THICK);   // 상하는 굵게
+		headerStyle.setBorderBottom(BorderStyle.THICK);
+		headerStyle.setBorderLeft(BorderStyle.THIN);  // 왼쪽, 오른쪽은 얇게
+		headerStyle.setBorderRight(BorderStyle.THIN);
+		
+		// == Cell Merge 셀 병합시키기 == //
+		/* 셀병합은 시트의 addMergeRegion 메소드에 CellRangeAddress 객체를 인자로 하여 병합시킨다.
+		   CellRangeAddress 생성자의 인자로(시작 행, 끝 행, 시작 열, 끝 열) 순서대로 넣어서 병합시킬 범위를 정한다. 배열처럼 시작은 0부터이다.  
+		*/
+		// 병합할 행 만들기
+		Row mergeRow = sheet.createRow(rowLocation);  // 엑셀에서 행의 시작은 0 부터 시작한다.
+		
+		// 병합할 행에 우리회사 사원정보로 셀을 만들어 셀에 스타일을 주기 
+		for(int i=0; i<9; i++) {  
+			Cell cell = mergeRow.createCell(i);
+			cell.setCellStyle(mergeRowStyle);  // 해당 셀에 표 제목단 스타일을 설정 
+			cell.setCellValue("여기는어때 회원 리스트");  // 해당 셀에 데이터 값 입력 
+		}
+		
+		// 셀 병합하기 
+		sheet.addMergedRegion(new CellRangeAddress(rowLocation, rowLocation, 0, 8)); // 시작 행, 끝 행, 시작 열, 끝 열 
+		
+		// == CellStyle 천단위 쉼표, 금액 == // 
+		CellStyle moneyStyle = workbook.createCellStyle();
+		moneyStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0"));
+		////////////////////////////////////////////////////////////////////////////////////////	
+		CellStyle centerStyle = workbook.createCellStyle();            
+		centerStyle.setAlignment(HorizontalAlignment.CENTER); 
+		
+		// 헤더 행 생성 
+		Row headerRow = sheet.createRow(++rowLocation); // 엑셀 기준 두번째 행부터 시작한다는 뜻 (첫번째 행은 비움) => rowLocation = 1
+		                                                // ++rowLocation : 전위연산자
+		
+		// 헤더 행의 첫번째 열 셀 생성
+        Cell headerCell = headerRow.createCell(0); // 엑셀에서 열의 시작은 0 부터 시작한다.
+        headerCell.setCellValue("회원번호");
+        headerCell.setCellStyle(headerStyle);
+        
+        // 헤더 행의 두번째 열 셀 생성
+        headerCell = headerRow.createCell(1);
+        headerCell.setCellValue("이름");
+        headerCell.setCellStyle(headerStyle);
+        
+        // 헤더 행의 세번째 열 셀 생성
+        headerCell = headerRow.createCell(2);
+        headerCell.setCellValue("이메일");
+        headerCell.setCellStyle(headerStyle);
+        
+        // 헤더 행의 네번째 열 셀 생성
+        headerCell = headerRow.createCell(3);
+        headerCell.setCellValue("휴대폰번호");
+        headerCell.setCellStyle(headerStyle);
+        
+        // 헤더 행의 다섯번째 열 셀 생성
+        headerCell = headerRow.createCell(4);
+        headerCell.setCellValue("가입일자");
+        headerCell.setCellStyle(headerStyle);
+        
+        // 헤더 행의 여섯번째 열 셀 생성
+        headerCell = headerRow.createCell(5);
+        headerCell.setCellValue("성별");
+        headerCell.setCellStyle(headerStyle);
+        
+        // 헤더 행의 일곱번째 열 셀 생성
+        headerCell = headerRow.createCell(6);
+        headerCell.setCellValue("나이");
+        headerCell.setCellStyle(headerStyle);
+        
+        // 헤더 행의 여덟번째 열 셀 생성
+        headerCell = headerRow.createCell(7);
+        headerCell.setCellValue("누적결제액");
+        headerCell.setCellStyle(headerStyle);
+        
+        // 헤더 행의 여덟번째 열 셀 생성
+        headerCell = headerRow.createCell(8);
+        headerCell.setCellValue("누적예약수");
+        headerCell.setCellStyle(headerStyle);
+        
+        // HR사원정보 내용(Body)에 해당하는 행 및 셀 생성하기 
+        Row bodyRow = null;
+        Cell bodyCell = null;
+        
+        for(int i=0; i<memberList.size(); i++) {  // DB에서 읽어온 결과물 : empList 
+        	
+        	SmhMemberVO membervo = memberList.get(i);
+            
+            // 행 생성
+            bodyRow = sheet.createRow( i + (rowLocation+1) );  // rowLocation : 1 => index : 2 => 3번째 행 부터 시작  
+         
+            bodyCell = bodyRow.createCell(0);
+            bodyCell.setCellValue(membervo.getMember_idx());
+            bodyCell.setCellStyle(centerStyle);           
+            
+            bodyCell = bodyRow.createCell(1);
+            bodyCell.setCellValue(membervo.getName());
+            bodyCell.setCellStyle(centerStyle);  
+            
+            bodyCell = bodyRow.createCell(2);
+            bodyCell.setCellValue(membervo.getEmail());
+            bodyCell.setCellStyle(centerStyle);  
+            
+            bodyCell = bodyRow.createCell(3);
+            if( membervo.getHp1() != null ) {
+            	bodyCell.setCellValue(membervo.getHp1() + "-" + membervo.getHp2() + "-" + membervo.getHp3());
+                bodyCell.setCellStyle(centerStyle);  
+            }
+            else {
+            	bodyCell.setCellValue("--");
+                bodyCell.setCellStyle(centerStyle);  
+            }
+         
+            bodyCell = bodyRow.createCell(4);
+            bodyCell.setCellValue(membervo.getRegisterday());
+            bodyCell.setCellStyle(centerStyle);  
+            
+            // 데이터 성별 
+            if ( "1".equals(membervo.getGender() )) {
+            	bodyCell = bodyRow.createCell(5);
+            	bodyCell.setCellValue("남");
+                bodyCell.setCellStyle(centerStyle);  
+            }
+            else {
+            	bodyCell = bodyRow.createCell(5);
+            	bodyCell.setCellValue("여");
+                bodyCell.setCellStyle(centerStyle);  
+            }
+             
+            // 데이터 나이 
+            bodyCell = bodyRow.createCell(6);
+            bodyCell.setCellValue( membervo.getAge());
+            bodyCell.setCellStyle(centerStyle);  
+          
+            // 누적 결제액 
+            bodyCell = bodyRow.createCell(7);
+         /*   bodyCell.setCellValue(Integer.parseInt(membrvo.get("AGE")));
+            bodyCell.setCellStyle(moneyStyle);   // 천단위 스타일 적용 
+*/        	
+            // DB에서 값을 읽어올 때 디폴트는 String 이므로, (사칙연산이) 필요한 경우 숫자로 바꿔야 한다.
+          
+            // 누적 예약수
+            bodyCell = bodyRow.createCell(8);
+      /*      bodyCell.setCellValue(Integer.parseInt(empMap.get("AGE")));
+            bodyCell.setCellStyle(moneyStyle);   // 천단위 스타일 적용 
+*/            
+        } // end of for----------------------------------
+        
+        // request.setAttribute("key 값", 넘길 데이터 ) 역할
+        model.addAttribute("locale", Locale.KOREA);  // 지역 표시를 해주는 것 (통화 단위 등을 한국에 맞춰줌)
+        model.addAttribute("workbook", workbook);
+        model.addAttribute("workbookName", "여기는어때 회원 리스트");
+		
+		return "excelDownloadView";  // excelDownloadView 라는 bean 호출  (DB 결과물을 엑실파일로 만든 것. html 파일을 엑셀로 만든 것  X)
+								     // 해당 bean 은  com.test.excel.ExcelDownloadView 라는 클래스를 작동시킴 
+		
+	}
+	
+	// 차트 생성 (성별, 인원별 인원) //
+	@ResponseBody
+	@RequestMapping(value="/chartMemberCount.bc", produces="text/plain;charset=UTF-8")
+	public String chartMemberCount() {
+	
+		List<HashMap<String, String>> memberCountList = service.chartMemberCount();
+		
+		Gson gson = new Gson();
+		JsonArray jsonArr = new JsonArray();   // JSONArray (org.json) 와 다름 
+		
+		if(memberCountList != null ) {
+			for ( HashMap<String, String> map : memberCountList ) { 
+				
+				JsonObject jsonObj = new JsonObject();  // JSONObject (org.json) 와 다름 
+				
+				jsonObj.addProperty("age", map.get("age"));
+				jsonObj.addProperty("gender", map.get("gender"));
+				jsonObj.addProperty("count", map.get("count"));
+				jsonObj.addProperty("PERCENTAGE", map.get("PERCENTAGE"));
+				
+				jsonArr.add(jsonObj);
+			}
+		}
+		return gson.toJson(jsonArr);  
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/chartMemberTrend.bc", produces="text/plain;charset=UTF-8")
+	public String chartMemberTrend() {
+		List<HashMap<String, String>> memberCountList = service.chartMemberTrend();
+		
+		Gson gson = new Gson();
+		JsonArray jsonArr = new JsonArray();   // JSONArray (org.json) 와 다름 
+		
+		if(memberCountList != null ) {
+			for ( HashMap<String, String> map : memberCountList ) { 
+				
+				JsonObject jsonObj = new JsonObject();  // JSONObject (org.json) 와 다름 
+				
+				jsonObj.addProperty("age", map.get("age"));
+				jsonObj.addProperty("gender", map.get("gender"));
+				jsonObj.addProperty("registerday", map.get("registerday"));
+				jsonObj.addProperty("count", map.get("count"));
+				jsonObj.addProperty("PERCENTAGE", map.get("PERCENTAGE"));
+				
+				jsonArr.add(jsonObj);
+			}
+		}
+		return gson.toJson(jsonArr);  
+	}	
+	@RequestMapping(value="/memberDetail.bc")
+	public ModelAndView adminMemberDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		
+		String member_idx = request.getParameter("member_idx");
+		
+		SmhMemberVO membervo = service.getOneMember(member_idx);
+		mav.addObject("membervo", membervo);
+		mav.setViewName("tilesSB/memberDetail.tilesSBM");
 		return mav;
 	}
 	
 	@RequestMapping(value="/adminMember_chart.bc")
 	public ModelAndView adminMember_list(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		int totalMember = service.getTotalMember();
+		mav.addObject("totalMember", totalMember);
 		mav.setViewName("tilesSB/adminMember_chart.tilesSBM");
 		return mav;
 	}
+	
+	
+	////////////////////////////////
 	
 	@RequestMapping(value="/adminSeller_list.bc")
 	public ModelAndView adminSeller_list(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
@@ -131,12 +836,6 @@ public class PsbController {
 	@RequestMapping(value="/adminReservList.bc")
 	public ModelAndView adminReservList(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		mav.setViewName("tilesSB/adminReservList.tilesSBSAT");
-		return mav;
-	}
-	
-	@RequestMapping(value="/memberDetail.bc")
-	public ModelAndView adminMemberDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
-		mav.setViewName("tilesSB/memberDetail.tilesSBM");
 		return mav;
 	}
 

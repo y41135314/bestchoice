@@ -24,12 +24,12 @@
 	
 		<if test="fk_seq == '' "> 
 	 	insert into tbl_here_adminBoard(adminBoard_idx, fk_adminId, name, fk_hotelName, fk_sellerName, registerday, title, content, groupno, fk_seq, depthno)
-		values(seq_tbl_here_adminBoard.nextval, #{fk_adminId}, #{name}, #{fk_hotelName}, #{fk_sellerName}, default, #{title}, #{content}, #{groupno}, default, default )
+		values(seq_here_adminBoard.nextval, #{fk_adminId}, #{name}, #{fk_hotelName}, #{fk_sellerName}, default, #{title}, #{content}, #{groupno}, default, default )
 	 	</if>
 	 	
 	 	<if test="fk_seq != '' "> 
 	 	insert into tbl_here_adminBoard(adminBoard_idx, fk_adminId,  name, fk_hotelName, fk_sellerName, registerday, title, content, groupno, fk_seq, depthno)
-		values(seq_tbl_here_adminBoard.nextval, #{fk_adminId}, #{name}, #{fk_hotelName}, #{fk_sellerName}, default, #{title}, #{content}, #{groupno}, #{fk_seq}, #{depthno}+1) 
+		values(seq_here_adminBoard.nextval, #{fk_adminId}, #{name}, #{fk_hotelName}, #{fk_sellerName}, default, #{title}, #{content}, #{groupno}, #{fk_seq}, #{depthno}+1) 
 		</if>
 	 	
 	</insert>
@@ -38,12 +38,12 @@
 	<insert id="add_withFile" parameterType="com.project.psb.BoardVO"> 
 	 	<if test='fk_seq.equals("")'>
 	 		insert into tbl_here_adminBoard(adminBoard_idx, fk_adminId, name, fk_hotelName, fk_sellerName, registerday, title, content, groupno, fk_seq, depthno, fileName, orgFilename, fileSize)
-			values(seq_tbl_here_adminBoard.nextval, #{fk_adminId}, #{name}, #{fk_hotelName}, #{fk_sellerName}, default, #{title}, #{content}, #{groupno}, default, default, #{fileName}, #{orgFilename}, #{fileSize} )
+			values(seq_here_adminBoard.nextval, #{fk_adminId}, #{name}, #{fk_hotelName}, #{fk_sellerName}, default, #{title}, #{content}, #{groupno}, default, default, #{fileName}, #{orgFilename}, #{fileSize} )
 	 	</if>
 		
 		<if test='!fk_seq.equals("")'>
 			insert into tbl_here_adminBoard(adminBoard_idx,fk_adminId, name, fk_hotelName, fk_sellerName, registerday, title, content, groupno, fk_seq, depthno, fileName, orgFilename, fileSize)
-			values(seq_tbl_here_adminBoard.nextval, #{fk_adminId}, #{name}, #{fk_hotelName}, #{fk_sellerName}, default, #{title}, #{content}, #{groupno}, #{fk_seq}, #{depthno}+1,#{fileName}, #{orgFilename}, #{fileSize} )
+			values(seq_here_adminBoard.nextval, #{fk_adminId}, #{name}, #{fk_hotelName}, #{fk_sellerName}, default, #{title}, #{content}, #{groupno}, #{fk_seq}, #{depthno}+1,#{fileName}, #{orgFilename}, #{fileSize} )
 		</if>
 	 </insert>  
 	 
@@ -62,16 +62,16 @@
 	 
 	 <select id="boardListWithPaging" parameterType="HashMap" resultType="com.project.psb.BoardVO"> 
 		select rno, adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday
-	     	    , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize 
+	     	    , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize ,fk_adminId
 		from 
 		(
-		    select rownum AS rno,
+		    select rownum AS rno,fk_adminId,
 		           adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday
 	     	        , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize 
 		    from
 		    (
 		        select  adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, to_char(registerday, 'yyyy-mm-dd hh24:mi:ss') as registerday      
-	     		        , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize
+	     		        , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize,fk_adminId
 		        from tbl_here_adminBoard
 		        where status = 1
 		     <if test='searchWord != "" '>   
@@ -86,28 +86,40 @@
 	</select>
 	
 	<select id="getView" parameterType="String" resultType="com.project.psb.BoardVO">
-  	 	select previousseq, previoussubject, 
-		       adminBoard_idx, fk_adminId, name, title,content, fk_sellerName, fk_hotelName, registerday,
+  	 	select previousseq, previoussubject, rno,
+		       adminBoard_idx, fk_adminId, name, title,  groupno, fk_seq, depthno,content, fk_sellerName, fk_hotelName, registerday,
 		       nextseq, nextsubject 
 		     , commentCount
-		     , groupno, fk_seq, depthno
 		     , fileName, orgFilename, fileSize
 		from 
-		(
-		      select lag(adminBoard_idx, 1) over(order by groupno desc, adminBoard_idx) as previousseq
-		         , lag(title, 1) over(order by groupno desc, adminBoard_idx) as previoussubject
+		( select lag(adminBoard_idx, 1) over(order by rno  ) as previousseq
+		         , lag(title, 1) over(order by rno ) as previoussubject
 		         ,  adminBoard_idx, fk_adminId, name, title, content, fk_sellerName, fk_hotelName
-		         , to_char(registerday, 'yyyy-mm-dd hh24:mi:ss') as registerday
-		         , lead(adminBoard_idx, 1) over(order by groupno desc, adminBoard_idx) as nextseq
-		         , lead(title, 1) over(order by groupno desc, adminBoard_idx) as nextsubject
+		         , registerday
+		         , lead(adminBoard_idx, 1) over(order by rno ) as nextseq
+		         , lead(title, 1) over(order by rno ) as nextsubject
 		         , commentCount
 		         , groupno, fk_seq, depthno
-		         , fileName, orgFilename, fileSize
-		    from tbl_here_adminBoard
-		    where status = 1
+		         , fileName, orgFilename, fileSize, rno
+		    from
+            (  
+                select rownum AS rno, fk_adminId
+                        ,adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday
+                      , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize 
+                from 
+                (
+                    select  adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, to_char(registerday, 'yyyy-mm-dd hh24:mi:ss') as registerday      
+                              , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize, fk_adminId
+                    from tbl_here_adminBoard
+                    where status = 1
+                    start with fk_seq = 0
+                    connect by prior adminBoard_idx = fk_seq
+                    order siblings by groupno desc, adminBoard_idx asc
+                )        
+            )
 		) V
 		where V.adminBoard_idx = #{adminBoard_idx}
-        order by groupno desc, adminBoard_idx 
+        order by rno
 	 </select>
 	 
 	 <update id="edit" parameterType="com.project.psb.BoardVO">
@@ -129,5 +141,196 @@
 		update tbl_here_adminBoard set status = 0 
 		where adminBoard_idx = #{adminBoard_idx}
 	</update>
+	
+	<!--  === 댓글쓰기(tblComment 테이블에 insert) === -->
+	 <insert id="addComment" parameterType="com.project.psb.CommentVO">
+    	insert into tbl_here_adminComment(adminComment_idx, fk_parentIdx, name, fk_adminId, registerday, content)
+        values(seq_here_adminComment.nextval, #{fk_parentIdx}, #{name}, #{fk_adminId}, default, #{content})
+    </insert>
+    
+    <!--  === 게시판 commentCount 컬럼의 값을 1증가(update) === -->  
+	 <update id="updateCommentCount" parameterType="String">
+    	update tbl_here_adminBoard set commentCount = commentCount + 1 
+    	where adminBoard_idx = #{fk_parentIdx}
+    </update>
+    
+    <!-- === 댓글 조회 === -->
+     <select id="getCommentList" parameterType="String" resultType="com.project.psb.CommentVO"> 
+     	select name, fk_adminId, content, to_char(registerday, 'yyyy-mm-dd hh24:mi:ss') as registerday, adminComment_idx ,fk_parentIdx
+     	from tbl_here_adminComment
+     	where fk_parentIdx = #{adminBoard_idx}
+     	order by adminComment_idx desc
+     </select>
+     
+     <delete id="adDelComment" parameterType="String">
+     	delete tbl_here_adminComment 
+     	where adminComment_idx = #{adminComment_idx}
+	 </delete>
+	 
+	 <!--  === 게시판 commentCount 컬럼의 값을 1증가(update) === -->  
+	 <update id="minusCount" parameterType="String">
+    	update tbl_here_adminBoard set commentCount = commentCount - 1 
+    	where adminBoard_idx = #{fk_parentIdx}
+    </update>
+	 
+	 <select id="getViewComment" parameterType="String" resultType="com.project.psb.CommentVO"> 
+     	select name, fk_adminId, content, to_char(registerday, 'yyyy-mm-dd hh24:mi:ss') as registerday, adminComment_idx,fk_parentIdx
+     	from tbl_here_adminComment
+     	where adminComment_idx = #{adminComment_idx}
+     </select>
+     
+     <!-- 댓글 수정  -->
+     <update id="updateComment" parameterType="HashMap">
+    	update tbl_here_adminComment set content = #{content}
+    	where adminComment_idx = #{adminComment_idx}
+    </update>
+     
+     <!--  ===================================== 회원 ==================================== -->
+     <select id="getTotalCountMember" resultType="int" parameterType="HashMap">
+     	select count(*) 
+		from
+		(
+		select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+		        trunc(age,-1) AS age,
+		        mstatus, clientip, registerday, lastlogindate, lastpwdchangedate
+		from 
+		    (
+		    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+		            extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
+		            mstatus, clientip, to_char(registerday,'yyyymmdd') AS registerday, lastlogindate, lastpwdchangedate
+		    from tbl_here_member
+		    )
+		  
+	 	<if test="ageArr == null">
+			where trunc(age,-1) in (10,20,30,40,50,60,70,80,90)
+		</if>
+		<if test="ageArr != null">
+			where trunc(age,-1) in (
+			<!-- 10,20 -->
+			<foreach collection="ageArr" item="age" separator=",">
+				#{age}
+			</foreach> 
+			)
+		</if> 
+			 <if test='gender != null '>   
+		        and gender = #{gender}
+		     </if> 
+		     <if test='mstatus != null '>   
+		        and mstatus = #{mstatus}
+		     </if>
+		      <if test='searchWord != "" '>   
+		        and ${searchType} like '%'|| #{searchWord} ||'%'
+		     </if> 
+			 <if test='startDate != null and startDate != "" '>
+			 	<if test='endDate != null and endDate != "" '> 
+		       and registerday between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+		     	</if>
+		     </if> 
+		 order by ${orderType} desc
+		 )
+     </select>
+     
+      <select id="getTotalMember" resultType="int">
+     	select count(*) 
+		from tbl_here_member
+     </select>
+    
+      <select id="memberListWithPaging"  parameterType="HashMap" resultType="com.project.smh.SmhMemberVO">
+     	select rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+		        age, 
+		        mstatus, clientip, to_char(registerday,'yyyy-mm-dd') AS registerday, lastlogindate, lastpwdchangedate
+		from
+		(
+		select rownum AS rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+		       age, 
+		        mstatus, clientip, registerday, lastlogindate, lastpwdchangedate
+		from 
+		    (
+		    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+		            extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
+		            mstatus, clientip, registerday, lastlogindate, lastpwdchangedate
+		    from tbl_here_member
+		    )
+		  
+	 	<if test="ageArr == null">
+			where trunc(age,-1) in (10,20,30,40,50,60,70,80,90)
+		</if>
+		<if test="ageArr != null">
+			where trunc(age,-1) in (
+			<!-- 10,20 -->
+			<foreach collection="ageArr" item="age" separator=",">
+				#{age}
+				<if test='age == 70 '>   
+		        ,80,90
+		     	</if>
+			</foreach> 
+			)
+		</if> 
+			 <if test='gender != null '>   
+		        and gender = #{gender}
+		     </if> 
+		     <if test='mstatus != null '>   
+		        and mstatus = #{mstatus}
+		     </if>
+		      <if test='searchWord != "" '>   
+		        and ${searchType} like '%'|| #{searchWord} ||'%'
+		     </if> 
+			 <if test='startDate != null and startDate != "" '>
+			 	<if test='endDate != null and endDate != "" '> 
+		       and to_char(registerday,'yyyymmdd') between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+		     	</if>
+		     </if> 
+		 order by ${orderType} desc
+		 )
+		 <if test='startRno != "" and endRno != "" '> 
+		  where rno between #{startRno} and #{endRno}
+		 </if>
+		
+      </select>
+      
+      <select id="getOneMember" parameterType="String" resultType="com.project.smh.SmhMemberVO">
+      	 select member_idx, name, email, to_char(registerday,'yyyy-mm-dd') AS registerday,
+      	        gender,  extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
+      	        birthday ,mstatus
+      	 from tbl_here_member
+      	 where member_idx = #{member_idx}
+      </select>
+      
+     <resultMap type="HashMap" id="chartMemberCountMap">
+		<result property="age" column="age" javaType="String"/>  <!-- key 값과 컬럼명, 리턴값 타입 -->
+		<result property="gender" column="gender" javaType="String"/> 
+		<result property="count" column="count" javaType="String"/> 
+		<result property="PERCENTAGE" column="PERCENTAGE" javaType="String"/> 
+	</resultMap>
+    
+    <select id="chartMemberCount" resultMap="chartMemberCountMap">
+		select age, gender, count(*) AS count,  round(  ( count(*)  / ( select count(*) from tbl_here_member ) )* 100  , 2) AS PERCENTAGE
+		from 
+		( 
+		   select  trunc(extract(year from sysdate) - to_number(substr(birthday,1,4)),-1) AS age, gender
+		   from tbl_here_member
+		) V
+		group by cube(age, gender)
+		order by age, gender
+	</select>
+	
+	 <resultMap type="HashMap" id="chartMemberTrendMap">
+		<result property="age" column="age" javaType="String"/>  <!-- key 값과 컬럼명, 리턴값 타입 -->
+		<result property="gender" column="gender" javaType="String"/> 
+		<result property="registerday" column="registerday" javaType="String"/> 
+		<result property="count" column="count" javaType="String"/> 
+		<result property="PERCENTAGE" column="PERCENTAGE" javaType="String"/> 
+	</resultMap>
+	
+	<select id="chartMemberTrend" resultMap="chartMemberTrendMap">
+		select age, gender,  registerday, count(*) as count
+		from 
+		( 
+		   select  trunc(extract(year from sysdate) - to_number(substr(birthday,1,4)),-1) AS age, gender, to_char(registerday,'yyyy-mm') AS registerday
+		   from tbl_here_member
+		) V
+		group by cube(registerday, gender, age)
+		order by age, registerday, gender
+	</select>
 </mapper>
 

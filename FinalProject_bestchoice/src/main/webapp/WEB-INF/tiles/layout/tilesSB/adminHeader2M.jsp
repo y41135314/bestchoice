@@ -44,9 +44,9 @@
 	</p> 
 		  
 	<p id="adminInfo">
-	안녕하세요<br/>
-	관리자 <span style="font-weight: bold;"><%-- ${(sessionScope.loginadmin).name} --%> </span> 님 
+	안녕하세요! 관리자 <span style="font-weight: bold;">${(sessionScope.loginadmin).name} </span> 님 
 	</p>
+		    
 		    
 	<img id="iconHeader" style="height: 150px; width: 150px;" src="./resources/images/관리자헤더.png">
 

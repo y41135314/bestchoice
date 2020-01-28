@@ -54,6 +54,7 @@ nhn.husky.EZCreator = new (function(){
 		}catch(e){
 			elIFrame = document.createElement("IFRAME");
 			elIFrame.setAttribute("frameborder", "0");
+			elIFrame.setAttribute("id", "huskey_editor_jinto_set_id"); 
 			elIFrame.setAttribute("scrolling", "no");
 		}
 		

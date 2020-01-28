@@ -5,6 +5,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.project.smh.SmhMemberVO;
+
 
 @Service
 public class PsbService {
@@ -80,6 +86,80 @@ public class PsbService {
 	public int adBoardDel(BoardVO boardvo) {
 		int n = dao.adBoardDel(boardvo);
 		return n;
+	}
+
+	@Transactional(propagation=Propagation.REQUIRED, isolation= Isolation.READ_COMMITTED, rollbackFor={Throwable.class})
+	public int addComment(CommentVO commentvo) {
+		int result = 0;
+		int n = 0;
+		
+		n = dao.addComment(commentvo); // tblComment(댓글) 테이블에 insert 
+		
+		if(n==1) {
+			result = dao.updateCount(commentvo.getFk_parentIdx()); // tblBoard 테이블의 commentCount 컬럼 값을 1 증가 
+		}
+		
+		return result;
+	}
+
+	public List<CommentVO> getCommentList(String fk_parentIdx) {
+		List<CommentVO> commentList = dao.getCommentList(fk_parentIdx);
+		return commentList;
+	}
+
+	public int adDelComment(String adminComment_idx, String fk_parentIdx) {
+		int n = dao.adDelComment(adminComment_idx);
+		if(n==1) {
+			n = dao.minusCount(fk_parentIdx); // tblBoard 테이블의 commentCount 컬럼 값을 1 증가 
+		}
+		
+		return n;
+	}
+
+	public CommentVO getViewComment(String adminComment_idx) {
+		CommentVO commentvo = dao.getViewComment(adminComment_idx);
+		return commentvo;
+	}
+
+	public int updateComment(String adminComment_idx, String content) {
+		
+		HashMap<String,String> paraMap = new HashMap<String,String>();
+		paraMap.put("adminComment_idx", adminComment_idx);
+		paraMap.put("content",content);
+		int n = dao.updateComment(paraMap);
+		return n;
+	}
+
+	////////////////////////////////////////////////////////////////////////// 회원 
+	
+	public int getTotalCountMember(HashMap<String, Object> paraMap) {
+		int count = dao.getTotalCountMember(paraMap);
+		return count;
+	}
+
+	public int getTotalMember() {
+		int count = dao.getTotalMember();
+		return count;
+	}
+
+	public List<SmhMemberVO> memberListWithPaging(HashMap<String, Object> paraMap) {
+		List<SmhMemberVO> memberList = dao.memberListWithPaging(paraMap);
+		return memberList;
+	}
+
+	public SmhMemberVO getOneMember(String member_idx) {
+		SmhMemberVO membervo = dao.getOneMember(member_idx);
+		return membervo;
+	}
+
+	public List<HashMap<String, String>> chartMemberCount() {
+		List<HashMap<String, String>> memberCountList = dao.chartMemberCount();
+		return memberCountList;
+	}
+
+	public List<HashMap<String, String>> chartMemberTrend() {
+		List<HashMap<String, String>> memberCountList = dao.chartMemberTrend();
+		return memberCountList;
 	}
 	
 }
