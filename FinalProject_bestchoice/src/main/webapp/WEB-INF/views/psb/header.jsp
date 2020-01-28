@@ -202,7 +202,7 @@
 			</div>
 			</td>		
 
-			<td width="6%"><a href="<%=ctxPath%>/logout.bc">로그아웃</a></td>
+			<td width="6%"><a href="<%=ctxPath%>/main_logout.bc">로그아웃</a></td>
 		</c:if>
 		
 		<c:if test="${sessionScope.loginseller != null }">  
