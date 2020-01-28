@@ -100,6 +100,14 @@ public class PsbController {
 			session.removeAttribute("loginadmin");	
 		}
 		
+		if(session.getAttribute("loginuser") != null) {
+			session.removeAttribute("loginuser");	
+		}
+		
+		if(session.getAttribute("loginseller") != null) {
+			session.removeAttribute("loginseller");	
+		}
+		
 		mav.setViewName("psb/main");
 		return mav;
 	}
