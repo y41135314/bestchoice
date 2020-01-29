@@ -33,9 +33,10 @@ button {
  /* 메인 슬라이더 이미지  */
  .mySlides{	
 	height: 400px;
-	width: 1583px;
+	width: 2000px;
 	text-decoration:none;
 	margin: 0 auto;
+
 
 }
 /* 검색> text */
@@ -233,7 +234,7 @@ button {
 .slideshow-container1 {
   width: 528px;
   height: 251px;
-  padding-left: 250px;
+  padding-left: 410px;
   
 }
 
