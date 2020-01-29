@@ -14,5 +14,14 @@ public class DwsController {
 	
 	
 	
+
+	// 결제 페이지 뷰단 
+	@RequestMapping(value="/pay/reserve.bc")
+	public String faqMain(HttpServletRequest request) {
+
+		
+		return "dws/reserve";
+	} // end of eventMain -----------------------------------
+	
 	
 }

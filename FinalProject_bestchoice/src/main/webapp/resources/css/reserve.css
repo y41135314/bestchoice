@@ -1,0 +1,49 @@
+.reserve{ width: 1600px; margin: 0 auto; padding-top: 44px; color: #222222; }
+.reserve::after{ display: block; clear: both; content:""; }
+
+/* 결제 진행 영역 */
+.reserve .reserve-payment{ width: calc(69.73% - 44px); margin-right: 88px; float: left; }
+.reserve .reserve-payment .tit{ font-size: 19px; font-weight: 700; line-height: 1; margin-top: 54px; margin-bottom: 42px; }
+.reserve .reserve-payment .tit.tit-small{ margin-bottom: 19px; }
+.reserve .reserve-payment .tit:first-child{ margin-top: 0; }
+.reserve .reserve-payment .input-wrap label{ font-size: 18px; padding-bottom: 15px; line-height: 1; display: block; color: #707070; }
+.reserve .reserve-payment .input-wrap label b{ font-size: 16px; }
+.reserve .reserve-payment .input-wrap .input-element input[type="text"]{ width: 100%; border: 1px solid #eeeeee; border-radius: 4px; font-size: 18px; color: #707070; padding: 8px 14px; line-height: 1.45; box-sizing: border-box; height: 42px; }
+.reserve .reserve-payment .input-wrap .input-element.add-btn{ position: relative; padding-right: 138px }
+.reserve .reserve-payment .input-wrap .input-element.add-btn button{ position: absolute; right: 0; top: 0; text-align: center; background: #cccccc; color: #ffffff; width: 125px; border-radius: 4px; font-size: 15px; padding: 12px 0; }
+.reserve .reserve-payment .input-wrap .input-element.add-timer span{ position: absolute; top: 50%; right: 148px; transform: translateY(-50%); color: #ff0055; }
+.reserve .reserve-payment .input-wrap .txt-warning{ height: 46px; padding-top: 5px; font-size: 14px; color: #e61c51; }
+.reserve .reserve-payment .input-wrap .txt{ padding-bottom: 17px; font-size: 14px; }
+.reserve .reserve-payment .benefits-guide{ margin-top: 120px; text-align: center; background: #ff0055; color: #ffffff; }
+.reserve .reserve-payment .benefits-guide a{ display: block; width: 100%; padding: 22px 0; color: #ffffff; font-size: 15px; line-height:1.4 }
+.reserve .reserve-payment .benefits-guide a span{ padding-right: 14px; font-size: 16px; }
+.reserve .reserve-payment select{ box-sizing: border-box; width: 100%; max-width: 360px; padding: 18px 12px; border: 1px solid #eeeeee; color: #707070; font-size: 18px; border-radius: 4px; background: #fafafa; }
+.reserve .reserve-payment .agree-wrap{ margin-top: 46px; }
+.reserve .reserve-payment .agree-wrap div{ position: relative; font-size: 18px; color: #707070; padding-bottom: 4px; width: auto; padding-left: 37px; }
+.reserve .reserve-payment .agree-wrap div + div{ margin-top: 5px; }
+.reserve .reserve-payment .agree-wrap div label{ cursor: pointer; }
+.reserve .reserve-payment .agree-wrap div input[type="checkbox"]{ width: 24px; height: 24px; -webkit-appearance: checkbox; -moz-appearance: inherit; appearance: inherit; position: absolute; top: 4px; left: 0; }
+.reserve .reserve-payment .agree-wrap div span{ color: #e61c51; }
+.reserve .reserve-payment .member-payment{ padding-top: 54px; border-top: 1px solid #eeeeee; border-bottom: 1px solid #eeeeee; }
+.reserve .reserve-payment .member-payment table{ width: 100%; }
+.reserve .reserve-payment .member-payment table th,
+.reserve .reserve-payment .member-payment table td{ padding-bottom: 24px; }
+.reserve .reserve-payment .member-payment table th{ text-align: left; font-weight: 400; }
+.reserve .reserve-payment .member-payment table td{ text-align: right; }
+.reserve .reserve-payment .member-payment table p{font-size: 16px; line-height: 2.5;}
+.reserve .reserve-payment .member-payment table button{ border: 1px solid #eeeeee; color: #707070; text-align: center; font-size: 16px; background: #fafafa; border-radius: 4px; padding: 0 10px; line-height: 40px; }
+
+/* 결제 내용 영역 */
+.reserve .reserve-product{ width: calc(30.27% - 44px); float: left; background-color: #fafafa; border-radius: 0 0 4px 4px; overflow: hidden; padding: 39px 0 0; box-sizing: border-box; }
+.reserve .reserve-product .product-selection{ padding-bottom: 31px; border-bottom: 1px solid #eeeeee; margin: 0 24px;}
+.reserve .reserve-product .product-selection .tit{ font-size: 18px; color: #999999; line-height: 1; margin-bottom: 6px; }
+.reserve .reserve-product .product-selection .txt{ font-size: 20px; }
+.reserve .reserve-product .product-selection .txt + .tit{ margin-top: 29px; }
+.reserve .reserve-product .total-payment{ padding: 39px 24px 33px; }
+.reserve .reserve-product .total-payment h3{ font-size: 18px; font-weight: 700; }
+.reserve .reserve-product .total-payment h3 span{ font-size: 16px; font-weight: 400 }
+.reserve .reserve-product .total-payment .price{ padding: 19px 0 23px 0; font-size: 24px; font-weight: bold; color: #e61c51; }
+.reserve .reserve-product .total-payment ul li{ position: relative; padding-left: 16px; font-size: 16px; color: #444444; font-weight: 300 }
+.reserve .reserve-product .total-payment ul li::before{ position: absolute; display: block; content:""; border-radius: 50%; background: #444444; width: 5px; height: 5px; left: 0; top: 12px; line-height: 1.6; }
+.reserve .reserve-product .total-payment ul li span{ color: #e61c51; }
+.reserve .reserve-product > button{ width: 100%; background: #e61c51; font-size: 15px; line-height: 56px; color: #ffffff; }
