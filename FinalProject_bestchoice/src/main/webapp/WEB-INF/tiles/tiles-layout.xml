@@ -95,4 +95,22 @@
 	</definition>
 	
 	<!-- ====  ==== -->
+	
+	<!-- 양현재 타일즈 -->
+	<definition name="layout-tiles_yhj" template="/WEB-INF/tiles/layout/layout-tiles_yhj.jsp"> 
+		<put-attribute name="header" value="/WEB-INF/tiles/tile_yhj/header_yhj.jsp" />
+		<put-attribute name="head_div" value="/WEB-INF/tiles/tile_yhj/head_div_yhj.jsp" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/tile_yhj/footer_yhj.jsp" />
+	</definition>
+	
+	<definition name="*.tiles_yhj" extends="layout-tiles_yhj">
+		<put-attribute name="content" value="/WEB-INF/views/yhj/tile_yhj/{1}.jsp"/>
+	</definition>
+	<definition name="*/*.tiles_yhj" extends="layout-tiles_yhj">
+		<put-attribute name="content" value="/WEB-INF/views/yhj/tile_yhj/{1}/{2}.jsp"/>
+	</definition>
+	<!-- 양현재 타일즈 끝 -->
+	
+	
 </tiles-definitions>       

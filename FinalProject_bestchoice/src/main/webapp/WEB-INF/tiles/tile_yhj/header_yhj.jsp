@@ -10,7 +10,6 @@
 <html>
 <head>
 <meta charset="UTF-8">  
-<title>여기는어때</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -21,19 +20,21 @@ body {
 	font-family: Arial, Helvetica, sans-serif, 돋움;
 }  
 
-.navbar {   
+.navbar { 
 	overflow: hidden;
-	background-color: #F7323F;
-	/* border: solid 1px black; */   
+	background-color: red;
+	/* border: solid 1px black; */
+	color: white;
 	position: fixed;   
 	top: 0;
-	height: 80px;
-	padding: 20px 5% 0 5% ;  
-	z-index: 1;   
+	height: 100px;
+	padding: 20px 5% ;   
+	transition: 0.5s;
+	z-index: 100;
 }
 
 #logo {  
-	height: 35px;    
+	height: 45px;    
 	width: 150px;
 }   
 /*   
@@ -45,14 +46,21 @@ body {
     border-collapse: collapse;
     width: 100%;   
     text-align: center;
+    font-family: 'Nanum Gothic', sans-serif;
+ }
+ 
+ .dropbtn {
+ 	color: white !important;
  }
     
 #headertbl td > a {     
 	font-size: 16px;
-	color: white;
+	background-color: rgba( 255, 255, 255, 0 );
 	text-align: center;        
 	text-decoration: none;
 	font-weight: bold; 
+	color: white;
+	transition: 0.5s;
 }    
 
 #headertbl td > a:hover {     
@@ -71,22 +79,24 @@ body {
 .dropdown .dropbtn {
   border: none;  
   outline: none;
-  color: white;
+  color: #404040;
   background-color: inherit;
   font-family: inherit;             
   margin: 0;
   font-size: 16px !important;
+  transition: 0.5s;
+  font-weight: bold;
 }
 
 
 .dropdown-content {
   display: none;
-  position: absolute; 
+ /* position: absolute; */
   position: fixed;
   background-color: white;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 2; 
+  z-index: 1;
 }
 
 .dropdown-content a {
@@ -131,20 +141,19 @@ body {
 	cursor: pointer;
 }
 
-
 .navbar_active {
 	background-color: white;
 	color: black !important;
 }
 
-</style>
 
-
-       
+/* ////////////////////////////////////////// */
+</style>      
+    
 <script type="text/javascript">
 	
 	$(document).ready(function(){
-		
+	
 		var navbarTop = $("#navbar").offset().top;		// navbar와 화면 상단 간의 위치값 알아온다.
 		//	var navbarLeft = $("#navbar").offset().left;
 			
@@ -157,7 +166,7 @@ body {
 			    if(scrollTop > navbarTop) {
 			    //	alert("스크롤의 위치가 네비게이션위치 및 그이하로 떨어졌네요.");
 					$("#navbar").addClass("navbar_active");
-					// $("#navbar").css("border-bottom","solid 1px gray");
+					$("#navbar").css("border-bottom","solid 1px gray");
 					$("#headertbl td > a").addClass("navbar_active");
 					$(".dropbtn").addClass("navbar_active");
 					$("#logo").attr("src", "<%=request.getContextPath()%>/resources/images/로고4.png");
@@ -172,19 +181,22 @@ body {
 				}
 			});
 		
+		
+		
+		
+		
 	}); // end of $(document).ready(function(){})=============================
-	
-</script> 
-
+	 
+</script>
 
 </head>
 
-<body>                    
+<body>                  
    
 <div class="navbar" id="navbar">
  <table id="headertbl">
       <tr>
-		<td><a href="main.bc"><img id="logo" src="<%=request.getContextPath()%>/resources/images/로고3.png"></a></td>
+		<td><a href="<%= request.getContextPath() %>/main.bc"><img id="logo" src="<%=request.getContextPath()%>/resources/images/로고3.png"></a></td>
 		
 	  	<td width="70%"></td>
 	     
@@ -218,18 +230,19 @@ body {
 		</td>
 		
 		<c:if test="${sessionScope.loginuser == null && sessionScope.loginseller == null && sessionScope.loginadmin == null}">  
-			<td width="5%"><a href="#">로그인</a></td>
-			<td width="6%"><a href="#">회원가입</a></td>
+			<td width="5%"><a href="<%=ctxPath%>/userLogin.bc">로그인</a></td>
+			<td width="6%"><a href="<%=ctxPath%>/userRegisterForm.bc">회원가입</a></td>
 		</c:if>
 		
 		<c:if test="${sessionScope.loginuser != null }">  
 			<td width="5%">
 				<div class="dropdown">
-	            <button class="dropbtn"><img class="loginIcon" src="./resources/images/ico_사용자.png">
+	            <button class="dropbtn"><img class="loginIcon" src="<%= request.getContextPath() %>/resources/images/ico_사용자.png">
 	               <i class="fa fa-caret-down"></i>
 	            </button>  
 			    <div class="dropdown-content">
-			      <a href="#">내정보</a>
+			      <a>${(sessionScope.loginuser).name}님</a>
+			      <a href="<%=ctxPath%>/myPage.bc">내정보</a>
 			      <a href="#">포인트</a>
 			      <a href="#">쿠폰함</a>
 			      <a href="#">예약내역</a>
@@ -244,7 +257,7 @@ body {
 		<c:if test="${sessionScope.loginseller != null }">  
 			<td width="5%">
 				<div class="dropdown">
-	            <button class="dropbtn"><img class="loginIcon" src="./resources/images/ico_판매자.png">
+	            <button class="dropbtn"><img class="loginIcon" src="<%= request.getContextPath() %>/resources/images/ico_판매자.png">
 	               <i class="fa fa-caret-down"></i>
 	            </button>  
 			    <div class="dropdown-content">
@@ -261,7 +274,7 @@ body {
 		<c:if test="${sessionScope.loginadmin != null }">  
 			<td width="5%">
 				<div class="dropdown">
-	            <button class="dropbtn"><img class="loginIcon" src="./resources/images/ico_관리자.png">
+	            <button class="dropbtn"><img class="loginIcon" src="<%= request.getContextPath() %>/resources/images/ico_관리자.png">
 	               <i class="fa fa-caret-down"></i>
 	            </button>  
 			    <div class="dropdown-content">
@@ -274,10 +287,6 @@ body {
 			
 			<td width="6%"><a  class="logout" href="<%=ctxPath%>/main_logout.bc">로그아웃</a></td>
 		</c:if>
-         
-	  </tr>
    </table> 
- 
 </div>   
-
 

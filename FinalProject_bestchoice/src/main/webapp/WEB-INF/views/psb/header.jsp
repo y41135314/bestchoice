@@ -142,7 +142,7 @@
 <div class="navbar" id="navbar">
  <table id="headertbl">
       <tr>
-		<td><a href="main.bc"><img id="logo" src="./resources/images/로고.PNG"></a></td>
+		<td><a href="<%= request.getContextPath() %>/main.bc"><img id="logo" src="./resources/images/로고.PNG"></a></td>
 
 	  	<td width="70%"></td>
 	  
@@ -169,10 +169,10 @@
 	               <i class="fa fa-caret-down"></i>
 	            </button>  
 			    <div class="dropdown-content">
-			      <a href="#">공지사항</a>
-			      <a href="#">이벤트</a>
-			      <a href="#">자주 묻는 질문</a>
-			      <a href="#">1:1문의</a>
+			      <a href="<%=ctxPath%>/notice/main.bc">공지사항</a>
+			      <a href="<%=ctxPath%>/event/main.bc">이벤트</a>
+			      <a href="<%=ctxPath%>/question/main.bc">자주 묻는 질문</a>
+			      <a href="<%=ctxPath%>/faq/main.bc">1:1문의</a>
 			      <a href="#">약관 및 정책</a>
 			    </div>
 			</div>
