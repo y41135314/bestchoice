@@ -1,5 +1,6 @@
 package com.project.smh;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -54,26 +55,41 @@ public class SmhController {
 
 	
 	// == 회원가입한 user insert ==
-	@RequestMapping(value="/userRegisterForm.bc", method= {RequestMethod.POST})
-	public String memberInsert(SmhMemberVO smhmbrvo ) {
+		@RequestMapping(value="/userRegisterForm.bc", method= {RequestMethod.POST})
+		public String memberInsert(SmhMemberVO smhmbrvo, HttpServletRequest request,  HttpServletResponse response) throws IOException {
+			
+			// 암호화전 확인
+			//System.out.println("smhmbrvo.getPwd()  :  "+smhmbrvo.getPwd());	
+			
+			// 비밀번호 암호화 		     
+			String encryPassword = SHA256.encrypt(smhmbrvo.getPwd());
+			
+			// 암호화 집어넣기 		 
+			 smhmbrvo.setPwd(encryPassword);
+			 
+			// 암호화후 확인	
+			// System.out.println("두번째:" + smhmbrvo.getPwd());
+			 
+	         int n = service.memberInsert(smhmbrvo);
+			
+	         // 회원가입 성공시 포인트 1000점 insert
+	         if(n == 1) {
+
+	        	 String useremail = request.getParameter("email");
+	        	 // System.out.println("email => "+ useremail);
+
+	        	 String memberIdx = service.selectmemberidx(useremail);
+	        	 // System.out.println("memberIdx"+ memberIdx);
+	      
+	        	 int memberPoint = 1000;
+	        	 int m  = service.memberPointInsert(memberIdx, memberPoint);
+	        	 	
+	        	
+	         }
+	   
+			return "smh/userLoginForm";
+		}
 		
-		// 암호화전 확인
-		//System.out.println("smhmbrvo.getPwd()  :  "+smhmbrvo.getPwd());	
-		
-		// 비밀번호 암호화 		     
-		String encryPassword = SHA256.encrypt(smhmbrvo.getPwd());
-		
-		// 암호화 집어넣기 		 
-		 smhmbrvo.setPwd(encryPassword);
-		 
-		// 암호화후 확인	
-		// System.out.println("두번째:" + smhmbrvo.getPwd());
-		 
-         service.memberInsert(smhmbrvo);
-		
-		
-		return "smh/userLoginForm";
-	}
 	
 	// 로그인 처리하기 
 	@RequestMapping(value="/loginEnd.bc", method= {RequestMethod.POST} )
@@ -143,7 +159,7 @@ public class SmhController {
 		
 		String email = request.getParameter("email");
 		int result = service.userEmailCheck(email);
-		System.out.println("컨트롤러 result(email)=>  "+ result);
+		//System.out.println("컨트롤러 result(email)=>  "+ result);
 		return Integer.toString(result);
 	}
 	

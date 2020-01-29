@@ -22,8 +22,9 @@ public class SmhService {
 	
 	
 	// 회원가입
-	public void memberInsert(SmhMemberVO smhmbrvo) {		
-		dao.memberInsert(smhmbrvo);		
+	public int memberInsert(SmhMemberVO smhmbrvo) {		
+		int n = dao.memberInsert(smhmbrvo);
+		return n;		
 	}
 	
 	// 로그인유처리 
@@ -50,6 +51,19 @@ public class SmhService {
 		int n = dao.userEmailCheck(email);
 
 		return n ;
+	}
+	
+	// 회원가입시 user의 idx알아오기 
+	public String selectmemberidx(String useremail) {
+		String memberidx = dao.selectmemberidx(useremail);
+		 return memberidx;
+	}
+
+	// 회원가입시 포인트 1000점 업데이트 
+	public int memberPointInsert(String memberIdx, int memberPoint) {
+		int n = dao.memberPointInsert(memberIdx, memberPoint);
+
+		return n;
 	}
 
 	/*//  인증메일을 보내기전에 유저의 아이디가 있는지 확인 

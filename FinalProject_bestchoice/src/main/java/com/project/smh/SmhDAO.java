@@ -17,9 +17,11 @@ public class SmhDAO {
 	private SqlSessionTemplate sqlsession;
 
 	// 회원가입 
-	public void memberInsert(SmhMemberVO smhvo) {
+	public int memberInsert(SmhMemberVO smhvo) {
 		
-		sqlsession.insert("smhMapper.memberInsert", smhvo);		
+		int n = sqlsession.insert("smhMapper.memberInsert", smhvo);
+		
+		return n;		
 	}
 
 	// 로그인처리
@@ -40,10 +42,28 @@ public class SmhDAO {
 		boolean bool = sqlsession.selectOne("smhMapper.isUserExist", paraMap);
 		return bool;
 	}
-
+	// 회원가입 이메일 중복체크 
 	public int userEmailCheck(String email) {
 		int n = sqlsession.selectOne("smhMapper.userEmailCheck", email);
 		return n;
+	}
+
+	// 회원가입시 userd의 회원번호 알아오기 
+	public String selectmemberidx(String useremail) {
+		String memberidx = sqlsession.selectOne("smhMapper.selectmemberidx", useremail);
+		return memberidx;
+	}
+
+	// 회원가입시 포인트 1000점  insert
+	public int memberPointInsert(String memberIdx, int memberPoint) {
+		
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+	      paraMap.put("memberIdx", memberIdx);
+	      paraMap.put("memberPoint", memberPoint);
+	      
+	      int n = sqlsession.insert("smhMapper.memberPointInsert", paraMap);
+	      return n ;
+
 	}
 
 	

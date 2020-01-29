@@ -15,13 +15,16 @@
 	
 	<!--로그인처리   -->
 	<select id="getLoginMember" resultType="com.project.smh.SmhMemberVO" parameterType="HashMap">
-	select member_idx, email, name, pwd
-	from tbl_here_member
+
+		     select member_idx,name,email
+			  , trunc( months_between(sysdate, lastLoginDate) ) AS lastlogindategap 
+              , trunc( months_between(sysdate, lastpwdChangeDate) ) AS lastpwdChangeDate 
+			 from tbl_here_member 
 			 where mstatus = 1 and 
 		     email = #{email} and
 		     pwd = #{pwd}
+		     		
 	</select>
-
 	<!-- 마지막으로 로그인한 날짜 변경하기  -->
 	<update id="setLastLoginDate" parameterType="HashMap">
 	 update tbl_here_member set lastLoginDate = sysdate
@@ -33,5 +36,20 @@
 	select count(*) from tbl_here_member where email = #{email}
 	</select>
 
+	<!-- 회원가입시 user의 회원번호 알아오기  -->
+   <select id="selectmemberidx" resultType="String" parameterType="String">
+    select member_idx from tbl_here_member where email = #{useremail}
+   </select>
+   
+   <!-- 회원가입시 포인트 1000점 업데이트  -->
+   <insert id="memberPointInsert"  parameterType="HashMap">
+      insert into tbl_here_mpoint(fk_member_idx, mpointCash)
+      values(#{memberIdx}, #{memberPoint})
+   </insert>
+
+	<!-- <select id="isUserExist" parameterType="HashMap"  resultType="_boolean"  >
+	select * from tbl_here_member where email = #{email}
+	</select> -->
+	
 </mapper>
 
