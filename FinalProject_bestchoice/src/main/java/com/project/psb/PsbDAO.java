@@ -142,5 +142,90 @@ public class PsbDAO {
 		return memberCountList;
 	}
 
+	public int getMemberPoint(String member_idx) {
+		int memberPoint = sqlsession.selectOne("psbMapper.getMemberPoint",member_idx);
+		return memberPoint;
+	}
+
+	public int memberPointUpdate(String member_idx,int memberPoint) {
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+		paraMap.put("member_idx", member_idx);
+		paraMap.put("memberPoint", memberPoint);
+		
+		int n = sqlsession.update("psbMapper.memberPointUpdate", paraMap);
+		return n ;
+	}
+
+	public int memberPointInsert(String member_idx, int memberPoint) {
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+		paraMap.put("member_idx", member_idx);
+		paraMap.put("memberPoint", memberPoint);
+		
+		int n = sqlsession.insert("psbMapper.memberPointInsert", paraMap);
+		return n ;
+	}
+
+	public List<String> wordSellerSearchShow(String fk_sellerName) {
+		List<String> wordList = sqlsession.selectList("psbMapper.wordSellerSearchShow", fk_sellerName);
+		return wordList;
+	}
+
+	public List<String> wordHotelSearchShow(String fk_hotelName) {
+		List<String> wordList = sqlsession.selectList("psbMapper.wordHotelSearchShow", fk_hotelName);
+		return wordList;
+	}
+
+	public String getlastDate(String member_idx) {
+		String lastDate = sqlsession.selectOne("psbMapper.getlastDate",member_idx);
+		return lastDate;
+	}
+
+	public int total_Price() {
+		int total_Price = sqlsession.selectOne("psbMapper.total_Price");
+		return total_Price;
+	}
+	
+	public int last_yearPrice() {
+		int last_yearPrice = sqlsession.selectOne("psbMapper.last_yearPrice");
+		return last_yearPrice;
+	}
+
+	public int yearPrice() {
+		int yearPrice = sqlsession.selectOne("psbMapper.yearPrice");
+		return yearPrice;
+	}
+
+	public int monthPrice() {
+		int monthPrice = sqlsession.selectOne("psbMapper.monthPrice");
+		return monthPrice;
+	}
+
+	public int dayPrice() {
+		int dayPrice = sqlsession.selectOne("psbMapper.dayPrice");
+		return dayPrice;
+	}
+
+	public int searchPrice(HashMap<String,String> paraMap) {
+		int searchPrice = sqlsession.selectOne("psbMapper.searchPrice",paraMap);
+		return searchPrice;
+	}
+
+	public List<HashMap<String, Object>> chart_MonthlyPrice() {
+		List<HashMap<String, Object>> montlyPriceList = sqlsession.selectList("psbMapper.chart_MonthlyPrice");
+		return montlyPriceList;
+	}
+
+	public List<HashMap<String, Object>> sales_gender() {
+		List<HashMap<String, Object>> paraMap = sqlsession.selectList("psbMapper.sales_gender");
+		return paraMap;
+	}
+
+	public List<HashMap<String, Object>> sales_age() {
+		List<HashMap<String, Object>> paraMap = sqlsession.selectList("psbMapper.sales_age");
+		return paraMap;
+	}
+
+	
+
 
 }

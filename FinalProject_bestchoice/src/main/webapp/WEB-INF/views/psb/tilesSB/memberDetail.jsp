@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <style>
 #memberDetail {
  /* 	border: solid 1px black; */
@@ -30,7 +31,7 @@
  
 </style>
 
-<script>
+<script type="text/javascript">
 	$(document).ready(function(){
 		$("#adminMemberChartBTN").bind("mouseover", function(){	
 			$("#adminMemberChartBTN").css({"color":"white","background-color":"#F7323F"});
@@ -46,7 +47,39 @@
 			$("#adminMemberListBTN").css({"color":"#F7323F","background-color":"white"});
 		})
 
+		// 적립금 - 천단위 콤마
+		var memberPoint = $("#memberPoint").val();
+		memberPoint = comma(memberPoint);
+		$("#memberPoint").val(memberPoint);
+		
+		// 적립금 변경 
+		$("#pointUpdateBtn").click(function(){
+			var frm = document.memberPointFrm;
+			frm.method="POST";
+			frm.action="memberPointUpdate.bc?member_idx=${membervo.member_idx}";
+			frm.submit();
+		})
+		
 	})
+	
+	// 천 단위 콤마 함수 
+	function comma(obj) {
+        var regx = new RegExp(/(-?\d+)(\d{3})/);
+        var bExists = obj.indexOf(".", 0);//0번째부터 .을 찾는다.
+        var strArr = obj.split('.');
+        while (regx.test(strArr[0])) {//문자열에 정규식 특수문자가 포함되어 있는지 체크
+            //정수 부분에만 콤마 달기 
+            strArr[0] = strArr[0].replace(regx, "$1,$2");//콤마추가하기
+        }
+        if (bExists > -1) {
+            //. 소수점 문자열이 발견되지 않을 경우 -1 반환
+            obj = strArr[0] + "." + strArr[1];
+        } else { //정수만 있을경우 //소수점 문자열 존재하면 양수 반환 
+            obj = strArr[0];
+        }
+        return obj;//문자열 반환
+    }
+
 </script>
 
 <div id="memberDetail">
@@ -88,14 +121,17 @@
 			</td>
 			<td>${membervo.age}</td>
 			<td>${membervo.birthday}</td>
-			<td>.</td>
-			<td>.</td>
-			<td>.</td>
+			<td><fmt:formatNumber value="${membervo.totalPrice}" pattern="#,###"/></td>
+			<td><fmt:formatNumber value="${membervo.totalCount}" pattern="#,###"/></td>   
+			<td>${lastDate}</td>
 			<td>${membervo.mstatus}</td>
 		</tr>
 	</table>	
 	     
-	<br/>  
-	<label>▶회원 적립금 : </label> <input type="text" style="width: 100px;"value=""/>원 &nbsp;<input type="button" value="수정" style="font-size: 8pt;"/> 
-	
+	<br/>      
+	<label>▶회원 적립금 : </label>   
+	<form name="memberPointFrm" style="display: inline-block;">
+	    <input type="text" name="memberPoint" id="memberPoint" style="width: 100px; text-align: right;" value="${memberPoint}" />원 &nbsp;
+	    <input type="button" value="수정" id="pointUpdateBtn" style="font-size: 8pt;"/> 
+ 	</form>
 </div>    

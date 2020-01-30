@@ -161,5 +161,82 @@ public class PsbService {
 		List<HashMap<String, String>> memberCountList = dao.chartMemberTrend();
 		return memberCountList;
 	}
+
+	public int getMemberPoint(String member_idx) {
+		int memberPoint = dao.getMemberPoint(member_idx); 
+		return memberPoint;
+	}
+
+	public int memberPointUpdate(String member_idx,int memberPoint) {
+		int n = dao.memberPointUpdate(member_idx, memberPoint);
+		return n;
+	}
+
+	public int memberPointInsert(String member_idx, int memberPoint) {
+		int n = dao.memberPointInsert(member_idx, memberPoint);
+		return n;
+	}
+
+	public List<String> wordSellerSearchShow(String fk_sellerName) {
+		List<String> wordList = dao.wordSellerSearchShow(fk_sellerName);
+		return wordList;
+	}
+
+	public List<String> wordHotelSearchShow(String fk_hotelName) {
+		List<String> wordList = dao.wordHotelSearchShow(fk_hotelName);
+		return wordList;
+	}
+
+	public String getlastDate(String member_idx) {
+		String lastDate = dao.getlastDate(member_idx);
+		return lastDate;
+	}
+
+	public int total_Price() {
+		int total_Price = dao.total_Price();
+		return total_Price;
+	}
+	
+	public int last_yearPrice() {
+		int last_yearPrice = dao.last_yearPrice();
+		return last_yearPrice;
+	}
+
+	public int yearPrice() {
+		int yearPrice = dao.yearPrice();
+		return yearPrice;
+	}
+
+	public int monthPrice() {
+		int monthPrice = dao.monthPrice();
+		return monthPrice;
+	}
+
+	public int dayPrice() {
+		int dayPrice = dao.dayPrice();
+		return dayPrice;
+	}
+
+	public int searchPrice(HashMap<String,String> paraMap) {
+		int searchPrice = dao.searchPrice(paraMap);
+		return searchPrice;
+	}
+
+	public List<HashMap<String, Object>> chart_MonthlyPrice() {
+		List<HashMap<String, Object>> montlyPriceList = dao.chart_MonthlyPrice();
+		return montlyPriceList;
+	}
+
+	public List<HashMap<String, Object>> sales_gender() {
+		List<HashMap<String, Object>> paraMap = dao.sales_gender();
+		return paraMap;
+	}
+
+	public List<HashMap<String, Object>> sales_age() {
+		List<HashMap<String, Object>> paraMap = dao.sales_age();
+		return paraMap;
+	}
+
+	
 	
 }

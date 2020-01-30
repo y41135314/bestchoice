@@ -195,19 +195,23 @@
 					    	      y: 0.0 }; 
 			        	 resultMArr.push(obj);
 			         }
+			         
 			         var bool70 = ageMM.includes('70');
-			         if (bool70){
+			         var bool80 = ageMM.includes('80');
+			         if (bool70 || bool80){
+			        	 var agepnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender==1){
-				        	 		var obj =  { name : 70, 
-				   			    	             y: Number(-json[i].PERCENTAGE) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender==1){
+				        	 		agepnt +=  Number(json[i].PERCENTAGE);
 				        	 	}
 				        	 }	
+				    	 var obj =  { name : 70 , 
+   			    	                     y: -agepnt }; 
 				    	 resultMArr.push(obj);
 			         }else {
 			        	 var obj =  { name : 70, 
 					    	      y: 0.0 }; 
-			        	 resultMArr.push(obj);
+			        	 resultMArr.push(obj); 
 			         }
 			           
 			         /////////////////////////////
@@ -303,13 +307,16 @@
 			         }
 			         
 			         var boolF70 = ageFF.includes('70');
-			         if (boolF70){
+			         var boolF80 = ageFF.includes('80');
+			         if (boolF70 || boolF80 ){
+			        	 var agepnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender==2){
-				        	 		var obj =  { name : 70, 
-				   			    	             y: Number(json[i].PERCENTAGE) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender==2){
+				        	 		agepnt +=  Number(json[i].PERCENTAGE);
 				        	 	}
 				        	 }	
+				    	 var obj =  { name : 70 , 
+   			    	                     y: agepnt }; 
 				    	 resultFArr.push(obj);
 			         }else {
 			        	 var obj =  { name : 70, 
@@ -417,30 +424,39 @@
 			   var html = "<table><tr style='border: solid 1px black;text-align: center; font-weight: bold; background-color: #eee;' > "
 			       html += "<td>AGE</td><td>인원수</td><td>PERCENT</td></tr>"			
 			   
+	    	   var age70 = "70대이상";
+			   var agepnt = 0;
+			   var count = 0;
 			   for (var i = 0; i < json.length; i++) {
 				   
-			   		if ( json[i].age!= null && json[i].gender == null) {
+			   		if ( json[i].age!= null && json[i].age < 70 && json[i].gender == null) {
 						// 자바스크립트에서의 객체 선언 
 						
 						var age = "";
-						if(json[i].age == 70){ 
-							age = json[i].age + "대이상";
-						}
-						else {
-							age = json[i].age + "대";
-						}
+						age = json[i].age + "대";
 						
 						var obj = { name : age, 
 								    y: Number(json[i].PERCENTAGE) };  // ★ DB에서 받을 때 문자열로 가져왔기 때문에, 다시 숫자로 바꿔야 한다!!!
-								
+						
+								    
 						// 배열 속에 객체 넣기   [{},{},{},...]
 						resultArr.push(obj); 
 								    	 
 						html += "<tr style='border: solid 1px black; text-align: center;'><td style='font-weight: bold;background-color: #eee;'>" + age + "</td>"
 						html += "<td>" + json[i].count + "&nbsp;명</td><td>" + Number(json[i].PERCENTAGE) + "&nbsp;%</td></tr>"	
-					}  
+					}else if( json[i].age>=70 && json[i].gender == null) {
+		        	 	agepnt +=  Number(json[i].PERCENTAGE);
+		        	 	count += Number(json[i].count);
+					}    
 			   }
-			  
+			   var obj = { name : age70, 
+					    y : agepnt };  // ★ DB에서 받을 때 문자열로 가져왔기 때문에, 다시 숫자로 바꿔야 한다!!!
+			
+		       resultArr.push(obj);
+			
+				html += "<tr style='border: solid 1px black; text-align: center;'><td style='font-weight: bold;background-color: #eee;'>" + age70 + "</td>"
+				html += "<td>" + count + "&nbsp;명</td><td>" + agepnt + "&nbsp;%</td></tr>"	
+			       
 			   html += "</table>"
 			   $("#ageTable").html(html);
 			   
@@ -1749,186 +1765,210 @@
 				    
 					var ageDay = "";
 					for (var i = 0; i < json.length; i++) {						
-						 if ( json[i].age == 70 && json[i].gender == null && json[i].registerday != null ){ 	
+						 if ( json[i].age >= 70 && json[i].gender == null && json[i].registerday != null ){ 	
 							 ageDay += json[i].registerday; 
 						 }
 					}	
 				    var bool = ageDay.includes('2019-03');
 				    if (bool){
+				    	 var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-03'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-03'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상" , 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name :70, 
+			        	 var obj =  { name :"70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        } 
 				    
 				    var bool = ageDay.includes('2019-04');
 				    if (bool){
+				    	 var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-04'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-04'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt }
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        } 
 				    
 				    var bool = ageDay.includes('2019-05');
 				    if (bool){
+				    	 var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-05'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-05'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        } 
 				    
 				    var bool = ageDay.includes('2019-06');
 				    if (bool){
+				    	 var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-06'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-06'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name :"70대이상" , 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        } 
 				    
 				    var bool = ageDay.includes('2019-07');
 				    if (bool){
+				    	 var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-07'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-07'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name :70, 
+			        	 var obj =  { name :"70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        } 
 				    
 				    var bool = ageDay.includes('2019-08');
 				    if (bool){
+				    	 var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-08'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-08'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        } 
 				    
 				    var bool = ageDay.includes('2019-09');
 				    if (bool){
+				    	 var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-09'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-09'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name :"70대이상" , 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        }
 				    
 				    var bool = ageDay.includes('2019-10');
 				    if (bool){
+				    	var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-10'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-10'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        }	 
 			        
 				    var bool = ageDay.includes('2019-11');
 				    if (bool){
+				    	var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-11'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-11'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name :70, 
+			        	 var obj =  { name :"70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        }	 
 				    
 				    var bool = ageDay.includes('2019-12');
 				    if (bool){
+				    	var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2019-12'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2019-12'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        }	 
 				    
 				    var bool = ageDay.includes('2020-01');
 				    if (bool){
+				    	var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2020-01'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2020-01'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        }	 
 				    
 				    var bool = ageDay.includes('2020-02');
 				    if (bool){
+				    	 var agecnt = 0;
 				    	 for (var i = 0; i < json.length; i++) {
-				        	 	if(json[i].age == 70 && json[i].gender == null && json[i].registerday == '2020-02'){
-				        	 		var obj =  { name : 70, 
-				        	 				         y: Number( json[i].count ) }; 
+				    		 	if(json[i].age >= 70 && json[i].gender == null && json[i].registerday == '2020-02'){
+				    		 		agecnt +=  Number(json[i].count);
 				        	 	}
-				        	 }	
+				          }	
+				    	 var obj =  { name : "70대이상", 
+		    	                     y: agecnt };
 				    	 resultArr70.push(obj);
 			        }else {
-			        	 var obj =  { name : 70, 
+			        	 var obj =  { name : "70대이상", 
 					    	      y: 0.0 }; 
 			        	 resultArr70.push(obj);
 			        }	 
@@ -2441,7 +2481,7 @@
 					        align: 'right',
 					        x: -30,
 					        verticalAlign: 'top',
-					        y: -10,
+					        y: -10,  
 					        floating: true,
 					        backgroundColor:
 					            Highcharts.defaultOptions.legend.backgroundColor || 'white',
@@ -2513,7 +2553,6 @@
 		<div id="chart_monthlyTrend">
 		
 		</div>
-	<!-- 	<div style="border: solid 1px black; margin-bottom: 15px;">월 연령대/성별 점유율 테이블 </div> -->
 	</div>
 	
 	

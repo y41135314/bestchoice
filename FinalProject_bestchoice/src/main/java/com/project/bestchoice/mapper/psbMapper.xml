@@ -123,12 +123,13 @@
 	 </select>
 	 
 	 <update id="edit" parameterType="com.project.psb.BoardVO">
-		update tbl_here_adminBoard set title = #{title} , content = #{content}
+		update tbl_here_adminBoard set title = #{title} , content = #{content}, fk_sellerName = #{fk_sellerName}, fk_hotelName = #{fk_hotelName}
 		where adminBoard_idx = #{adminBoard_idx}
 	</update> 
 	
 	 <update id="edit_withFile" parameterType="com.project.psb.BoardVO">
-		update tbl_here_adminBoard set title = #{title} , content = #{content}, fileName = #{fileName}, orgFilename = #{orgFilename}, fileSize = #{fileSize} 
+		update tbl_here_adminBoard set title = #{title} , content = #{content}, fk_sellerName = #{fk_sellerName}, fk_hotelName = #{fk_hotelName}
+		                               ,fileName = #{fileName}, orgFilename = #{orgFilename}, fileSize = #{fileSize} 
 		where adminBoard_idx = #{adminBoard_idx}
 	</update> 
 	
@@ -185,6 +186,18 @@
     	where adminComment_idx = #{adminComment_idx}
     </update>
      
+     <select id="wordSellerSearchShow" parameterType="String" resultType="String">
+     	select seller_Name
+		from tbl_here_sellerMember
+		where lower( seller_Name ) like '%' || lower(#{fk_sellerName}) || '%'	
+     </select>
+     
+      <select id="wordHotelSearchShow" parameterType="String" resultType="String">
+     	select hotel_Name
+		from tbl_here_hotelInfo
+		where lower( hotel_Name ) like '%' || lower(#{fk_hotelName}) || '%'	
+     </select>
+     
      <!--  ===================================== 회원 ==================================== -->
      <select id="getTotalCountMember" resultType="int" parameterType="HashMap">
      	select count(*) 
@@ -197,7 +210,7 @@
 		    (
 		    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
 		            extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
-		            mstatus,  to_char(registerday,'yyyymmdd') AS registerday, lastlogindate, lastpwdchangedate
+		            mstatus,to_char(registerday,'yyyymmdd') AS registerday, lastlogindate, lastpwdchangedate
 		    from tbl_here_member
 		    )
 		  
@@ -226,7 +239,6 @@
 		       and registerday between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
 		     	</if>
 		     </if> 
-		 order by ${orderType} desc
 		 )
      </select>
      
@@ -236,51 +248,63 @@
      </select>
     
       <select id="memberListWithPaging"  parameterType="HashMap" resultType="com.project.smh.SmhMemberVO">
-     	select rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
-		        age, 
-		        mstatus,  to_char(registerday,'yyyy-mm-dd') AS registerday, lastlogindate, lastpwdchangedate
-		from
-		(
-		select rownum AS rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
-		       age, 
-		        mstatus,  registerday, lastlogindate, lastpwdchangedate
-		from 
-		    (
-		    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
-		            extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
-		            mstatus, registerday, lastlogindate, lastpwdchangedate
-		    from tbl_here_member
-		    )
-		  
+   		select rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+                    age, 
+                    mstatus, registerday, lastlogindate, lastpwdchangedate, totalPrice, totalCount
+        from 
+        (
+           select  rownum AS rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+                    age, 
+                    mstatus, registerday, lastlogindate, lastpwdchangedate, totalPrice, totalCount
+            from 
+            (
+                select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+                        age, 
+                        mstatus, to_char(registerday,'yyyy-mm-dd') AS registerday, lastlogindate, lastpwdchangedate, nvl(totalPrice,0) AS totalPrice, nvl(totalCount,0) AS totalCount
+                from
+                (
+                select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+                       age, 
+                        mstatus, registerday, lastlogindate, lastpwdchangedate
+                from 
+                    (
+                    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+                            extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
+                            mstatus,registerday, lastlogindate, lastpwdchangedate
+                    from tbl_here_member
+                    )
 	 	<if test="ageArr == null">
-			where trunc(age,-1) in (10,20,30,40,50,60,70,80,90)
+					where trunc(age,-1) in (10,20,30,40,50,60,70,80,90)
 		</if>
 		<if test="ageArr != null">
-			where trunc(age,-1) in (
+					where trunc(age,-1) in (
 			<!-- 10,20 -->
 			<foreach collection="ageArr" item="age" separator=",">
-				#{age}
+						#{age}
 				<if test='age == 70 '>   
-		        ,80,90
+		        		,80,90
 		     	</if>
 			</foreach> 
 			)
 		</if> 
 			 <if test='gender != null '>   
-		        and gender = #{gender}
+		       			and gender = #{gender}
 		     </if> 
 		     <if test='mstatus != null '>   
-		        and mstatus = #{mstatus}
+		      		    and mstatus = #{mstatus}
 		     </if>
 		      <if test='searchWord != "" '>   
-		        and ${searchType} like '%'|| #{searchWord} ||'%'
+		       			 and ${searchType} like '%'|| #{searchWord} ||'%'
 		     </if> 
 			 <if test='startDate != null and startDate != "" '>
 			 	<if test='endDate != null and endDate != "" '> 
-		       and to_char(registerday,'yyyymmdd') between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+		                and to_char(registerday,'yyyymmdd') between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
 		     	</if>
 		     </if> 
-		 order by ${orderType} desc
+				 ) M left outer join  (select sum(res_totalPrice)  AS totalPrice,  fk_member_idx, count(*) AS totalCount  from tbl_here_reservation group by fk_member_idx )  R  
+		         on M.member_idx = R.fk_member_idx
+				 order by ${orderType} desc
+			 )
 		 )
 		 <if test='startRno != "" and endRno != "" '> 
 		  where rno between #{startRno} and #{endRno}
@@ -289,11 +313,18 @@
       </select>
       
       <select id="getOneMember" parameterType="String" resultType="com.project.smh.SmhMemberVO">
-      	 select member_idx, name, email, to_char(registerday,'yyyy-mm-dd') AS registerday,
+ 		 select member_idx, name, email, to_char(registerday,'yyyy-mm-dd') AS registerday, 
       	        gender,  extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
-      	        birthday ,mstatus
-      	 from tbl_here_member
+      	        substr(birthday,1,4) || '-' || substr(birthday,5,2) || '-' || substr(birthday,7,2)  AS birthday, mstatus, hp1, hp2, hp3, nvl(totalPrice,0) AS totalPrice, nvl(totalCount,0) AS totalCount
+      	 from tbl_here_member M left outer join  (select sum(res_totalPrice)  AS totalPrice, fk_member_idx, count(*) AS totalCount  from tbl_here_reservation group by fk_member_idx )  R  
+         on M.member_idx = R.fk_member_idx
       	 where member_idx = #{member_idx}
+      </select>
+      
+      <select id="getlastDate" parameterType="String"  resultType="String">
+      	select to_char(max(res_paymentDay),'yyyy-mm-dd') AS lastDate
+		from tbl_here_reservation
+		where fk_member_idx = #{member_idx}
       </select>
       
      <resultMap type="HashMap" id="chartMemberCountMap">
@@ -332,5 +363,132 @@
 		group by cube(registerday, gender, age)
 		order by age, registerday, gender
 	</select>
+	
+	<select id="getMemberPoint" resultType="int">
+		select P.mpointCash
+		from tbl_here_mpoint P join tbl_here_member M
+		on P.fk_member_idx = M.member_idx
+		where P.fk_member_idx = #{member_idx}
+	</select>
+	
+	<update id="memberPointUpdate" parameterType="HashMap">
+		update tbl_here_mpoint set mpointCash = #{memberPoint}
+		where fk_member_idx = #{member_idx}
+	</update>
+	
+	<insert id="memberPointInsert"  parameterType="HashMap">
+		insert into tbl_here_mpoint(fk_member_idx, mpointCash)
+		values(#{member_idx}, #{memberPoint})
+	</insert>
+	
+	<!--  ===================================== 매출 통계 ==================================== -->
+	<select id="total_Price" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+	</select> 
+	
+	<select id="last_yearPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+		where to_char(res_paymentDay,'yyyy') = '2019'
+	</select> 
+	
+	<select id="yearPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+		where to_char(res_paymentDay,'yyyy') = '2020'
+	</select> 
+	
+	<select id="monthPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+		where to_char(res_paymentDay,'yyyy-mm') = to_char(sysdate, 'yyyy-mm') 
+	</select> 
+	
+	<select id="dayPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+		where to_char(res_paymentDay,'yyyy-mm-dd') = to_char(sysdate, 'yyyy-mm-dd') 
+	</select> 
+	
+	<select id="searchPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+		where to_char(res_paymentDay,'yyyy-mm-dd') between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+	</select> 
+	
+	<resultMap type="HashMap" id="chartMontlyPriceMap">
+		<result property="MONTH" column="MONTH" javaType="String"/>  <!-- key 값과 컬럼명, 리턴값 타입 -->
+		<result property="totalPrice" column="totalPrice" javaType="int"/> 
+		<result property="totalCount" column="totalCount" javaType="int"/> 
+	</resultMap>
+	
+	<select id="chart_MonthlyPrice" resultMap="chartMontlyPriceMap">
+		select to_char(res_paymentDay,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
+		from tbl_here_reservation
+		group by to_char(res_paymentDay,'yyyy-mm')
+		order by to_char(res_paymentDay,'yyyy-mm') 
+	</select>
+	
+	<resultMap type="HashMap" id="sales_genderMap">
+		<result property="gender" column="gender" javaType="String"/>  <!-- key 값과 컬럼명, 리턴값 타입 -->
+		<result property="RCount" column="RCount" javaType="int"/> 
+		<result property="totalPrice" column="totalPrice" javaType="int"/> 
+		<result property="AVG" column="AVG" javaType="int"/>
+	</resultMap>
+	
+	<select id="sales_gender" resultMap="sales_genderMap">
+		select V.gender, totalPrice, RCount,  totalPrice/RCount AS AVG
+		from 
+		    (
+		    select gender,  
+		             sum(res_totalPrice) AS totalPrice
+		    from tbl_here_member M left outer join tbl_here_reservation R
+		     on M.member_idx = R.fk_member_idx
+		     group by gender 
+		     ) V
+		left join 
+		     (select gender, count(*) AS RCount
+		    from
+		    (
+		    select gender, fk_member_idx
+		    from tbl_here_member M right outer join tbl_here_reservation R
+		    on M.member_idx = R.fk_member_idx
+		    )
+		    group by gender
+		    ) T
+		on V.gender = T.gender
+	</select>
+	
+	<resultMap type="HashMap" id="sales_agerMap">
+		<result property="age" column="age" javaType="String"/>  <!-- key 값과 컬럼명, 리턴값 타입 -->
+		<result property="RCount" column="RCount" javaType="int"/> 
+		<result property="totalPrice" column="totalPrice" javaType="int"/> 
+		<result property="AVG" column="AVG" javaType="int"/>
+	</resultMap>
+	
+	<select id="sales_age" resultMap="sales_agerMap">
+		select V.age, nvl(totalPrice,0) AS totalPrice, nvl(RCount,0) AS RCount,  nvl(totalPrice/RCount, 0) AS AVG
+		from 
+		    (
+		    select trunc(extract(year from sysdate) - to_number(substr(birthday,1,4)),-1) AS age,
+		             sum(res_totalPrice) AS totalPrice
+		    from tbl_here_member M left outer join tbl_here_reservation R
+		     on M.member_idx = R.fk_member_idx
+		     group by trunc(extract(year from sysdate) - to_number(substr(birthday,1,4)),-1)
+		     ) V
+		left join 
+		     (select age, count(*) AS RCount
+		    from
+		    (
+		    select trunc(extract(year from sysdate) - to_number(substr(birthday,1,4)),-1)AS age,  fk_member_idx
+		    from tbl_here_member M right outer join tbl_here_reservation R
+		    on M.member_idx = R.fk_member_idx
+		    )
+		    group by age
+		    ) T
+		on V.age = T.age
+	</select>
+	
 </mapper>
 

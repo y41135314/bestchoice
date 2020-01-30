@@ -183,7 +183,27 @@ public class KmtHotelInfoVO {
 	}
 
 	
-	
+	////////////////////////////////////////// 추가 
+	private int totalPrice;
+	private int totalCount;
+
+
+		public int getTotalPrice() {
+			return totalPrice;
+		}
+		
+		public void setTotalPrice(int totalPrice) {
+			this.totalPrice = totalPrice;
+		}
+		
+		public int getTotalCount() {
+			return totalCount;
+		}
+		
+		public void setTotalCount(int totalCount) {
+			this.totalCount = totalCount;
+		}
+	//////////////////////////////////////////
 	
 	
 	
