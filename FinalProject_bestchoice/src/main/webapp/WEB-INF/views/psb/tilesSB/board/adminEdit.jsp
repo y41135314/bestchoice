@@ -21,6 +21,11 @@
  #fileDel:hover{
  	cursor: pointer;
  }
+ 
+  .sellerNameone:hover, .hotelNameone:hover {
+    font-weight: bold;
+ }
+ 
 </style>
 
 
@@ -122,6 +127,131 @@
 			})
 			<%-- location.href="<%=request.getContextPath()%>/fileDel.bc"; --%>
 		})
+		
+		// 자동완성 
+		$("#sellerDisplayList").hide();
+		$("#hotelDisplayList").hide();
+		
+		$("#fk_sellerName").keyup(function(){
+			
+			var wordLength = $("#fk_sellerName").val().length;
+			
+			if( wordLength == 0 ){
+				$("#sellerDisplayList").hide();
+			}	
+			else {
+				$.ajax({  
+					url: "<%= request.getContextPath() %>/wordSellerSearchShow.bc" ,
+					type: "GET",
+					data:{ "fk_sellerName": $("#fk_sellerName").val() },
+					dataType: "JSON",
+					success: function(json){
+						
+						<%-- === #113. 검색어 입력시 자동글 완성하기 7 === --%> 
+						if(json.length>0){ // 검색된 데이터가 있는 경우
+							// 조회된 데이터가 없을 경우 if(json == null ) 이 아님 !! 
+							// ==> B/C Controller 에서 이미 JSONObject jsonObj = new JSONObject(); 를 썼으므로.
+		
+							var html = "";
+							$.each(json, function(index, item) {
+								
+								var word = item.word;
+								var index = word.toLowerCase().indexOf( $("#fk_sellerName").val().toLowerCase() ); 
+								
+								var len = $("#fk_sellerName").val().length;
+								var result = "";
+								result = "<span class='first'>" +word.substr(0, index)+ "</span>" + "<span class='second' style='color:red; font-weight:bold;'>" +word.substr(index, len)+ "</span>" + "<span class='third'>" +word.substr(index+len, word.length - (index+len) )+ "</span>";  
+								html += "<span class='sellerNameone' style='cursor:pointer;'>"+ result +"</span><br/>";
+							})
+							$("#sellerDisplayList").html(html);
+							$("#sellerDisplayList").show();
+						}
+						else{ // 검색된 데이터가 존재하지 않는 경우
+							$("#sellerDisplayList").hide();
+						}
+					},
+					error: function(request, status, error){
+						alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+					}	
+				})
+			}
+		}) 
+		
+		$("#sellerDisplayList").click(function(){
+			var word = "";	
+			var $target = $(event.target);
+			if($target.is(".first")){ // 내가 클릭한 곳이 first 라면 
+				word = $target.text() + $target.next().text() + $target.next().next().text()
+			}
+			else if($target.is(".second")){
+				word = $target.prev().text() + $target.text() + $target.next().text()
+			}
+			else if($target.is(".third")){
+				word = $target.prev().prev().text() + $target.prev().text() + $target.text()
+			}
+			
+			$("#fk_sellerName").val(word);
+			$("#sellerDisplayList").hide();
+		})	
+		
+		$("#fk_hotelName").keyup(function(){
+			
+			var wordLength = $("#fk_hotelName").val().length;
+			
+			if( wordLength == 0 ){
+				$("#hotelDisplayList").hide();
+			}	
+			else {
+				$.ajax({  
+					url: "<%= request.getContextPath() %>/wordHotelSearchShow.bc" ,
+					type: "GET",
+					data:{ "fk_hotelName": $("#fk_hotelName").val() },
+					dataType: "JSON",
+					success: function(json){
+						
+						<%-- === #113. 검색어 입력시 자동글 완성하기 7 === --%> 
+						if(json.length>0){ 
+							var html = "";
+							$.each(json, function(index, item) {
+								
+								var word = item.word;
+								var index = word.toLowerCase().indexOf( $("#fk_hotelName").val().toLowerCase() ); 
+								
+								var len = $("#fk_hotelName").val().length;
+								var result = "";
+								result = "<span class='first'>" +word.substr(0, index)+ "</span>" + "<span class='second' style='color:red; font-weight:bold;'>" +word.substr(index, len)+ "</span>" + "<span class='third'>" +word.substr(index+len, word.length - (index+len) )+ "</span>";  
+								html += "<span class='hotelNameone' style='cursor:pointer;'>"+ result +"</span><br/>";
+							})
+							$("#hotelDisplayList").html(html);
+							$("#hotelDisplayList").show();
+						}
+						else{ // 검색된 데이터가 존재하지 않는 경우
+							$("#hotelDisplayList").hide();
+						}
+					},
+					error: function(request, status, error){
+						alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+					}	
+				})
+			}
+		}) 
+		
+		$("#hotelDisplayList").click(function(){
+			var word = "";	
+			var $target = $(event.target);
+			if($target.is(".first")){ // 내가 클릭한 곳이 first 라면 
+				word = $target.text() + $target.next().text() + $target.next().next().text()
+			}
+			else if($target.is(".second")){
+				word = $target.prev().text() + $target.text() + $target.next().text()
+			}
+			else if($target.is(".third")){
+				word = $target.prev().prev().text() + $target.prev().text() + $target.text()
+			}
+			
+			$("#fk_hotelName").val(word);
+			$("#hotelDisplayList").hide();
+		})	
 
 	})
 </script>
@@ -132,8 +262,8 @@
 	<form name="adminEditFrm" enctype="multipart/form-data"> 
 	 <input type="hidden" name="adminBoard_idx" value="${boardvo.adminBoard_idx}" />
 	<input type="text" name="name" value="${(sessionScope.loginadmin).name}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly  />  
-	<input type="text" name="fk_sellerName" value="${boardvo.fk_sellerName}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly/> 
-	<input type="text" name="fk_hotelName" value="${boardvo.fk_hotelName}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"   readonly /> 
+	<input type="text" name="fk_sellerName" id="fk_sellerName" value="${boardvo.fk_sellerName}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  /> 
+	<input type="text" name="fk_hotelName" id="fk_hotelName" value="${boardvo.fk_hotelName}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  /> 
 	<br/>
 	<input type="text" name="title" id="title" value="${boardvo.title}" style="margin: 5px 0;" /><br/>	
 	<textarea name="content" id="content" style="width: 50%;">${boardvo.content}</textarea>	
@@ -155,6 +285,12 @@
 	<input type="button" id="btnEdit" value="완료" style="font-size: 8pt; margin-left: 100;"/> 
 	<input type="button" value="취소" onclick="location.href='<%=request.getContextPath()%>/adminCommentBoard.bc'" style="font-size: 8pt; margin-left: 100;"/> 
 
+
+	<div id="sellerDisplayList" style="width: 7%; font-size: 8pt; position: relative; left: 7.3%; height: 50px; margin-top: -374px;  border-top: none; border: solid 1px gray; background-color: white; z-index: 2 ">
+	</div>   
+	            
+	<div id="hotelDisplayList" style="width: 7%; font-size: 8pt; position: relative; left: 14.7%; height: 50px; margin-top: -374px;  border-top: none; border: solid 1px gray; background-color: white; z-index: 2 ">
+	</div>   
 </div>
 
 

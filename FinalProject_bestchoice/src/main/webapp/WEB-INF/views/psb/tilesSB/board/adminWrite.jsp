@@ -13,6 +13,9 @@
  	color: #F7323F;
  }
  
+ .sellerNameone:hover, .hotelNameone:hover {
+    font-weight: bold;
+ } 
 </style>
 
 
@@ -103,27 +106,156 @@
 			frm.action = "<%= request.getContextPath() %>/adminBoardEnd.bc";
 			frm.submit();
 		});
+  
+		// 자동완성 
+		$("#sellerDisplayList").hide();
+		$("#hotelDisplayList").hide();
 		
-
-	})
+		$("#fk_sellerName").keyup(function(){
+			
+			var wordLength = $("#fk_sellerName").val().length;
+			
+			if( wordLength == 0 ){
+				$("#sellerDisplayList").hide();
+			}	
+			else {
+				$.ajax({  
+					url: "<%= request.getContextPath() %>/wordSellerSearchShow.bc" ,
+					type: "GET",
+					data:{ "fk_sellerName": $("#fk_sellerName").val() },
+					dataType: "JSON",
+					success: function(json){
+						
+						<%-- === #113. 검색어 입력시 자동글 완성하기 7 === --%> 
+						if(json.length>0){ // 검색된 데이터가 있는 경우
+							// 조회된 데이터가 없을 경우 if(json == null ) 이 아님 !! 
+							// ==> B/C Controller 에서 이미 JSONObject jsonObj = new JSONObject(); 를 썼으므로.
+		
+							var html = "";
+							$.each(json, function(index, item) {
+								
+								var word = item.word;
+								var index = word.toLowerCase().indexOf( $("#fk_sellerName").val().toLowerCase() ); 
+								
+								var len = $("#fk_sellerName").val().length;
+								var result = "";
+								result = "<span class='first'>" +word.substr(0, index)+ "</span>" + "<span class='second' style='color:red; font-weight:bold;'>" +word.substr(index, len)+ "</span>" + "<span class='third'>" +word.substr(index+len, word.length - (index+len) )+ "</span>";  
+								html += "<span class='sellerNameone' style='cursor:pointer;'>"+ result +"</span><br/>";
+							})
+							$("#sellerDisplayList").html(html);
+							$("#sellerDisplayList").show();
+						}
+						else{ // 검색된 데이터가 존재하지 않는 경우
+							$("#sellerDisplayList").hide();
+						}
+					},
+					error: function(request, status, error){
+						alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+					}	
+				})
+			}
+		}) 
+		
+		$("#sellerDisplayList").click(function(){
+			var word = "";	
+			var $target = $(event.target);
+			if($target.is(".first")){ // 내가 클릭한 곳이 first 라면 
+				word = $target.text() + $target.next().text() + $target.next().next().text()
+			}
+			else if($target.is(".second")){
+				word = $target.prev().text() + $target.text() + $target.next().text()
+			}
+			else if($target.is(".third")){
+				word = $target.prev().prev().text() + $target.prev().text() + $target.text()
+			}
+			
+			$("#fk_sellerName").val(word);
+			$("#sellerDisplayList").hide();
+		})	
+		
+		$("#fk_hotelName").keyup(function(){
+			
+			var wordLength = $("#fk_hotelName").val().length;
+			
+			if( wordLength == 0 ){
+				$("#hotelDisplayList").hide();
+			}	
+			else {
+				$.ajax({  
+					url: "<%= request.getContextPath() %>/wordHotelSearchShow.bc" ,
+					type: "GET",
+					data:{ "fk_hotelName": $("#fk_hotelName").val() },
+					dataType: "JSON",
+					success: function(json){
+						
+						<%-- === #113. 검색어 입력시 자동글 완성하기 7 === --%> 
+						if(json.length>0){ 
+							var html = "";
+							$.each(json, function(index, item) {
+								
+								var word = item.word;
+								var index = word.toLowerCase().indexOf( $("#fk_hotelName").val().toLowerCase() ); 
+								
+								var len = $("#fk_hotelName").val().length;
+								var result = "";
+								result = "<span class='first'>" +word.substr(0, index)+ "</span>" + "<span class='second' style='color:red; font-weight:bold;'>" +word.substr(index, len)+ "</span>" + "<span class='third'>" +word.substr(index+len, word.length - (index+len) )+ "</span>";  
+								html += "<span class='hotelNameone' style='cursor:pointer;'>"+ result +"</span><br/>";
+							})
+							$("#hotelDisplayList").html(html);
+							$("#hotelDisplayList").show();
+						}
+						else{ // 검색된 데이터가 존재하지 않는 경우
+							$("#hotelDisplayList").hide();
+						}
+					},
+					error: function(request, status, error){
+						alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+					}	
+				})
+			}
+		}) 
+		
+		$("#hotelDisplayList").click(function(){
+			var word = "";	
+			var $target = $(event.target);
+			if($target.is(".first")){ // 내가 클릭한 곳이 first 라면 
+				word = $target.text() + $target.next().text() + $target.next().next().text()
+			}
+			else if($target.is(".second")){
+				word = $target.prev().text() + $target.text() + $target.next().text()
+			}
+			else if($target.is(".third")){
+				word = $target.prev().prev().text() + $target.prev().text() + $target.text()
+			}
+			
+			$("#fk_hotelName").val(word);
+			$("#hotelDisplayList").hide();
+		})	
+	}); // end of document=======================================
+		
+	
 </script>
-
+  
 <div id="adminWrite">
-	<label style="font-size: 16px;">◎ 글 작성</label>
+	<label style="font-size: 16px;">◎ 글 작성</label>    
 	<br/>
 	<form name="adminWriteFrm" enctype="multipart/form-data"> 
 	<input type="text" name="name" value="${(sessionScope.loginadmin).name}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly  />  
-	<input type="text" name="fk_sellerName" placeholder="사업자명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  /> 
-	<input type="text" name="fk_hotelName" placeholder="호텔명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"    /> 
-	<br/>
-	<input type="text" name="title" id="title" placeholder="제목" style="margin: 5px 0;" /><br/>	
+	<input type="text" name="fk_sellerName" id="fk_sellerName" autocomplete="off"  placeholder="판매자" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  /> 
+	<input type="text" name="fk_hotelName" id="fk_hotelName" autocomplete="off"  placeholder="호텔명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"    /> 
+	<br/>   
+	  
+	
+	
+	<input type="text" name="title" id="title" placeholder="제목" style="margin: 5px 0; " /><br/>	
 	<textarea name="content" id="content" style="width: 50%;"></textarea>	
 	<br/>
+	
 	<p style="display: inline-block;  font-size: 10pt; ">*파일첨부</p> <input type="file"  style="display: inline-block; font-size: 8pt;" name="attach" />
 	
 	<input type="hidden" name="fk_adminId" value="${sessionScope.loginadmin.adminId}" readonly />
 	
-	<input type="hidden" value="${fk_seq}" name="fk_seq"/>
+	<input type="hidden" value="${fk_seq}" name="fk_seq"/> 
 	<input type="hidden" value="${groupno}" name="groupno"/>
 	<input type="hidden" value="${depthno}" name="depthno"/>
 	
@@ -131,7 +263,13 @@
 	<br/>  
 	<input type="button" id="btnWrite" value="등록" style="font-size: 8pt; margin-left: 100;"/> 
 	<input type="button" value="취소" onclick="location.href='<%=request.getContextPath()%>/adminCommentBoard.bc'" style="font-size: 8pt; margin-left: 100;"/> 
-
+ 
+	<div id="sellerDisplayList" style="width: 7%; font-size: 8pt; position: relative; left: 7.3%; height: 50px; margin-top: -374px;  border-top: none; border: solid 1px gray; background-color: white; z-index: 2 ">
+	</div>   
+	            
+	<div id="hotelDisplayList" style="width: 7%; font-size: 8pt; position: relative; left: 14.7%; height: 50px; margin-top: -374px;  border-top: none; border: solid 1px gray; background-color: white; z-index: 2 ">
+	</div>        
+	        
 </div>
 
 

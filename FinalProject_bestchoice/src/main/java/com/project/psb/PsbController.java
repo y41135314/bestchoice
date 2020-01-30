@@ -45,6 +45,7 @@ import com.project.common.FileManager;
 import com.project.common.MyUtil;
 import com.project.smh.SmhMemberVO;
 
+
 @Controller
 public class PsbController {
 
@@ -102,24 +103,16 @@ public class PsbController {
 			session.removeAttribute("loginadmin");	
 		}
 		
-		if(session.getAttribute("loginuser") != null) {
-			session.removeAttribute("loginuser");	
-		}
-		
-		if(session.getAttribute("loginseller") != null) {
-			session.removeAttribute("loginseller");	
-		}
-		
 		mav.setViewName("psb/main");
 		return mav;
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////// 회원 리스트  ///////////////////////////
+						//////////////////// 회원 리스트  ///////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	@RequestMapping(value="/adminMember_list.bc")
 	public ModelAndView adminMember(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
-	
+		
 		List<SmhMemberVO> memberList = null;
 		
 		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
@@ -134,7 +127,7 @@ public class PsbController {
 		
 		String gender = request.getParameter("gender");
 		String[] ageArr = request.getParameterValues("age");
-		
+	
 		String startDate = request.getParameter("startDate");
 		String endDate = request.getParameter("endDate");
 		
@@ -156,7 +149,7 @@ public class PsbController {
 		if(orderType == null) {
 			orderType = "registerday";
 		}
-		
+			
 		String mstatus = request.getParameter("mstatus");
 		
 		HashMap<String, Object> paraMap = new HashMap<String,Object>();
@@ -170,7 +163,7 @@ public class PsbController {
 		paraMap.put("endDate", endDate);
 		paraMap.put("ageArr",ageArr);
 		
-		// System.out.println(startDate);
+		// System.out.println(orderType);
 		
 		if( ageArr != null ) {
 			String ageStr = Arrays.toString(ageArr);
@@ -194,7 +187,7 @@ public class PsbController {
 		else {
 			try {
 				currentShowPageNO = Integer.parseInt(str_currentShowPageNO);
-			
+				
 				if(currentShowPageNO < 1 || currentShowPageNO > totalPage) {
 					currentShowPageNO = 1;
 				}
@@ -202,7 +195,7 @@ public class PsbController {
 				currentShowPageNO = 1;
 			}
 		}
-		
+	
 		startRno = ((currentShowPageNO-1)*sizePerPage) + 1;
 		endRno = startRno + sizePerPage -1;
 		paraMap.put("startRno", String.valueOf(startRno));
@@ -228,112 +221,36 @@ public class PsbController {
 		String url = "adminMember_list.bc";	
 		// *** [이전] 만들기 *** //    
 		if(pageNo != 1) {
-		if( ageArr == null & gender == null & mstatus == null ) {
-		
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+ (pageNo-1)
-			+"&startDate="+startDate+"&endDate="+endDate
-			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-			+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
-		}
-		else if( ageArr != null & gender == null & mstatus == null ) {
-			String ageurl = "";
-			for (int i = 0; i < ageArr.length; i++) {
-				ageurl += "&age=" + ageArr[i] ;
-			}
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
-			+ageurl+"&startDate="+startDate+"&endDate="+endDate
-			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-			+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
-			
-		}
-		else if( ageArr == null & gender != null & mstatus == null ) {
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
-			+"&startDate="+startDate+"&endDate="+endDate
-			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-			+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
-		}
-		else if( ageArr == null & gender == null & mstatus != null ) {
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
-			+"&startDate="+startDate+"&endDate="+endDate
-			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-			+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
-			
-		}
-		else if( ageArr != null & gender != null & mstatus == null ) {
-			String ageurl = "";
-			for (int i = 0; i < ageArr.length; i++) {
-				ageurl += "&age=" + ageArr[i] ;
-			}
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
-			+ageurl+"&startDate="+startDate+"&endDate="+endDate
-			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-			+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
-		}
-		else if( ageArr != null & gender == null & mstatus != null ) {
-			String ageurl = "";
-			for (int i = 0; i < ageArr.length; i++) {
-				ageurl += "&age=" + ageArr[i] ;
-			}
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
-			+ageurl+"&startDate="+startDate+"&endDate="+endDate
-			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-			+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
-		}
-		else if( ageArr == null & gender != null & mstatus != null ) {
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1)  + "&gender="+gender
-			+"&startDate="+startDate+"&endDate="+endDate
-			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-			+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
-		}
-		else if( ageArr != null & gender != null & mstatus != null ) {
-			String ageurl = "";
-			for (int i = 0; i < ageArr.length; i++) {
-				ageurl += "&age=" + ageArr[i] ;
-			}
-			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
-			+ageurl+"&startDate="+startDate+"&endDate="+endDate
-			+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-			+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
-			}
-		}
-		
-		while( !(loop>blockSize || pageNo>totalPage) ) {
-		
-			if(pageNo == currentShowPageNO) {
-				pagebar += "&nbsp;<span style='color: red; border: 1px solid gray; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";				
-			}
-			else {
-			
-				if( ageArr == null & gender == null & mstatus == null ) {
+			if( ageArr == null & gender == null & mstatus == null ) {
 				
-				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
-				+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+ (pageNo-1)
+							+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
 			}
 			else if( ageArr != null & gender == null & mstatus == null ) {
 				String ageurl = "";
 				for (int i = 0; i < ageArr.length; i++) {
 					ageurl += "&age=" + ageArr[i] ;
 				}
-				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
-				+ageurl+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
-			
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
+							+ageurl+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+				
 			}
 			else if( ageArr == null & gender != null & mstatus == null ) {
-				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
-				+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
-			
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+				
 			}
 			else if( ageArr == null & gender == null & mstatus != null ) {
-				pagebar += "&nbsp;<a style='color:black;'  href='"+url+"?&currentShowPageNO="+pageNo 
-				+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
 				
 			}
 			else if( ageArr != null & gender != null & mstatus == null ) {
@@ -341,36 +258,113 @@ public class PsbController {
 				for (int i = 0; i < ageArr.length; i++) {
 					ageurl += "&age=" + ageArr[i] ;
 				}
-				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
-				+ageurl+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
+							+ageurl+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
 			}
 			else if( ageArr != null & gender == null & mstatus != null ) {
-					String ageurl = "";
+				String ageurl = "";
 				for (int i = 0; i < ageArr.length; i++) {
 					ageurl += "&age=" + ageArr[i] ;
 				}
-				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
-				+ageurl+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
+							+ageurl+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
 			}
 			else if( ageArr == null & gender != null & mstatus != null ) {
-				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo  + "&gender="+gender
-				+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1)  + "&gender="+gender
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
 			}
 			else if( ageArr != null & gender != null & mstatus != null ) {
 				String ageurl = "";
 				for (int i = 0; i < ageArr.length; i++) {
 					ageurl += "&age=" + ageArr[i] ;
 				}
-				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
-				+ageurl+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) + "&gender="+gender
+							+ageurl+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+			}
+		}
+			
+		while( !(loop>blockSize || pageNo>totalPage) ) {
+		
+			if(pageNo == currentShowPageNO) {
+				pagebar += "&nbsp;<span style='color: red; border: 1px solid gray; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";				
+			}
+			else {
+				
+				if( ageArr == null & gender == null & mstatus == null ) {
+					
+					pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+								+"&startDate="+startDate+"&endDate="+endDate
+								+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+								+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				}
+				else if( ageArr != null & gender == null & mstatus == null ) {
+					String ageurl = "";
+					for (int i = 0; i < ageArr.length; i++) {
+						ageurl += "&age=" + ageArr[i] ;
+					}
+					pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+								+ageurl+"&startDate="+startDate+"&endDate="+endDate
+								+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+								+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+					
+				}
+				else if( ageArr == null & gender != null & mstatus == null ) {
+					pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+							+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+					
+				}
+				else if( ageArr == null & gender == null & mstatus != null ) {
+					pagebar += "&nbsp;<a style='color:black;'  href='"+url+"?&currentShowPageNO="+pageNo 
+							+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+					
+				}
+				else if( ageArr != null & gender != null & mstatus == null ) {
+					String ageurl = "";
+					for (int i = 0; i < ageArr.length; i++) {
+						ageurl += "&age=" + ageArr[i] ;
+					}
+					pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+								+ageurl+"&startDate="+startDate+"&endDate="+endDate
+								+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+								+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				}
+				else if( ageArr != null & gender == null & mstatus != null ) {
+					String ageurl = "";
+					for (int i = 0; i < ageArr.length; i++) {
+						ageurl += "&age=" + ageArr[i] ;
+					}
+					pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
+								+ageurl+"&startDate="+startDate+"&endDate="+endDate
+								+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+								+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				}
+				else if( ageArr == null & gender != null & mstatus != null ) {
+					pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo  + "&gender="+gender
+							+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				}
+				else if( ageArr != null & gender != null & mstatus != null ) {
+					String ageurl = "";
+					for (int i = 0; i < ageArr.length; i++) {
+						ageurl += "&age=" + ageArr[i] ;
+					}
+					pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
+								+ageurl+"&startDate="+startDate+"&endDate="+endDate
+								+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+								+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
 				}
 			
 			}  
@@ -380,13 +374,13 @@ public class PsbController {
 		
 		// *** [다음] 만들기 *** //
 		if( !(pageNo>totalPage) ) {
-		
+
 			if( ageArr == null & gender == null & mstatus == null ) {
-			
+				
 				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
-				+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+							+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
 			}
 			else if( ageArr != null & gender == null & mstatus == null ) {
 				String ageurl = "";
@@ -394,23 +388,23 @@ public class PsbController {
 					ageurl += "&age=" + ageArr[i] ;
 				}
 				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
-				+ageurl+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
-			
+							+ageurl+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+				
 			}
 			else if( ageArr == null & gender != null & mstatus == null ) {
 				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
-				+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
 				
 			}
 			else if( ageArr == null & gender == null & mstatus != null ) {
 				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
-				+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
 				
 			}
 			else if( ageArr != null & gender != null & mstatus == null ) {
@@ -419,9 +413,9 @@ public class PsbController {
 					ageurl += "&age=" + ageArr[i] ;
 				}
 				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
-				+ageurl+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+							+ageurl+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
 			}
 			else if( ageArr != null & gender == null & mstatus != null ) {
 				String ageurl = "";
@@ -429,15 +423,15 @@ public class PsbController {
 					ageurl += "&age=" + ageArr[i] ;
 				}
 				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
-				+ageurl+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+							+ageurl+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
 			}
 			else if( ageArr == null & gender != null & mstatus != null ) {
 				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo  + "&gender="+gender
-				+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
 			}
 			else if( ageArr != null & gender != null & mstatus != null ) {
 				String ageurl = "";
@@ -445,9 +439,9 @@ public class PsbController {
 					ageurl += "&age=" + ageArr[i] ;
 				}
 				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo + "&gender="+gender
-				+ageurl+"&startDate="+startDate+"&endDate="+endDate
-				+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
-				+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+							+ageurl+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+ "&mstatus="+mstatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
 			}
 		
 		}
@@ -473,7 +467,7 @@ public class PsbController {
 	public String memberExcelFile(HttpServletRequest request, Model model){
 		List<SmhMemberVO> memberList = null;
 		
-		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
+		/*String str_currentShowPageNO = request.getParameter("currentShowPageNO");
 		
 		int totalCount = 0; // 총 게시물 건수
 		int sizePerPage = 5;  // 한 페이지당 보여줄 게시물 수
@@ -482,7 +476,7 @@ public class PsbController {
 		
 		int startRno = 0;  // 시작 행번호
 		int endRno = 0; // 끝 행번호 
-		
+*/		
 		String gender = request.getParameter("gender");
 		String[] ageArr = request.getParameterValues("age");
 	
@@ -718,16 +712,16 @@ public class PsbController {
           
             // 누적 결제액 
             bodyCell = bodyRow.createCell(7);
-         /*   bodyCell.setCellValue(Integer.parseInt(membrvo.get("AGE")));
-            bodyCell.setCellStyle(moneyStyle);   // 천단위 스타일 적용 
-*/        	
+            bodyCell.setCellValue(membervo.getTotalPrice());
+            bodyCell.setCellStyle(moneyStyle); 
+        	
             // DB에서 값을 읽어올 때 디폴트는 String 이므로, (사칙연산이) 필요한 경우 숫자로 바꿔야 한다.
           
             // 누적 예약수
             bodyCell = bodyRow.createCell(8);
-      /*      bodyCell.setCellValue(Integer.parseInt(empMap.get("AGE")));
+            bodyCell.setCellValue(membervo.getTotalCount());
             bodyCell.setCellStyle(moneyStyle);   // 천단위 스타일 적용 
-*/            
+            
         } // end of for----------------------------------
         
         // request.setAttribute("key 값", 넘길 데이터 ) 역할
@@ -789,7 +783,8 @@ public class PsbController {
 			}
 		}
 		return gson.toJson(jsonArr);  
-	}	
+	}
+	
 	@RequestMapping(value="/memberDetail.bc")
 	public ModelAndView adminMemberDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		
@@ -797,10 +792,28 @@ public class PsbController {
 		
 		SmhMemberVO membervo = service.getOneMember(member_idx);
 		mav.addObject("membervo", membervo);
+		
+		// 회원 적립금 가져오기
+		int memberPoint = 0;
+		try {
+			memberPoint = service.getMemberPoint(member_idx);
+			mav.addObject("memberPoint", memberPoint);
+		} catch (NullPointerException e) {
+			mav.addObject("memberPoint", 0);
+		}
+	
+		// 최근 결제일 가져오기
+		String lastDate = service.getlastDate(member_idx);
+		if (lastDate != null ) {
+			mav.addObject("lastDate", lastDate);
+		}else {
+			mav.addObject("lastDate", ".");
+		}
+		
 		mav.setViewName("tilesSB/memberDetail.tilesSBM");
 		return mav;
 	}
-	
+
 	@RequestMapping(value="/adminMember_chart.bc")
 	public ModelAndView adminMember_list(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		int totalMember = service.getTotalMember();
@@ -809,9 +822,38 @@ public class PsbController {
 		return mav;
 	}
 	
+	@RequestMapping(value="/memberPointUpdate.bc")
+	public ModelAndView memberPointUpdate(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		
+		String member_idx = request.getParameter("member_idx");
+		String memberPointStr = request.getParameter("memberPoint");
+		
+		int memberPoint = Integer.parseInt( memberPointStr.replaceAll(",", ""));
+		
+		int n = 0;
+		try {
+			int bool = service.getMemberPoint(member_idx);
+			n = service.memberPointUpdate(member_idx, memberPoint);
+		} catch (NullPointerException e) {
+			n = service.memberPointInsert(member_idx, memberPoint);
+		}
+		
+		if(n==1) {
+
+			mav.addObject("msg","회원 적립금이 업데이트 되었습니다.");
+			mav.addObject("loc", request.getContextPath() + "/memberDetail.bc?member_idx="+member_idx );
+
+			mav.setViewName("psb/msg");
+		}
+		
+		return mav;
+	}
 	
-	////////////////////////////////
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+						//////////////////// 판매자 리스트  ///////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+		
 	@RequestMapping(value="/adminSeller_list.bc")
 	public ModelAndView adminSeller_list(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		mav.setViewName("tilesSB/adminSeller_list.tilesSBS");
@@ -837,10 +879,144 @@ public class PsbController {
 	}
 	
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+					//////////////////// 매출 통계  ///////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+		
 	@RequestMapping(value="/salesStatistic.bc")
 	public ModelAndView adminSalesStatistic(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		
+		// 누적 매출액
+		int toal_Price = service.total_Price();
+		int last_yearPrice = service.last_yearPrice();
+		int yearPrice = service.yearPrice();
+		int monthPrice = service.monthPrice();
+		int dayPrice = service.dayPrice();
+		
+		mav.addObject("toal_Price",toal_Price);
+		mav.addObject("last_yearPrice", last_yearPrice);
+		mav.addObject("yearPrice", yearPrice);
+		mav.addObject("monthPrice", monthPrice);
+		mav.addObject("dayPrice", dayPrice);
+		
+		// 회원 매출액 - 성별
+		List<HashMap<String,Object>> paraMapList = service.sales_gender();
+	    for ( HashMap<String, Object> map : paraMapList ) { 
+			
+	    	if ( map.get("gender").equals("1")) {
+	    		mav.addObject("M_RCount",map.get("RCount"));
+	    		mav.addObject("M_totalPrice",map.get("totalPrice"));
+	    		mav.addObject("M_AVG",map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("gender").equals("2")) {
+	    		mav.addObject("F_RCount",map.get("RCount"));
+	    		mav.addObject("F_totalPrice",map.get("totalPrice"));
+	    		mav.addObject("F_AVG",map.get("AVG"));
+	    	}
+		}
+		
+	    // 회원 매출액 - 연령대
+		List<HashMap<String,Object>> paraMapList2 = service.sales_age();
+		int Count70 = 0; 
+		int Price70 = 0;
+		int Avg70 = 0;
+		
+	    for ( HashMap<String, Object> map : paraMapList2 ) { 
+			
+	    	if ( map.get("age").equals("10")) {
+	    		mav.addObject("RCount_10",map.get("RCount"));
+	    		mav.addObject("totalPrice_10",map.get("totalPrice"));
+	    		mav.addObject("AVG_10",map.get("AVG"));
+	    		
+	    	}
+	    	
+	    	if ( map.get("age").equals("20")) {
+	    		mav.addObject("RCount_20",map.get("RCount"));
+	    		mav.addObject("totalPrice_20",map.get("totalPrice"));
+	    		mav.addObject("AVG_20",map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("age").equals("30")) {
+	    		mav.addObject("RCount_30",map.get("RCount"));
+	    		mav.addObject("totalPrice_30",map.get("totalPrice"));
+	    		mav.addObject("AVG_30",map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("age").equals("40")) {
+	    		mav.addObject("RCount_40",map.get("RCount"));
+	    		mav.addObject("totalPrice_40",map.get("totalPrice"));
+	    		mav.addObject("AVG_40",map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("age").equals("50")) {
+	    		mav.addObject("RCount_50",map.get("RCount"));
+	    		mav.addObject("totalPrice_50",map.get("totalPrice"));
+	    		mav.addObject("AVG_50",map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("age").equals("60")) {
+	    		mav.addObject("RCount_60",map.get("RCount"));
+	    		mav.addObject("totalPrice_60",map.get("totalPrice"));
+	    		mav.addObject("AVG_60",map.get("AVG"));
+	    	}
+	    	
+	    	if ( Integer.parseInt((String) map.get("age")) >= 70  ) {
+	    		Count70 += (int)map.get("RCount"); 
+	    		Price70 += (int)map.get("totalPrice");
+	    		Avg70 += (int)map.get("AVG");
+	    	}
+		}
+	    mav.addObject("RCount_70",Count70);
+		mav.addObject("totalPrice_70",Price70);
+		mav.addObject("AVG_70",Price70/Count70);
+		
 		mav.setViewName("tilesSB/salesStatistic.tilesSBSAT");
 		return mav;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/viewPrice.bc", produces="text/plain;charset=UTF-8")
+	public String viewPrice(HttpServletRequest request) {
+		
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		
+		HashMap<String,String> paraMap = new HashMap<String,String>();
+		paraMap.put("startDate", startDate);
+		paraMap.put("endDate", endDate);
+		
+		int searchPrice = service.searchPrice(paraMap);
+
+		Gson gson = new Gson();
+		JsonObject jsonObj = new JsonObject();  // JSONObject (org.json) 와 다름 
+		jsonObj.addProperty("searchPrice",searchPrice);
+		return gson.toJson(jsonObj);  
+	}
+	
+	//chart_MonthlyPrice
+	@ResponseBody
+	@RequestMapping(value="/chart_MonthlyPrice.bc", produces="text/plain;charset=UTF-8")
+	public String chart_MonthlyPrice(HttpServletRequest request) {
+		
+		List<HashMap<String, Object>> montlyPriceList = service.chart_MonthlyPrice();
+
+		Gson gson = new Gson();
+		JsonArray jsonArr = new JsonArray();   // JSONArray (org.json) 와 다름 
+		
+		if(montlyPriceList != null ) {
+			for ( HashMap<String, Object> map : montlyPriceList ) { 
+				
+				JsonObject jsonObj = new JsonObject();  // JSONObject (org.json) 와 다름 
+				
+				jsonObj.addProperty("MONTH", (String)map.get("MONTH"));
+				jsonObj.addProperty("totalPrice", (int)map.get("totalPrice"));
+				jsonObj.addProperty("totalCount", (int)map.get("totalCount"));
+				
+				jsonArr.add(jsonObj);
+			}
+		}
+		return gson.toJson(jsonArr);  
 	}
 	
 	@RequestMapping(value="/adminReservList.bc")
@@ -848,6 +1024,7 @@ public class PsbController {
 		mav.setViewName("tilesSB/adminReservList.tilesSBSAT");
 		return mav;
 	}
+	
 
 	@RequestMapping(value="/sellerDetail.bc")
 	public ModelAndView adminSellerDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
@@ -860,7 +1037,6 @@ public class PsbController {
 		mav.setViewName("tilesSB/hotelDetail.tilesSBS");
 		return mav;
 	}
-	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 						//////////////////// 관리자 게시판 ///////////////////////////
@@ -996,7 +1172,6 @@ public class PsbController {
 		return mav;
 	}
 	
-	
 	@RequestMapping(value="/adCommentDetail.bc")
 	public ModelAndView adminCommentDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		
@@ -1022,7 +1197,7 @@ public class PsbController {
 		mav.setViewName("tilesSB/board/adCommentDetail.tilesSBS");
 		return mav;
 	}
-
+	
 	// 관리자 게시판 글쓰기
 	@RequestMapping(value="/adminWrite.bc")
 	public ModelAndView adminWrite(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
@@ -1167,7 +1342,7 @@ public class PsbController {
 		mrequest.setAttribute("n", n);
 		return "psb/board/addEnd";
 	}
-
+	
 	// 첨부파일 다운 
 	@RequestMapping(value="/adminDownload.bc", method={RequestMethod.GET} )
 	public void adminDownload(HttpServletRequest request, HttpServletResponse response) {
@@ -1350,7 +1525,7 @@ public class PsbController {
 	
 		return mav;
 	}
-
+	
 	// 글 삭제 페이지 요청
 	@RequestMapping(value="/adBoardDelete.bc", method={RequestMethod.GET} )
 	public ModelAndView adminBoardDelete(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
@@ -1452,7 +1627,7 @@ public class PsbController {
 		}
 		return jsonStr;
 	}
-		
+	
 	// 게시판 댓글 수정  upComment
 	@ResponseBody
 	@RequestMapping(value="/upComment.bc", method={RequestMethod.POST}, produces="text/plain;charset=UTF-8" )
@@ -1484,6 +1659,46 @@ public class PsbController {
 			e.printStackTrace();
 		}
 		return jsonStr;
+	}
+	
+	// 자동입력
+	@ResponseBody
+	@RequestMapping(value="/wordSellerSearchShow.bc", method={RequestMethod.GET}, produces="text/plain;charset=UTF-8" )
+	public String wordSellerSearchShow(HttpServletRequest request) {
+		
+		String fk_sellerName = request.getParameter("fk_sellerName");
+	
+		List<String> wordList = service.wordSellerSearchShow(fk_sellerName);
+		
+		JSONArray jsonArr = new JSONArray();
+		if( wordList != null ) {
+			for(String word : wordList) {
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("word",word);
+				jsonArr.put(jsonObj);
+			}
+		}
+		return jsonArr.toString();
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/wordHotelSearchShow.bc", method={RequestMethod.GET}, produces="text/plain;charset=UTF-8" )
+	public String wordHotelSearchShow(HttpServletRequest request) {
+		
+		String fk_hotelName = request.getParameter("fk_hotelName");
+	
+		List<String> wordList = service.wordHotelSearchShow(fk_hotelName);
+		
+		JSONArray jsonArr = new JSONArray();
+		if( wordList != null ) {
+			for(String word : wordList) {
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("word",word);
+				jsonArr.put(jsonObj);
+			}
+		}
+		return jsonArr.toString();
 	}
 	
 }	
