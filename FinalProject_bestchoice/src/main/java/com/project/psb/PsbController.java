@@ -969,8 +969,11 @@ public class PsbController {
 		}
 	    mav.addObject("RCount_70",Count70);
 		mav.addObject("totalPrice_70",Price70);
-		mav.addObject("AVG_70",Price70/Count70);
-		
+		if(Count70 != 0) {
+			mav.addObject("AVG_70",Price70/Count70);
+		} else {
+			mav.addObject("AVG_70",0);
+		}
 		mav.setViewName("tilesSB/salesStatistic.tilesSBSAT");
 		return mav;
 	}
