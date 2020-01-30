@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
+<% String ctxPath = request.getContextPath(); %>
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
@@ -99,7 +100,7 @@
 	
 	function chart_MonthlyPrice(){
 		$.ajax({
-			url: "/test_bestchoice/chart_MonthlyPrice.bc",
+			url: "<%= request.getContextPath() %>/chart_MonthlyPrice.bc",
 			dataType: "JSON",
 			success:function(json){
 				
