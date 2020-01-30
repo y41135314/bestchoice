@@ -317,7 +317,7 @@
 	<update id="updateEventStatus">
 		
 		update tbl_here_admin_event set event_status = 2
-		where sysdate > event_endday
+		where sysdate > event_endday and event_status = 1
 		
 	</update>
 	
