@@ -99,6 +99,7 @@
 			border: solid 1px black;
 			border-radius: 4px;
 			padding: 2px;
+			font-weight: bold;
 		}
 		
 		#insertFaq {
@@ -213,6 +214,7 @@
 			border: solid 1px black;
 			border-radius: 4px;
 			padding: 2px;
+			font-weight: bold;
 		}
 		
 		#insertFaq {
@@ -376,7 +378,7 @@
 							<c:forEach var="vo" items="${ faqList }">  
 						
 							<tr style="cursor: pointer;" onclick="goDetail('${vo.no}')">
-								<td style="width: 20%;">${vo.type_str}</td>
+								<td style="width: 20%; font-weight: bold;">${vo.type_str}</td>
 								<td style="width: 50%;">${ vo.content_short }</td>
 								<td>
 									<c:if test="${ vo.rep_no == null }"><span class="myfaq_reply">답변대기중</span></c:if>
