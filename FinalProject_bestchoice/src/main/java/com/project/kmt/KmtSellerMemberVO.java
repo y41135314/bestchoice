@@ -7,10 +7,10 @@ public class KmtSellerMemberVO {
 	private String seller_Name;		// 사업자명
 	private String seller_No;		// 사업자번호
 	private String seller_Regday;	// 사업자등록신청일
-	private int seller_Phone;		// 사업자대표전화번호
-	private int seller_Mobile;		// 사업자휴대전화
+	private String seller_Phone;		// 사업자대표전화번호
+	private String seller_Mobile;		// 사업자휴대전화
 	private String seller_Addr;		// 사업자소재지(주소)
-	private int seller_Post;		// 우편번호
+	private String seller_Post;		// 우편번호
 	private String seller_RepName;	// 대표자명
 	private String seller_homepage; // 홈페이지주소
 	private int seller_Form;		// 사업형태 (1.개인법인 2.단체법인...)
@@ -21,7 +21,7 @@ public class KmtSellerMemberVO {
 	public KmtSellerMemberVO() {}
 	
 	public KmtSellerMemberVO(String seller_Id, int seller_idx, String seller_Pwd, String seller_Name, String seller_No,
-			String seller_Regday, int seller_Phone, int seller_Mobile, String seller_Addr, int seller_Post,
+			String seller_Regday, String seller_Phone, String seller_Mobile, String seller_Addr, String seller_Post,
 			String seller_RepName, String seller_homepage, int seller_Form, String seller_Item,
 			String seller_registerday, int seller_realStatus) {
 
@@ -92,19 +92,19 @@ public class KmtSellerMemberVO {
 		this.seller_Regday = seller_Regday;
 	}
 
-	public int getSeller_Phone() {
+	public String getSeller_Phone() {
 		return seller_Phone;
 	}
 
-	public void setSeller_Phone(int seller_Phone) {
+	public void setSeller_Phone(String seller_Phone) {
 		this.seller_Phone = seller_Phone;
 	}
 
-	public int getSeller_Mobile() {
+	public String getSeller_Mobile() {
 		return seller_Mobile;
 	}
 
-	public void setSeller_Mobile(int seller_Mobile) {
+	public void setSeller_Mobile(String seller_Mobile) {
 		this.seller_Mobile = seller_Mobile;
 	}
 
@@ -116,11 +116,11 @@ public class KmtSellerMemberVO {
 		this.seller_Addr = seller_Addr;
 	}
 
-	public int getSeller_Post() {
+	public String getSeller_Post() {
 		return seller_Post;
 	}
 
-	public void setSeller_Post(int seller_Post) {
+	public void setSeller_Post(String seller_Post) {
 		this.seller_Post = seller_Post;
 	}
 
@@ -173,27 +173,7 @@ public class KmtSellerMemberVO {
 	}
 	
 	
-	////////////////////////////////////////// 추가 
-	private int totalPrice;
-	private int totalCount;
-
-
-		public int getTotalPrice() {
-			return totalPrice;
-		}
-		
-		public void setTotalPrice(int totalPrice) {
-			this.totalPrice = totalPrice;
-		}
-		
-		public int getTotalCount() {
-			return totalCount;
-		}
-		
-		public void setTotalCount(int totalCount) {
-			this.totalCount = totalCount;
-		}
-	//////////////////////////////////////////
+	
 	
 	
 	

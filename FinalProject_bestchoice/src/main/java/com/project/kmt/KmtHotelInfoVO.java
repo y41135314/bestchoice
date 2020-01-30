@@ -9,13 +9,13 @@ public class KmtHotelInfoVO {
 	private String hotel_Addr1;			// 호텔주소 ( 시 / 도 )
 	private String hotel_Addr2;			// 호텔주소 ( 구 / 군  / 면)
 	private String hotel_Addr3;			// 호텔주소 ( 상세주소  )
-	private int hotel_Post;				// 호텔 우편번호
+	private String hotel_Post;				// 호텔 우편번호
 	private String hotel_RepName;		// 호텔 대표자명
 	private String hotel_Homepage;		// 호텔 홈페이지주소
 	private int hotel_Status;			// 호텔 상태 (1은 영업중 0은 비활성화 default는 0)
 	private String hotel_registerday;	// 호텔 등록일 (default 는 sysdate)
-	private int hotel_Phone;			// 호텔 대표전화번호
-	private int hotel_Fax;				// 호텔 대표팩스번호
+	private String hotel_Phone;			// 호텔 대표전화번호
+	private String hotel_Fax;				// 호텔 대표팩스번호
 	private String hotel_Email;			// 호텔 대표이메일
 	private String hotel_GEO;			// 호텔 (위,경도) 위치
 	private String fk_seller_Id;		// (foreign key) 판매자아이디
@@ -23,8 +23,8 @@ public class KmtHotelInfoVO {
 	public KmtHotelInfoVO() {}
 	
 	public KmtHotelInfoVO(int hotel_idx, String hotel_name, int hotel_Category, int hotel_Grade, String hotel_Addr1,
-			String hotel_Addr2, String hotel_Addr3, int hotel_Post, String hotel_RepName, String hotel_Homepage,
-			int hotel_Status, String hotel_registerday, int hotel_Phone, int hotel_Fax, String hotel_Email,
+			String hotel_Addr2, String hotel_Addr3, String hotel_Post, String hotel_RepName, String hotel_Homepage,
+			int hotel_Status, String hotel_registerday, String hotel_Phone, String hotel_Fax, String hotel_Email,
 			String hotel_GEO, String fk_seller_Id) {
 		super();
 		this.hotel_idx = hotel_idx;
@@ -102,11 +102,11 @@ public class KmtHotelInfoVO {
 		this.hotel_Addr3 = hotel_Addr3;
 	}
 
-	public int getHotel_Post() {
+	public String getHotel_Post() {
 		return hotel_Post;
 	}
 
-	public void setHotel_Post(int hotel_Post) {
+	public void setHotel_Post(String hotel_Post) {
 		this.hotel_Post = hotel_Post;
 	}
 
@@ -142,19 +142,19 @@ public class KmtHotelInfoVO {
 		this.hotel_registerday = hotel_registerday;
 	}
 
-	public int getHotel_Phone() {
+	public String getHotel_Phone() {
 		return hotel_Phone;
 	}
 
-	public void setHotel_Phone(int hotel_Phone) {
+	public void setHotel_Phone(String hotel_Phone) {
 		this.hotel_Phone = hotel_Phone;
 	}
 
-	public int getHotel_Fax() {
+	public String getHotel_Fax() {
 		return hotel_Fax;
 	}
 
-	public void setHotel_Fax(int hotel_Fax) {
+	public void setHotel_Fax(String hotel_Fax) {
 		this.hotel_Fax = hotel_Fax;
 	}
 
@@ -183,27 +183,7 @@ public class KmtHotelInfoVO {
 	}
 
 	
-	////////////////////////////////////////// 추가 
-	private int totalPrice;
-	private int totalCount;
-
-
-		public int getTotalPrice() {
-			return totalPrice;
-		}
-		
-		public void setTotalPrice(int totalPrice) {
-			this.totalPrice = totalPrice;
-		}
-		
-		public int getTotalCount() {
-			return totalCount;
-		}
-		
-		public void setTotalCount(int totalCount) {
-			this.totalCount = totalCount;
-		}
-	//////////////////////////////////////////
+	
 	
 	
 	
