@@ -119,9 +119,11 @@
 	
 		.faq_admin_textarea button {
 			/* width: 17%; */
-			background-color: white;
-		    border: solid;
-		    font-weight: bold;
+			background-color: #ff8080;
+		    border: solid 1px #ff8080;
+		    border-radius: 4px;
+		    color: white;
+		    font-weight: bold; 
 		    padding: 5px 15px;
 		}
 	
@@ -250,8 +252,10 @@
 	
 		.faq_admin_textarea button {
 			/* width: 17%; */
-			background-color: white;
-		    border: solid;
+			background-color: #ff8080;
+		    border: solid 1px #ff8080;
+		    border-radius: 4px;
+		    color: white;
 		    font-weight: bold;
 		    padding: 5px 15px;
 		}
@@ -425,7 +429,7 @@
 				<table style="font-family: 'Nanum Gothic', sans-serif;">
 					
 					<thead>
-						<tr>
+						<tr style="border: solid 2px #bf80ff;">
 							<td style="text-align: center; font-weight: bold; padding: 15px 0; background-color:#bf80ff; color:white;">글번호</td>
 							<td style="text-align: center; font-weight: bold; background-color:#bf80ff; color:white;">내역</td>
 						</tr>
@@ -435,7 +439,7 @@
 						<c:if test="${ not empty faqList }">
 							
 							<c:forEach items="${ faqList }" var="vo"> 
-								<tr>
+								<tr style="border:solid 2px #737373;">
 									
 									<td style="text-align: center;">${vo.no}</td>
 									<td>
