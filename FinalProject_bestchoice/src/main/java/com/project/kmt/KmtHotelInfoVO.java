@@ -5,7 +5,7 @@ public class KmtHotelInfoVO {
 	private int hotel_idx;				// 호텔코드(시퀀스)
 	private String hotel_name;			// 호텔명
 	private int hotel_Category; 		// 호텔유형 (1은 호텔 2는모텔 3은 리조트 등등)
-	private int hotel_Grade;			// 호텔등급 (5는 5성급, 4는 4성급...)
+
 	private String hotel_Addr1;			// 호텔주소 ( 시 / 도 )
 	private String hotel_Addr2;			// 호텔주소 ( 구 / 군  / 면)
 	private String hotel_Addr3;			// 호텔주소 ( 상세주소  )
@@ -23,7 +23,7 @@ public class KmtHotelInfoVO {
 			
 	public KmtHotelInfoVO() {}
 	
-	public KmtHotelInfoVO(int hotel_idx, String hotel_name, int hotel_Category, int hotel_Grade, String hotel_Addr1,
+	public KmtHotelInfoVO(int hotel_idx, String hotel_name, int hotel_Category, String hotel_Addr1,
 			String hotel_Addr2, String hotel_Addr3, String hotel_Post, String hotel_RepName, String hotel_Homepage,
 			int hotel_Status, String hotel_registerday, String hotel_Phone, String hotel_Fax, String hotel_Email,
 			String hotel_GEO_X,String hotel_GEO_Y, String fk_seller_Id) {
@@ -31,7 +31,7 @@ public class KmtHotelInfoVO {
 		this.hotel_idx = hotel_idx;
 		this.hotel_name = hotel_name;
 		this.hotel_Category = hotel_Category;
-		this.hotel_Grade = hotel_Grade;
+
 		this.hotel_Addr1 = hotel_Addr1;
 		this.hotel_Addr2 = hotel_Addr2;
 		this.hotel_Addr3 = hotel_Addr3;
@@ -70,14 +70,6 @@ public class KmtHotelInfoVO {
 
 	public void setHotel_Category(int hotel_Category) {
 		this.hotel_Category = hotel_Category;
-	}
-
-	public int getHotel_Grade() {
-		return hotel_Grade;
-	}
-
-	public void setHotel_Grade(int hotel_Grade) {
-		this.hotel_Grade = hotel_Grade;
 	}
 
 	public String getHotel_Addr1() {
