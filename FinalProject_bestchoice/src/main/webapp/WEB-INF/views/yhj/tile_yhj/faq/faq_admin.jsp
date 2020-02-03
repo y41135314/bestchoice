@@ -128,7 +128,7 @@
 		}
 	
 		.faq_admin_reply, .faq_admin_ajax_reply, .faq_admin_textarea {
-			padding: 5px 15px;
+			padding: 15px;
 		}
 	
 		#faq_pageBar {
@@ -261,7 +261,7 @@
 		}
 	
 		.faq_admin_reply, .faq_admin_ajax_reply, .faq_admin_textarea {
-			padding: 5px 15px;
+			padding: 15px;
 		}
 	
 		#faq_pageBar {
@@ -460,7 +460,7 @@
 											</div>
 											<div>
 												<span style="font-weight:bold;">▷ 사용자 질문 내역</span><br>
-												<div style="padding: 5px 15px; ">
+												<div style="padding: 15px; ">
 													${vo.content }
 												</div>
 											</div>
@@ -502,6 +502,7 @@
 									</td>
 									
 								</tr>
+								<tr style="height:30px;"></tr>
 							</c:forEach>	
 							
 						</c:if> 
