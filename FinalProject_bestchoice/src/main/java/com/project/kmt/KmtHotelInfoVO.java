@@ -17,7 +17,8 @@ public class KmtHotelInfoVO {
 	private String hotel_Phone;			// 호텔 대표전화번호
 	private String hotel_Fax;				// 호텔 대표팩스번호
 	private String hotel_Email;			// 호텔 대표이메일
-	private String hotel_GEO;			// 호텔 (위,경도) 위치
+	private String hotel_GEO_X;			// 호텔 (위,경도) 위치
+	private String hotel_GEO_Y;			// 호텔 (위,경도) 위치
 	private String fk_seller_Id;		// (foreign key) 판매자아이디
 			
 	public KmtHotelInfoVO() {}
@@ -25,7 +26,7 @@ public class KmtHotelInfoVO {
 	public KmtHotelInfoVO(int hotel_idx, String hotel_name, int hotel_Category, int hotel_Grade, String hotel_Addr1,
 			String hotel_Addr2, String hotel_Addr3, String hotel_Post, String hotel_RepName, String hotel_Homepage,
 			int hotel_Status, String hotel_registerday, String hotel_Phone, String hotel_Fax, String hotel_Email,
-			String hotel_GEO, String fk_seller_Id) {
+			String hotel_GEO_X,String hotel_GEO_Y, String fk_seller_Id) {
 		super();
 		this.hotel_idx = hotel_idx;
 		this.hotel_name = hotel_name;
@@ -42,7 +43,8 @@ public class KmtHotelInfoVO {
 		this.hotel_Phone = hotel_Phone;
 		this.hotel_Fax = hotel_Fax;
 		this.hotel_Email = hotel_Email;
-		this.hotel_GEO = hotel_GEO;
+		this.hotel_GEO_X = hotel_GEO_X;
+		this.hotel_GEO_Y = hotel_GEO_Y;
 		this.fk_seller_Id = fk_seller_Id;
 	}
 
@@ -166,14 +168,22 @@ public class KmtHotelInfoVO {
 		this.hotel_Email = hotel_Email;
 	}
 
-	public String getHotel_GEO() {
-		return hotel_GEO;
+	public String getHotel_GEO_X() {
+		return hotel_GEO_X;
 	}
 
-	public void setHotel_GEO(String hotel_GEO) {
-		this.hotel_GEO = hotel_GEO;
+	public void setHotel_GEO_X(String hotel_GEO_X) {
+		this.hotel_GEO_X = hotel_GEO_X;
 	}
 
+	public String getHotel_GEO_Y() {
+		return hotel_GEO_Y;
+	}
+
+	public void setHotel_GEO_Y(String hotel_GEO_Y) {
+		this.hotel_GEO_Y = hotel_GEO_Y;
+	}
+	
 	public String getFk_seller_Id() {
 		return fk_seller_Id;
 	}
