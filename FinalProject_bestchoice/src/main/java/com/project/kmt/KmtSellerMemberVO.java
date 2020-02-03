@@ -13,7 +13,7 @@ public class KmtSellerMemberVO {
 	private String seller_Post;		// 우편번호
 	private String seller_RepName;	// 대표자명
 	private String seller_homepage; // 홈페이지주소
-	private int seller_Form;		// 사업형태 (1.개인법인 2.단체법인...)
+
 	private String seller_Item;		// 취급품목 (호텔, 모텔 등등 default 는 호텔)
 	private String seller_registerday;	// 여기는어때 가입일
 	private int seller_realStatus;	// 여기는어때 내에서 활성화(1) 비활성화(0) default는 0 
@@ -22,7 +22,7 @@ public class KmtSellerMemberVO {
 	
 	public KmtSellerMemberVO(String seller_Id, int seller_idx, String seller_Pwd, String seller_Name, String seller_No,
 			String seller_Regday, String seller_Phone, String seller_Mobile, String seller_Addr, String seller_Post,
-			String seller_RepName, String seller_homepage, int seller_Form, String seller_Item,
+			String seller_RepName, String seller_homepage, String seller_Item,
 			String seller_registerday, int seller_realStatus) {
 
 		super();
@@ -38,7 +38,7 @@ public class KmtSellerMemberVO {
 		this.seller_Post = seller_Post;
 		this.seller_RepName = seller_RepName;
 		this.seller_homepage = seller_homepage;
-		this.seller_Form = seller_Form;
+
 		this.seller_Item = seller_Item;
 		this.seller_registerday = seller_registerday;
 		this.seller_realStatus = seller_realStatus;
@@ -140,13 +140,6 @@ public class KmtSellerMemberVO {
 		this.seller_homepage = seller_homepage;
 	}
 
-	public int getSeller_Form() {
-		return seller_Form;
-	}
-
-	public void setSeller_Form(int seller_Form) {
-		this.seller_Form = seller_Form;
-	}
 
 	public String getSeller_Item() {
 		return seller_Item;
@@ -173,6 +166,27 @@ public class KmtSellerMemberVO {
 	}
 	
 	
+	////////////////////////////////////////// 추가 
+	private int totalPrice;
+	private int totalCount;
+
+
+		public int getTotalPrice() {
+			return totalPrice;
+		}
+		
+		public void setTotalPrice(int totalPrice) {
+			this.totalPrice = totalPrice;
+		}
+		
+		public int getTotalCount() {
+			return totalCount;
+		}
+		
+		public void setTotalCount(int totalCount) {
+			this.totalCount = totalCount;
+		}
+	//////////////////////////////////////////
 	
 	
 	
