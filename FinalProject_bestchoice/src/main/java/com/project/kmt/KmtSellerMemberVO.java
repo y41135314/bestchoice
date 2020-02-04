@@ -13,7 +13,6 @@ public class KmtSellerMemberVO {
 	private String seller_Post;		// 우편번호
 	private String seller_RepName;	// 대표자명
 	private String seller_homepage; // 홈페이지주소
-
 	private String seller_Item;		// 취급품목 (호텔, 모텔 등등 default 는 호텔)
 	private String seller_registerday;	// 여기는어때 가입일
 	private int seller_realStatus;	// 여기는어때 내에서 활성화(1) 비활성화(0) default는 0 
@@ -38,7 +37,6 @@ public class KmtSellerMemberVO {
 		this.seller_Post = seller_Post;
 		this.seller_RepName = seller_RepName;
 		this.seller_homepage = seller_homepage;
-
 		this.seller_Item = seller_Item;
 		this.seller_registerday = seller_registerday;
 		this.seller_realStatus = seller_realStatus;
@@ -140,7 +138,6 @@ public class KmtSellerMemberVO {
 		this.seller_homepage = seller_homepage;
 	}
 
-
 	public String getSeller_Item() {
 		return seller_Item;
 	}
@@ -166,27 +163,6 @@ public class KmtSellerMemberVO {
 	}
 	
 	
-	////////////////////////////////////////// 추가 
-	private int totalPrice;
-	private int totalCount;
-
-
-		public int getTotalPrice() {
-			return totalPrice;
-		}
-		
-		public void setTotalPrice(int totalPrice) {
-			this.totalPrice = totalPrice;
-		}
-		
-		public int getTotalCount() {
-			return totalCount;
-		}
-		
-		public void setTotalCount(int totalCount) {
-			this.totalCount = totalCount;
-		}
-	//////////////////////////////////////////
 	
 	
 	

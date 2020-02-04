@@ -3,9 +3,8 @@ package com.project.kmt;
 public class KmtHotelInfoVO {
 	
 	private int hotel_idx;				// 호텔코드(시퀀스)
-	private String hotel_name;			// 호텔명
+	private String hotel_Name;			// 호텔명
 	private int hotel_Category; 		// 호텔유형 (1은 호텔 2는모텔 3은 리조트 등등)
-
 	private String hotel_Addr1;			// 호텔주소 ( 시 / 도 )
 	private String hotel_Addr2;			// 호텔주소 ( 구 / 군  / 면)
 	private String hotel_Addr3;			// 호텔주소 ( 상세주소  )
@@ -17,8 +16,9 @@ public class KmtHotelInfoVO {
 	private String hotel_Phone;			// 호텔 대표전화번호
 	private String hotel_Fax;				// 호텔 대표팩스번호
 	private String hotel_Email;			// 호텔 대표이메일
-	private String hotel_GEO_X;			// 호텔 (위,경도) 위치
-	private String hotel_GEO_Y;			// 호텔 (위,경도) 위치
+	private String hotel_GEO_X;			// 호텔 (위도) 위치
+	private String hotel_GEO_Y;			// 호텔 (경도) 위치
+	
 	private String fk_seller_Id;		// (foreign key) 판매자아이디
 			
 	public KmtHotelInfoVO() {}
@@ -26,12 +26,11 @@ public class KmtHotelInfoVO {
 	public KmtHotelInfoVO(int hotel_idx, String hotel_name, int hotel_Category, String hotel_Addr1,
 			String hotel_Addr2, String hotel_Addr3, String hotel_Post, String hotel_RepName, String hotel_Homepage,
 			int hotel_Status, String hotel_registerday, String hotel_Phone, String hotel_Fax, String hotel_Email,
-			String hotel_GEO_X,String hotel_GEO_Y, String fk_seller_Id) {
+			String HOTEL_GEO_X, String HOTEL_GEO_Y, String fk_seller_Id) {
 		super();
 		this.hotel_idx = hotel_idx;
-		this.hotel_name = hotel_name;
+		this.hotel_Name = hotel_name;
 		this.hotel_Category = hotel_Category;
-
 		this.hotel_Addr1 = hotel_Addr1;
 		this.hotel_Addr2 = hotel_Addr2;
 		this.hotel_Addr3 = hotel_Addr3;
@@ -43,8 +42,8 @@ public class KmtHotelInfoVO {
 		this.hotel_Phone = hotel_Phone;
 		this.hotel_Fax = hotel_Fax;
 		this.hotel_Email = hotel_Email;
-		this.hotel_GEO_X = hotel_GEO_X;
-		this.hotel_GEO_Y = hotel_GEO_Y;
+		this.hotel_GEO_X = HOTEL_GEO_X;
+		this.hotel_GEO_Y = HOTEL_GEO_Y;
 		this.fk_seller_Id = fk_seller_Id;
 	}
 
@@ -56,12 +55,12 @@ public class KmtHotelInfoVO {
 		this.hotel_idx = hotel_idx;
 	}
 
-	public String getHotel_name() {
-		return hotel_name;
+	public String getHotel_Name() {
+		return hotel_Name;
 	}
 
-	public void setHotel_name(String hotel_name) {
-		this.hotel_name = hotel_name;
+	public void setHotel_Name(String hotel_Name) {
+		this.hotel_Name = hotel_Name;
 	}
 
 	public int getHotel_Category() {
@@ -175,7 +174,7 @@ public class KmtHotelInfoVO {
 	public void setHotel_GEO_Y(String hotel_GEO_Y) {
 		this.hotel_GEO_Y = hotel_GEO_Y;
 	}
-	
+
 	public String getFk_seller_Id() {
 		return fk_seller_Id;
 	}
@@ -186,39 +185,9 @@ public class KmtHotelInfoVO {
 
 	
 	
-	////////////////////////////////////////// 추가 
-	private int totalPrice;
-	private int totalCount;
-
-
-		public int getTotalPrice() {
-			return totalPrice;
-		}
-		
-		public void setTotalPrice(int totalPrice) {
-			this.totalPrice = totalPrice;
-		}
-		
-		public int getTotalCount() {
-			return totalCount;
-		}
-		
-		public void setTotalCount(int totalCount) {
-			this.totalCount = totalCount;
-		}
-	//////////////////////////////////////////
 	
-	private String seller_Name ;
-
-	public String getSeller_Name() {
-		return seller_Name;
-	}
-
-	public void setSeller_Name(String seller_Name) {
-		this.seller_Name = seller_Name;
-	}
-		
-   //////////////////////////////////////////
+	
+	
 	
 	
 }
