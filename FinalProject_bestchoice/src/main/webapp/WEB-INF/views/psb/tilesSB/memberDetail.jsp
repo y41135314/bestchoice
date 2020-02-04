@@ -88,7 +88,7 @@
    <br/>
    <input type="button" value="회원리스트페이지로" onclick="location.href='<%=request.getContextPath()%>/adminMember_list.bc'" style="font-size: 8pt;"/> 
    &nbsp;&nbsp;|&nbsp;&nbsp;
-   <input type="button" value="예약내역 보기" onclick="location.href='<%=request.getContextPath()%>/adminReservList.bc'" style="font-size: 8pt;"/> 
+   <input type="button" value="예약내역 보기" onclick="location.href='<%=request.getContextPath()%>/adminReservList.bc?searchType=fk_member_idx&searchWord=${membervo.member_idx}&startDate=&endDate=&res_startday=&res_startdayEnd='" style="font-size: 8pt;"/> 
 
    <table id="tableMemberDetail" style="text-align: center;">
 		<tr style="background-color: #FAFAFA;">

@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.dws.DwoReservationVO;
+import com.project.kmt.KmtHotelInfoVO;
+import com.project.kmt.KmtSellerMemberVO;
 import com.project.smh.SmhMemberVO;
 
 
@@ -236,6 +239,161 @@ public class PsbService {
 		List<HashMap<String, Object>> paraMap = dao.sales_age();
 		return paraMap;
 	}
+
+	public List<HashMap<String, Object>> sales_grade() {
+		List<HashMap<String, Object>> paraMap = dao.sales_grade();
+		return paraMap;
+	}
+
+	public List<HashMap<String, Object>> sales_addr() {
+		List<HashMap<String, Object>> paraMap = dao.sales_addr();
+		return paraMap;
+	}
+
+	////////////////////////////////////////////////////////////////////////// 판매자 
+	
+	public int getTotalCountSeller(HashMap<String, Object> paraMap) {
+		int count = dao.getTotalCountSeller(paraMap);
+		return count;
+	}
+
+	public int getTotalSeller() {
+		int count = dao.getTotalSeller();
+		return count;
+	}
+
+	public List<KmtSellerMemberVO> sellerListWithPaging(HashMap<String, Object> paraMap) {
+		List<KmtSellerMemberVO> sellerList = dao.sellerListWithPaging(paraMap);
+		return sellerList;
+	}
+
+	public KmtSellerMemberVO getOneSeller(String seller_idx) {
+		KmtSellerMemberVO sellervo = dao.getOneSeller(seller_idx);
+		return sellervo;
+	}
+
+	public int getHotelCount(String seller_idx) {
+		int count = dao.getHotelCount(seller_idx);
+		return count;
+	}
+
+	public int updateSellerStatus(String seller_idx) {
+		int n = dao.updateSellerStatus(seller_idx);
+		return n;
+	}
+
+	public List<BoardVO> getSellerBoardList(String seller_Name) {
+		List<BoardVO> sellerBoardList = dao.getSellerBoardList(seller_Name);
+		return sellerBoardList;
+	}
+
+	public List<HashMap<String, Object>> chart_SellerMonthlyPrice(String seller_idx) {
+		List<HashMap<String, Object>> montlyPriceList = dao.chart_SellerMonthlyPrice(seller_idx);
+		return montlyPriceList;
+	}
+
+	public List<String> getHotelArr(String seller_idx) {
+		List<String> hotel_idx_Arr = dao.getHotelArr(seller_idx);
+		return hotel_idx_Arr;
+	}
+	
+	public int stopSellerStatus(String seller_idx) {
+		int n = dao.stopSellerStatus(seller_idx);
+		return n;
+	}
+
+	//////////////////////////////////////////////////////////////////////////호텔 
+
+	public int getTotalCountHotel(HashMap<String, Object> paraMap) {
+		int count = dao.getTotalCountHotel(paraMap);
+		return count;
+	}
+
+	public int getTotalHotel() {
+		int count = dao.getTotalHotel();
+		return count;
+	}
+
+	public List<KmtHotelInfoVO> hotelListWithPaging(HashMap<String, Object> paraMap) {
+		List<KmtHotelInfoVO> hotelList = dao.hotelListWithPaging(paraMap);
+		return hotelList;
+	}
+
+	public KmtHotelInfoVO getOneHotel(String hotel_idx) {
+		KmtHotelInfoVO hotelvo = dao.getOneHotel(hotel_idx);
+		return hotelvo;
+	}
+
+	public int getRoomCount(String hotel_idx) {
+		int count = dao.getRoomCount(hotel_idx);
+		return count;
+	}
+
+	public List<BoardVO> getHotelBoardList(String hotel_Name) {
+		List<BoardVO> hotelBoardList = dao.getHotelBoardList(hotel_Name);
+		return hotelBoardList;
+	}
+
+	public int updateHotelStatus(String[] hotel_idx) {
+		int n = dao.updateHotelStatus(hotel_idx);
+		return n;
+	}
+
+	public int stopHotelStatus(String[] hotel_idx) {
+		int n = dao.stopHotelStatus(hotel_idx);
+		return n;
+	}
+
+	public List<HashMap<String, Object>> chart_HotelMonthlyPrice(String hotel_idx) {
+		List<HashMap<String, Object>> montlyPriceList = dao.chart_HotelMonthlyPrice(hotel_idx);
+		return montlyPriceList;
+	}
+
+	public List<HashMap<String, String>> chartHotelLocation() {
+		List<HashMap<String, String>> hotelCountList = dao.chartHotelLocation();
+		return hotelCountList;
+	}
+
+	public List<HashMap<String, String>> chartHotelGrade() {
+		List<HashMap<String, String>> hotelCountList = dao.chartHotelGrade();
+		return hotelCountList;
+	}
+
+	public int getSellerStatus(String hotel_idxStr) {
+		int m = dao.getSellerStatus(hotel_idxStr);
+		return m;
+	}
+
+	public String getSellerIdx(String hotel_idxStr) {
+		String idx  = dao.getSellerIdx(hotel_idxStr);
+		return idx ;
+	}
+
+	////////////////////////////////////////////////////////////////////////// 예약내 
+	
+	public List<DwoReservationVO> reserveListWithPaging(HashMap<String, Object> paraMap) {
+		List<DwoReservationVO> resrveList = dao.reserveListWithPaging(paraMap);
+		return resrveList;
+	}
+
+	public int getTotalCountRserve(HashMap<String, Object> paraMap) {
+		int count = dao.getTotalCountRserve(paraMap);
+		return count;
+	}
+
+	public int getTotalReserve() {
+		int count = dao.getTotalReserve();
+		return count;
+	}
+
+	public int getEndPay() {
+		int n = dao.getEndPay();
+		return n;
+	}
+
+	
+	
+	
 
 	
 	

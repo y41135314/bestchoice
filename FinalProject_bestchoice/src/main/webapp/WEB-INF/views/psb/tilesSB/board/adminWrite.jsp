@@ -10,12 +10,16 @@
  }
  
  #commentBtn{
- 	color: #F7323F;
+ 	color: #F7323F;  
  }
  
  .sellerNameone:hover, .hotelNameone:hover {
     font-weight: bold;
  } 
+ 
+ .listStyle {
+	 background-color: #ffb3b3; 
+ }
 </style>
 
 
@@ -111,10 +115,11 @@
 		$("#sellerDisplayList").hide();
 		$("#hotelDisplayList").hide();
 		
-		$("#fk_sellerName").keyup(function(){
-			
+		var findvalSE = 0; 
+		$("#fk_sellerName").keyup(function(event){
+			$("#hotelDisplayList").hide();
 			var wordLength = $("#fk_sellerName").val().length;
-			
+		
 			if( wordLength == 0 ){
 				$("#sellerDisplayList").hide();
 			}	
@@ -125,27 +130,60 @@
 					data:{ "fk_sellerName": $("#fk_sellerName").val() },
 					dataType: "JSON",
 					success: function(json){
-						
+						var n = 0;
 						<%-- === #113. 검색어 입력시 자동글 완성하기 7 === --%> 
 						if(json.length>0){ // 검색된 데이터가 있는 경우
 							// 조회된 데이터가 없을 경우 if(json == null ) 이 아님 !! 
 							// ==> B/C Controller 에서 이미 JSONObject jsonObj = new JSONObject(); 를 썼으므로.
 		
 							var html = "";
+							
 							$.each(json, function(index, item) {
-								
+								n = n+1;
 								var word = item.word;
 								var index = word.toLowerCase().indexOf( $("#fk_sellerName").val().toLowerCase() ); 
 								
 								var len = $("#fk_sellerName").val().length;
 								var result = "";
 								result = "<span class='first'>" +word.substr(0, index)+ "</span>" + "<span class='second' style='color:red; font-weight:bold;'>" +word.substr(index, len)+ "</span>" + "<span class='third'>" +word.substr(index+len, word.length - (index+len) )+ "</span>";  
-								html += "<span class='sellerNameone' style='cursor:pointer;'>"+ result +"</span><br/>";
-							})
+								html += "<span id='stl" + n + "'  class='sellerNameone' style='cursor:pointer;'>"+ result +"</span><br/>";
+							    
+							})  
 							$("#sellerDisplayList").html(html);
 							$("#sellerDisplayList").show();
-						}
-						else{ // 검색된 데이터가 존재하지 않는 경우
+
+							if(event.keyCode == 8){
+								findvalSE = 0;
+							}
+							
+							if(event.keyCode == 40) {  
+								if (findvalSE == 0 || findvalSE == n ) { 
+									$("#sellerDisplayList").children(":first").addClass('listStyle');
+									findvalSE= 1 ;
+									
+								} else {
+									findvalSE = findvalSE+1;
+									$("#stl" + findvalSE ).addClass('listStyle');  
+									
+								}
+							} // end of keyCode = 40 =============== 
+						
+							if(event.keyCode == 38) {  
+								if (findvalSE == 0 ) { 
+									findvalSE= 1 ;
+								} else {
+									findvalSE = findvalSE-1;
+									$("#stl" + findvalSE ).addClass('listStyle');  
+								}	
+							} // end of keyCode = 38 =============== 
+							
+							if(event.keyCode==13){
+								var word = $("#stl" + findvalSE ).text();
+								$("#fk_sellerName").val(word);
+								$("#sellerDisplayList").hide();
+							}
+							
+						}else{ // 검색된 데이터가 존재하지 않는 경우
 							$("#sellerDisplayList").hide();
 						}
 					},
@@ -154,6 +192,8 @@
 					}	
 				})
 			}
+			
+   
 		}) 
 		
 		$("#sellerDisplayList").click(function(){
@@ -171,10 +211,12 @@
 			
 			$("#fk_sellerName").val(word);
 			$("#sellerDisplayList").hide();
-		})	
+		})	  
 		
-		$("#fk_hotelName").keyup(function(){
+		var findval = 0; 
+		$("#fk_hotelName").keyup(function(event){
 			
+			$("#sellerDisplayList").hide();	
 			var wordLength = $("#fk_hotelName").val().length;
 			
 			if( wordLength == 0 ){
@@ -187,23 +229,56 @@
 					data:{ "fk_hotelName": $("#fk_hotelName").val() },
 					dataType: "JSON",
 					success: function(json){
-						
+						var n = 0;
 						<%-- === #113. 검색어 입력시 자동글 완성하기 7 === --%> 
 						if(json.length>0){ 
-							var html = "";
+							var result = "";
 							$.each(json, function(index, item) {
-								
-								var word = item.word;
+								n = n+1;
+								var word = item.word; 
 								var index = word.toLowerCase().indexOf( $("#fk_hotelName").val().toLowerCase() ); 
-								
 								var len = $("#fk_hotelName").val().length;
-								var result = "";
-								result = "<span class='first'>" +word.substr(0, index)+ "</span>" + "<span class='second' style='color:red; font-weight:bold;'>" +word.substr(index, len)+ "</span>" + "<span class='third'>" +word.substr(index+len, word.length - (index+len) )+ "</span>";  
-								html += "<span class='hotelNameone' style='cursor:pointer;'>"+ result +"</span><br/>";
-							})
-							$("#hotelDisplayList").html(html);
-							$("#hotelDisplayList").show();
-						}
+								result += "<span id='htl" + n + "' class='hotelNameone' style='cursor:pointer; width: 100%;'>";
+								result += "<span class='first'>" +word.substr(0, index)+ "</span>" ;
+								result += "<span class='second' style='color:red; font-weight:bold;'>" +word.substr(index, len)+ "</span>";
+								result += "<span class='third'>" +word.substr(index+len, word.length - (index+len) )+ "</span></span><br/>";		
+							})   
+							
+							$("#hotelDisplayList").html(result);
+							$("#hotelDisplayList").show();      
+                            
+							if(event.keyCode == 8){
+								findval = 0;
+							}
+							
+							if(event.keyCode == 40) {  
+								if (findval == 0 || findval == n ) { 
+									$("#hotelDisplayList").children(":first").addClass('listStyle');
+									findval= 1 ;
+									
+								} else {
+									findval = findval+1;
+									$("#htl" + findval ).addClass('listStyle');  
+									
+								}
+							} // end of keyCode = 40 =============== 
+						
+							if(event.keyCode == 38) {  
+								if (findval == 0 ) { 
+									findval= 1 ;
+								} else {
+									findval = findval-1;
+									$("#htl" + findval ).addClass('listStyle');  
+								}	
+							} // end of keyCode = 38 =============== 
+							
+							if(event.keyCode==13){
+								var word = $("#htl" + findval ).text();
+								$("#fk_hotelName").val(word);
+								$("#hotelDisplayList").hide();
+							}
+							
+						}   
 						else{ // 검색된 데이터가 존재하지 않는 경우
 							$("#hotelDisplayList").hide();
 						}
@@ -242,7 +317,7 @@
 	<form name="adminWriteFrm" enctype="multipart/form-data"> 
 	<input type="text" name="name" value="${(sessionScope.loginadmin).name}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly  />  
 	<input type="text" name="fk_sellerName" id="fk_sellerName" autocomplete="off"  placeholder="판매자" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  /> 
-	<input type="text" name="fk_hotelName" id="fk_hotelName" autocomplete="off"  placeholder="호텔명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"    /> 
+	<input type="text" class="hotelNameone" name="fk_hotelName" id="fk_hotelName" autocomplete="off"  placeholder="호텔명" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"    /> 
 	<br/>   
 	  
 	
@@ -264,10 +339,10 @@
 	<input type="button" id="btnWrite" value="등록" style="font-size: 8pt; margin-left: 100;"/> 
 	<input type="button" value="취소" onclick="location.href='<%=request.getContextPath()%>/adminCommentBoard.bc'" style="font-size: 8pt; margin-left: 100;"/> 
  
-	<div id="sellerDisplayList" style="width: 7%; font-size: 8pt; position: relative; left: 7.3%; height: 50px; margin-top: -374px;  border-top: none; border: solid 1px gray; background-color: white; z-index: 2 ">
+	<div id="sellerDisplayList" style="width: 7%; font-size: 8pt; position: relative; left: 7.36%; min-height: 50px; margin-top: -374px;  border-top: none; border: solid 1px gray; background-color: white; z-index: 2 ">
 	</div>   
 	            
-	<div id="hotelDisplayList" style="width: 7%; font-size: 8pt; position: relative; left: 14.7%; height: 50px; margin-top: -374px;  border-top: none; border: solid 1px gray; background-color: white; z-index: 2 ">
+	<div id="hotelDisplayList" class="hotelDisplayList" style="width: 7%; font-size: 8pt; position: relative; left: 14.8%; min-height: 50px; margin-top: -374px;  border-top: none; border: solid 1px gray; background-color: white; z-index: 2 ">
 	</div>        
 	        
 </div>

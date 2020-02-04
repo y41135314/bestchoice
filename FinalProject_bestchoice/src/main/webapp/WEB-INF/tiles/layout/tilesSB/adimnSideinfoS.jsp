@@ -3,31 +3,32 @@
 <%
 	String ctxPath = request.getContextPath();
 %>      
-<style>
+<link href="https://fonts.googleapis.com/css?family=Do+Hyeon|Jua&display=swap" rel="stylesheet">
+
+<style type="text/css">
+
 .sidenav {
 	margin-top: 15px;
-	font-family: Arial, Helvetica, sans-serif, 돋움;
-	font-size: 18px !important;
+	font-family: 'Jua', sans-serif, 돋움;
 }
 .sidenav a {
 	display: block;
 	text-decoration: none;
-/* 	background-color: white;
-	color: #F7323F; */
+/* 	background-color: white;*/
+	color: #F7323F; 
 	color: rgba(0,0,0,0.56);
 	width: 150px;
 	height: 30px;
 	font-weight: bold;  
 	text-align: center;
 	margin-bottom: 15px;
-	font-size: 18px;
+	font-size: 24px;  
 }  
 
 .sidenav a:hover {
 	color: white;
 	background-color: #F7323F;
 	vertical-align: middle !important;
-	padding: 5px 0;
 }
 
 .sideDropdown {
@@ -37,9 +38,8 @@
 	background-color: white;
 	color: rgba(0,0,0,0.56);
 	text-align: center;
-	padding: 5px;
 	margin-bottom: 15px;
-	font-size: 18px !important;
+	font-size: 24px !important;
 }
    
 .sideDropdown:hover {
@@ -50,9 +50,8 @@
  
 .sideDropdown-container a {
 	color: rgba(0,0,0,0.56);
-	font-size: 18px;
+	font-size: 24px;
 	vertical-align: middle !important;
-	padding: 5px 0;
 }
         
 .sideBtn {
@@ -74,7 +73,7 @@
 			
 			if ( $(this).next().css('display') != "none" ){
 				$(this).parent().css({"border-bottom":"solid 1px #555555"});
-				$(this).css({"background-color":"#555555","color":"#B7B7B7"});
+				$(this).css({"color":"#B7B7B7"});
 			}
 			else{
 				$(this).parent().css({"border":"none"});

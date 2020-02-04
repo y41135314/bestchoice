@@ -36,6 +36,7 @@
  #member:hover{
  	cursor: pointer;
  	font-weight: bold;
+ 	color: #ff5c33;
  }
 </style>
 
@@ -97,7 +98,6 @@
 	
 		// 엑셀 파일 다운 버튼
 		$("#btnExcel").click(function(){
-
 			var frm = document.searchFrm;
 			frm.method="POST";
 			frm.action="memberExcelFile.bc";
@@ -136,7 +136,7 @@
 			70대이상&nbsp;<input type="checkbox" name="age" value="70" id="70"/>
 		&nbsp;&nbsp;|&nbsp;&nbsp;
 		<label>가입기간 : </label>     
-		<input type="date" id="startDate" name="startDate" style="width: 130px;"/> ~ <input type="date" id="endDate" name="endDate" style="width: 130px;"/>
+		<input type="date" id="startDate" name="startDate" style="width: 140px;"/> ~ <input type="date" id="endDate" name="endDate" style="width: 140px;"/>
 		<br/>  
 		<select name="searchType" id="searchType" style="height: 20px; margin-left: 80px; position: relative; top:2px;">
 			<option value="name">이름</option>
@@ -155,13 +155,13 @@
 			가입&nbsp;<input type="radio" name="mstatus" id="mstatus1" value="1"  ondblclick="this.checked=false"/>
 			탈퇴&nbsp;<input type="radio" name="mstatus" id="mstatus0" value="0"  ondblclick="this.checked=false"/>
 		&nbsp;&nbsp;|&nbsp;&nbsp;	    
-		<label>검색된 회원 : </label>&nbsp;총&nbsp;<span>${totalCount}</span>명
+		<label>검색된 회원 : </label><span style="color: #ff5c33">&nbsp;&nbsp;${totalCount}&nbsp;명</span>
 		  
         <input type="button" id="btnExcel" value="엑셀다운" style="float:right; font-size: 8pt; z-index: 1;" /> 
 		</form>
 		
 		<table id="tableMemberList">
-			<tr style="background-color: #FAFAFA;">
+			<tr style="background-color: #ffe6e6;">
 				<th style="width: 8%;">회원번호</th>
 				<th style="width: 20%;">이름</th>
 				<th style="width: 20%;">이메일</th>

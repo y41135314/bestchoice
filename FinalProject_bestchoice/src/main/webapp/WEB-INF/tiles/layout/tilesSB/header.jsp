@@ -15,12 +15,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  
+<link href="https://fonts.googleapis.com/css?family=Jua&display=swap" rel="stylesheet">
+
 <style type="text/css">
 body {
-	font-family: Arial, Helvetica, sans-serif, 돋움;
+	font-family: 'Jua', sans-serif, 돋움;
 }  
-
 .navbar {   
 	overflow: hidden;
 	background-color: #F7323F;
@@ -28,8 +28,8 @@ body {
 	position: fixed;   
 	top: 0;
 	height: 80px;
-	padding: 20px 5% 0 5% ;  
-	z-index: 1;   
+	padding: 20px 5% 0 5% ; 
+	z-index: 1;  
 }
 
 #logo {  
@@ -208,10 +208,10 @@ body {
 	               <i class="fa fa-caret-down"></i>
 	            </button>  
 			    <div class="dropdown-content">
-			      <a href="<%=ctxPath%>/notice/main.bc">공지사항</a>
-			      <a href="<%=ctxPath%>/event/main.bc">이벤트</a>
-			      <a href="<%=ctxPath%>/question/main.bc">자주 묻는 질문</a>
-			      <a href="<%=ctxPath%>/faq/main.bc">1:1문의</a>
+			      <a href="#">공지사항</a>
+			      <a href="#">이벤트</a>
+			      <a href="#">자주 묻는 질문</a>
+			      <a href="#">1:1문의</a>
 			      <a href="#">약관 및 정책</a>
 			    </div>
 			</div>

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -37,12 +38,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.project.common.FileManager;
 import com.project.common.MyUtil;
+import com.project.dws.DwoReservationVO;
+import com.project.kmt.KmtHotelInfoVO;
+import com.project.kmt.KmtSellerMemberVO;
 import com.project.smh.SmhMemberVO;
 
 
@@ -118,7 +123,7 @@ public class PsbController {
 		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
 		
 		int totalCount = 0; // 총 게시물 건수
-		int sizePerPage = 5;  // 한 페이지당 보여줄 게시물 수
+		int sizePerPage = 10;  // 한 페이지당 보여줄 게시물 수
 		int currentShowPageNO = 0 ;// 현재 보여주는 페이지번호로서, 초기치로는 1페이지로 설정함
 		int totalPage = 0 ; // 총 페이지수(웹브라우저상에 보여줄 총 페이지 갯수, 페이지바)
 		
@@ -856,26 +861,693 @@ public class PsbController {
 		
 	@RequestMapping(value="/adminSeller_list.bc")
 	public ModelAndView adminSeller_list(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		
+		List<KmtSellerMemberVO> sellerList = null;
+		
+		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
+		
+		int totalCount = 0; // 총 게시물 건수
+		int sizePerPage = 10;  // 한 페이지당 보여줄 게시물 수
+		int currentShowPageNO = 0 ;// 현재 보여주는 페이지번호로서, 초기치로는 1페이지로 설정함
+		int totalPage = 0 ; // 총 페이지수(웹브라우저상에 보여줄 총 페이지 갯수, 페이지바)
+		
+		int startRno = 0;  // 시작 행번호
+		int endRno = 0; // 끝 행번호 
+	
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		
+		if(startDate == null) {
+			startDate="";
+		}
+		if(endDate == null) {
+			endDate="";
+		}
+		
+		String searchType = request.getParameter("searchType"); 
+		String searchWord = request.getParameter("searchWord");
+		
+		if(searchWord==null|| searchWord.trim().isEmpty() ) {
+			searchWord = "";
+		}
+		
+		String orderType = request.getParameter("orderType");
+		if(orderType == null) {
+			orderType = "seller_registerday";
+		}
+			
+		String seller_realStatus = request.getParameter("seller_realStatus");
+		
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+		
+		paraMap.put("searchType", searchType);
+		paraMap.put("searchWord", searchWord);
+		paraMap.put("orderType", orderType);
+		paraMap.put("seller_realStatus", seller_realStatus);
+		paraMap.put("startDate", startDate);
+		paraMap.put("endDate", endDate);
+		
+		totalCount = service.getTotalCountSeller(paraMap);	
+		mav.addObject("totalCount", totalCount);
+		
+		// 총 판매자 수 
+		int totalSeller = service.getTotalSeller();
+		mav.addObject("totalSeller", totalSeller);
+		
+		totalPage = (int)Math.ceil( (double)totalCount/sizePerPage );
+		
+		// 게시판에 보여지는 초기화면 
+		if(str_currentShowPageNO == null ) {
+			currentShowPageNO = 1;  // 첫 페이지는 1페이지 
+		}
+		else {
+			try {
+				currentShowPageNO = Integer.parseInt(str_currentShowPageNO);
+				
+				if(currentShowPageNO < 1 || currentShowPageNO > totalPage) {
+					currentShowPageNO = 1;
+				}
+			} catch (NumberFormatException e) {
+				currentShowPageNO = 1;
+			}
+		}
+	
+		startRno = ((currentShowPageNO-1)*sizePerPage) + 1;
+		endRno = startRno + sizePerPage -1;
+		paraMap.put("startRno", String.valueOf(startRno));
+		paraMap.put("endRno", String.valueOf(endRno));
+		
+		// 페이징 처리한 글목록 보여주기 (검색어 유무와는 상관 없음. 모두 포함함)
+		sellerList = service.sellerListWithPaging(paraMap); 
+		
+		// 검색어 값을 유지시키기 위함 
+		mav.addObject("paraMap",paraMap);
+		
+		// === 페이지바 만들기 === /// 
+		String pagebar = "<ul>";
+		
+		int blockSize = 5;
+		// blockSize 는 1개 블럭(토막)당 보여지는 페이지번호의 갯수 이다.
+		
+		int loop = 1;
+		
+		int pageNo = ((currentShowPageNO - 1)/blockSize) * blockSize + 1;
+		// *** !! 공식이다. !! *** //
+		
+		String url = "adminSeller_list.bc";	
+		// *** [이전] 만들기 *** //    
+		if(pageNo != 1) {
+			if( seller_realStatus == null ) {
+				
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+ (pageNo-1)
+							+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+			}
+			else if( seller_realStatus != null ) {
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+ "&seller_realStatus="+seller_realStatus +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+				
+			}
+		}
+			
+		while( !(loop>blockSize || pageNo>totalPage) ) {
+		
+			if(pageNo == currentShowPageNO) {
+				pagebar += "&nbsp;<span style='color: red; border: 1px solid gray; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";				
+			}
+			else {
+				
+				if( seller_realStatus == null ) {
+					
+					pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+								+"&startDate="+startDate+"&endDate="+endDate
+								+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+								+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				}
+				else if( seller_realStatus != null ) {
+					pagebar += "&nbsp;<a style='color:black;'  href='"+url+"?&currentShowPageNO="+pageNo 
+							+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+ "&seller_realStatus="+seller_realStatus +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+					
+				}
+			}  
+			loop++;
+			pageNo++;
+		}// end of while---------------------------------
+		
+		// *** [다음] 만들기 *** //
+		if( !(pageNo>totalPage) ) {
+
+			if( seller_realStatus == null  ) {
+				
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+							+"&startDate="+startDate+"&endDate="+endDate
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+			}
+			else if( seller_realStatus != null ) {
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+ "&seller_realStatus="+seller_realStatus +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+				
+			}
+		}
+		
+		pagebar += "</ul>";
+		
+		mav.addObject("pagebar", pagebar);
+		
+		///////////////////////////////////////////////////////////////////////////////////
+		
+		String gobackURL = MyUtil.getCurrentURL(request); // 우리가 만든 URL 알아오는 메소드 
+		mav.addObject("gobackURL", gobackURL);
+		
+		///////////////////////////////////////////////////////////////////////////////////
+		mav.addObject("sellerList", sellerList);
+		
 		mav.setViewName("tilesSB/adminSeller_list.tilesSBS");
 		return mav;
 	}
 	
-	@RequestMapping(value="/adminSeller_chart.bc")
-	public ModelAndView adminSeller_chart(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
-		mav.setViewName("tilesSB/adminSeller_chart.tilesSBS");
+
+	@RequestMapping(value="/sellerDetail.bc")
+	public ModelAndView adminSellerDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		
+		String seller_idx = request.getParameter("seller_idx");
+		
+		KmtSellerMemberVO sellervo = service.getOneSeller(seller_idx);
+		mav.addObject("sellervo", sellervo);
+		
+		// 보유한 호텔 수 구하기
+		int seller_hotelCount = 0;
+		seller_hotelCount = service.getHotelCount(seller_idx);
+		mav.addObject("seller_hotelCount", seller_hotelCount);
+		
+		// 게시글 조회 
+		String seller_Name = sellervo.getSeller_Name();
+        List<BoardVO> boardList = service.getSellerBoardList(seller_Name);  // 원글에 달린 글 조회 
+		
+		mav.addObject("boardList", boardList);
+		
+		mav.setViewName("tilesSB/sellerDetail.tilesSBS");
 		return mav;
 	}
 	
+	// 판매자 상태 변경 
+	@RequestMapping(value="/updateSellerStatus.bc")
+	public ModelAndView updateSellerStatus(HttpServletRequest request, ModelAndView mav) {
+		
+		String seller_idx = request.getParameter("seller_idx");
+		String seller_realStatus = request.getParameter("seller_realStatus");
+		
+		List<String> hotel_idx_list = service.getHotelArr(seller_idx);
+
+		int n = 0;
+		if ( "1".equals(seller_realStatus) ) {
+			
+			n = service.updateSellerStatus(seller_idx);
+			
+			if(hotel_idx_list != null ) {
+				String[] hotel_idx_Arr = hotel_idx_list.toArray( new String[hotel_idx_list.size()] ) ;
+				n = service.updateHotelStatus(hotel_idx_Arr);
+			}
+			
+		} else {
+			n = service.stopSellerStatus(seller_idx);
+			if(hotel_idx_list != null ) {
+				String[] hotel_idx_Arr = hotel_idx_list.toArray( new String[hotel_idx_list.size()] ) ;
+				n = service.stopHotelStatus(hotel_idx_Arr);
+			}
+		}
+		
+		if(n != 0) {
+
+			mav.addObject("msg","판매자 계정 상태가 변경되었습니다.");
+			mav.addObject("loc", request.getContextPath() + "/sellerDetail.bc?seller_idx="+seller_idx );
+
+			mav.setViewName("psb/msg");
+		}
+		
+		return mav;
+	}
+	
+	// 판매자 코멘트 
+	@ResponseBody
+	@RequestMapping(value="/addSellerComment.bc", method={RequestMethod.POST}, produces="text/plain;charset=UTF-8" )
+	public String addSellerComment(BoardVO boardvo) {
+		String jsonStr = "";
+		
+		try {
+			int n = service.add(boardvo); 
+			
+			if(n==1) {  // 댓글쓰기가 insert & 원게시물 tblBoard 테이블의 댓글갯수는 +1 ==> 성공
+				        // 원글에 달린 댓글 조회 
+				// 게시글 조회 
+				String seller_Name = boardvo.getFk_sellerName();
+		        List<BoardVO> boardList = service.getSellerBoardList(seller_Name);  // 원글에 달린 글 조회 
+			
+				JSONArray jsonArr = new JSONArray();
+				for( BoardVO vo : boardList ) {
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("name", vo.getName());
+					jsonObj.put("fk_adminId", vo.getTitle());
+					jsonObj.put("registerday", vo.getRegisterday());
+					
+					jsonArr.put(jsonObj);
+				}
+				jsonStr = jsonArr.toString();
+				
+			  } // end of if(n==1)============================
+			
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return jsonStr;
+	}
+	
+	// chart_SellerMonthlyPrice
+	@ResponseBody
+	@RequestMapping(value="/chart_SellerMonthlyPrice.bc", produces="text/plain;charset=UTF-8")
+	public String chart_SellerMonthlyPrice(HttpServletRequest request) {
+		String seller_idx = request.getParameter("seller_idx");
+		List<HashMap<String, Object>> montlyPriceList = service.chart_SellerMonthlyPrice(seller_idx);
+
+		Gson gson = new Gson();
+		JsonArray jsonArr = new JsonArray();   // JSONArray (org.json) 와 다름 
+		
+		if(montlyPriceList != null ) {
+			for ( HashMap<String, Object> map : montlyPriceList ) { 
+				
+				JsonObject jsonObj = new JsonObject();  // JSONObject (org.json) 와 다름 
+				
+				jsonObj.addProperty("MONTH", (String)map.get("MONTH"));
+				jsonObj.addProperty("totalPrice", (int)map.get("totalPrice"));
+				jsonObj.addProperty("totalCount", (int)map.get("totalCount"));
+				
+				jsonArr.add(jsonObj);
+			}
+		}
+		return gson.toJson(jsonArr);  
+	}
+	
+	/*@RequestMapping(value="/adminSeller_chart.bc")
+	public ModelAndView adminSeller_chart(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		mav.setViewName("tilesSB/adminSeller_chart.tilesSBS");
+		return mav;
+	}*/
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+					  //////////////////// 호텔 리스트   ///////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	@RequestMapping(value="/adminHotel_list.bc")
 	public ModelAndView adminHotel_list(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		
+		List<KmtHotelInfoVO> hotelList = null;
+		
+		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
+		
+		int totalCount = 0; // 총 게시물 건수
+		int sizePerPage = 10;  // 한 페이지당 보여줄 게시물 수
+		int currentShowPageNO = 0 ;// 현재 보여주는 페이지번호로서, 초기치로는 1페이지로 설정함
+		int totalPage = 0 ; // 총 페이지수(웹브라우저상에 보여줄 총 페이지 갯수, 페이지바)
+		
+		int startRno = 0;  // 시작 행번호
+		int endRno = 0; // 끝 행번호 
+	
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		
+		if(startDate == null) {
+			startDate="";
+		}
+		if(endDate == null) {
+			endDate="";
+		}
+		
+		String searchType = request.getParameter("searchType"); 
+		String searchWord = request.getParameter("searchWord");
+		
+		if(searchWord==null|| searchWord.trim().isEmpty() ) {
+			searchWord = "";
+		}
+	
+		String orderType = request.getParameter("orderType");
+		if(orderType == null) {
+			orderType = "hotel_registerday";
+		}
+			
+		String hotel_Status = request.getParameter("hotel_Status");
+		String hotel_Category = request.getParameter("hotel_Category");
+		String hotel_Addr1 = request.getParameter("hotel_Addr1");
+		
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+		
+		paraMap.put("searchType", searchType);
+		paraMap.put("searchWord", searchWord);
+		paraMap.put("orderType", orderType);
+		paraMap.put("hotel_Status", hotel_Status);
+		paraMap.put("startDate", startDate);
+		paraMap.put("endDate", endDate);
+
+		if (hotel_Category != null ) {
+			paraMap.put("hotel_Category", hotel_Category);
+		}else {
+			paraMap.put("hotel_Category", "");
+		}
+		paraMap.put("hotel_Addr1", hotel_Addr1);
+	
+		if( hotel_Addr1 != null ) {
+			
+			if( hotel_Addr1.length() < 1 ) {
+				paraMap.put("addrArr", "");
+			} else {
+				String[] addrArr = hotel_Addr1.split(",");
+				paraMap.put("addrArr", addrArr);
+			}
+			
+		} else {
+			paraMap.put("addrArr", "");
+		}
+		
+		totalCount = service.getTotalCountHotel(paraMap);	
+		mav.addObject("totalCount", totalCount);
+		
+		// 총 판매자 수 
+		int totalHotel = service.getTotalHotel();
+		mav.addObject("totalHotel", totalHotel);
+		
+		totalPage = (int)Math.ceil( (double)totalCount/sizePerPage );
+		
+		// 게시판에 보여지는 초기화면 
+		if(str_currentShowPageNO == null ) {
+			currentShowPageNO = 1;  // 첫 페이지는 1페이지 
+		}
+		else {
+			try {
+				currentShowPageNO = Integer.parseInt(str_currentShowPageNO);
+				
+				if(currentShowPageNO < 1 || currentShowPageNO > totalPage) {
+					currentShowPageNO = 1;
+				}
+			} catch (NumberFormatException e) {
+				currentShowPageNO = 1;
+			}
+		}
+	
+		startRno = ((currentShowPageNO-1)*sizePerPage) + 1;
+		endRno = startRno + sizePerPage -1;
+		paraMap.put("startRno", String.valueOf(startRno));
+		paraMap.put("endRno", String.valueOf(endRno));
+		
+		// 페이징 처리한 글목록 보여주기 (검색어 유무와는 상관 없음. 모두 포함함)
+		hotelList = service.hotelListWithPaging(paraMap); 
+		
+		// 검색어 값을 유지시키기 위함 
+		mav.addObject("paraMap",paraMap);
+		
+		// === 페이지바 만들기 === /// 
+		String pagebar = "<ul>";
+		
+		int blockSize = 5;
+		// blockSize 는 1개 블럭(토막)당 보여지는 페이지번호의 갯수 이다.
+		
+		int loop = 1;
+		
+		int pageNo = ((currentShowPageNO - 1)/blockSize) * blockSize + 1;
+		// *** !! 공식이다. !! *** //
+		
+		String url = "adminHotel_list.bc";	
+		// *** [이전] 만들기 *** //    
+		if(pageNo != 1) {
+			if( hotel_Status == null ) {
+				
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+ (pageNo-1)
+							+"&startDate="+startDate+"&endDate="+endDate + "&hotel_Category=" + hotel_Category + "&hotel_Addr1="+hotel_Addr1
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+			}
+			
+			else if( hotel_Status != null ) {
+				pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+(pageNo-1) 
+						+"&startDate="+startDate+"&endDate="+endDate + "&hotel_Category=" + hotel_Category + "&hotel_Addr1="+hotel_Addr1
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+ "&hotel_Status="+ hotel_Status +"&orderType="+orderType + "'>"+pageNo+"[이전]</a>&nbsp;"; 
+				
+			}
+		}
+			
+		while( !(loop>blockSize || pageNo>totalPage) ) {
+		
+			if(pageNo == currentShowPageNO) {
+				pagebar += "&nbsp;<span style='color: red; border: 1px solid gray; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";				
+			}
+			else {
+				
+				if( hotel_Status == null ) {
+					
+					pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+								+"&startDate="+startDate+"&endDate="+endDate+ "&hotel_Category=" + hotel_Category + "&hotel_Addr1="+hotel_Addr1
+								+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+								+"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+				}
+				else if( hotel_Status != null ) {
+					pagebar += "&nbsp;<a style='color:black;'  href='"+url+"?&currentShowPageNO="+pageNo 
+							+"&startDate="+startDate+"&endDate="+endDate + "&hotel_Category=" + hotel_Category + "&hotel_Addr1="+hotel_Addr1
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+ "&hotel_Status="+hotel_Status +"&orderType="+orderType + "'>"+pageNo+"</a>&nbsp;"; 
+					
+				}
+			}  
+			loop++;
+			pageNo++;
+		}// end of while---------------------------------
+		
+		// *** [다음] 만들기 *** //
+		if( !(pageNo>totalPage) ) {
+
+			if( hotel_Status == null ) {
+				
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo
+							+"&startDate="+startDate+"&endDate="+endDate+ "&hotel_Category=" + hotel_Category + "&hotel_Addr1="+hotel_Addr1
+							+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+							+"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+			}
+			else if( hotel_Status != null ) {
+				pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
+						+"&startDate="+startDate+"&endDate="+endDate + "&hotel_Category=" + hotel_Category + "&hotel_Addr1="+hotel_Addr1
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+ "&hotel_Status="+hotel_Status +"&orderType="+orderType + "'>"+pageNo+"[다음]</a>&nbsp;"; 
+				
+			}
+		}
+		
+		pagebar += "</ul>";
+		
+		mav.addObject("pagebar", pagebar);
+		
+		///////////////////////////////////////////////////////////////////////////////////
+		
+		String gobackURL = MyUtil.getCurrentURL(request); // 우리가 만든 URL 알아오는 메소드 
+		mav.addObject("gobackURL", gobackURL);
+		
+		///////////////////////////////////////////////////////////////////////////////////
+		mav.addObject("hotelList", hotelList);
+		
 		mav.setViewName("tilesSB/adminHotel_list.tilesSBS");
 		return mav;
 	}
 	
+	@RequestMapping(value="/hotelDetail.bc")
+	public ModelAndView adminHotelDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		
+		String hotel_idx = request.getParameter("hotel_idx");
+		
+		KmtHotelInfoVO hotelvo = service.getOneHotel(hotel_idx);
+		mav.addObject("hotelvo", hotelvo);
+		
+		// 보유한 방 수 구하기 
+		int roomCount = 0;
+		roomCount = service.getRoomCount(hotel_idx);
+		mav.addObject("roomCount", roomCount);
+		
+		// 게시글 조회 
+		String hotel_Name = hotelvo.getHotel_Name();
+        List<BoardVO> boardList = service.getHotelBoardList(hotel_Name);  // 원글에 달린 글 조회 
+		
+		mav.addObject("boardList", boardList);
+		
+		mav.setViewName("tilesSB/hotelDetail.tilesSBS");
+		return mav;
+	}
+	
+	// 호텔 코멘트 
+	@ResponseBody
+	@RequestMapping(value="/addHotelComment.bc", method={RequestMethod.POST}, produces="text/plain;charset=UTF-8" )
+	public String addHotelComment(BoardVO boardvo) {
+		String jsonStr = "";
+		
+		try {
+			int n = service.add(boardvo); 
+			
+			if(n==1) {  // 댓글쓰기가 insert & 원게시물 tblBoard 테이블의 댓글갯수는 +1 ==> 성공
+				        // 원글에 달린 댓글 조회 
+				// 게시글 조회 
+				String hotel_Name = boardvo.getFk_hotelName();
+		        List<BoardVO> boardList = service.getHotelBoardList(hotel_Name);  // 원글에 달린 글 조회 
+			
+				JSONArray jsonArr = new JSONArray();
+				for( BoardVO vo : boardList ) {
+					JSONObject jsonObj = new JSONObject();
+					jsonObj.put("name", vo.getName());
+					jsonObj.put("fk_adminId", vo.getTitle());
+					jsonObj.put("registerday", vo.getRegisterday());
+					
+					jsonArr.put(jsonObj);
+				}
+				jsonStr = jsonArr.toString();
+				
+			  } // end of if(n==1)============================
+			
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return jsonStr;
+	}
+	
+	// 호텔 상태 변경 
+	@RequestMapping(value="/updateHotelStatus.bc")
+	public ModelAndView updateHotelStatus(HttpServletRequest request, ModelAndView mav) {
+		
+		String hotel_idxStr = request.getParameter("hotel_idx");
+		String hotel_Status = request.getParameter("hotel_Status");
+		
+	    int m  = service.getSellerStatus(hotel_idxStr);
+		if(m==0) {
+			mav.addObject("msg","판매자 계정이 휴먼 상태입니다.");
+			mav.addObject("loc", request.getContextPath() + "/hotelDetail.bc?hotel_idx="+ hotel_idxStr );
+			mav.setViewName("psb/msg");
+		}
+		else {
+			String[] hotel_idx = hotel_idxStr.split(",");
+			 
+			int n = 0;
+			if ( "1".equals(hotel_Status)) {
+				 n = service.updateHotelStatus(hotel_idx);
+			}else {
+				n = service.stopHotelStatus(hotel_idx);
+			}
+			
+			if(n==1) {
+				mav.addObject("msg","호텔 영업상태가 변경되었습니다.");
+				mav.addObject("loc", request.getContextPath() + "/hotelDetail.bc?hotel_idx="+ hotel_idxStr );
+				mav.setViewName("psb/msg");
+			}
+		}
+		
+		return mav;
+	}
+	
+	// 판매자 페이지로 이동 
+	@RequestMapping(value="/goSellerPage.bc")
+	public ModelAndView goSellerPage(HttpServletRequest request, ModelAndView mav) {
+		
+		String hotel_idxStr = request.getParameter("hotel_idx");
+		
+	    String idx  = service.getSellerIdx(hotel_idxStr);
+	    
+	    String url = "sellerDetail.bc?seller_idx="+ idx;
+	    
+		mav.setView(new RedirectView(url));
+		
+		return mav;
+	}
+		
+	
+	@ResponseBody
+	@RequestMapping(value="/chart_HotelMonthlyPrice.bc", produces="text/plain;charset=UTF-8")
+	public String chart_HotelMonthlyPrice(HttpServletRequest request) {
+		String hotel_idx = request.getParameter("hotel_idx");
+		
+		List<HashMap<String, Object>> montlyPriceList = service.chart_HotelMonthlyPrice(hotel_idx);
+
+		Gson gson = new Gson();
+		JsonArray jsonArr = new JsonArray();   // JSONArray (org.json) 와 다름 
+		
+		if(montlyPriceList != null ) {
+			for ( HashMap<String, Object> map : montlyPriceList ) { 
+				
+				JsonObject jsonObj = new JsonObject();  // JSONObject (org.json) 와 다름 
+				
+				jsonObj.addProperty("MONTH", (String)map.get("MONTH"));
+				jsonObj.addProperty("totalPrice", (int)map.get("totalPrice"));
+				jsonObj.addProperty("totalCount", (int)map.get("totalCount"));
+				
+				jsonArr.add(jsonObj);
+			}
+		}
+		return gson.toJson(jsonArr);  
+	}
+			
 	@RequestMapping(value="/adminHotel_chart.bc")
 	public ModelAndView adminHotel_chart(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+		
+		
 		mav.setViewName("tilesSB/adminHotel_chart.tilesSBS");
 		return mav;
+	}
+
+	@ResponseBody
+	@RequestMapping(value="/chartHotelLocation.bc", produces="text/plain;charset=UTF-8")
+	public String chartHotelLocation() {
+	
+		List<HashMap<String, String>> hotelCountList = service.chartHotelLocation();
+		
+		Gson gson = new Gson();
+		JsonArray jsonArr = new JsonArray();   // JSONArray (org.json) 와 다름 
+		
+		if(hotelCountList != null ) {
+			for ( HashMap<String, String> map : hotelCountList ) { 
+				
+				JsonObject jsonObj = new JsonObject();  // JSONObject (org.json) 와 다름 
+			
+				jsonObj.addProperty("hotel_addr1", map.get("hotel_addr1"));
+				jsonObj.addProperty("count", map.get("count"));
+				jsonObj.addProperty("PERCENTAGE", map.get("PERCENTAGE"));
+				
+				jsonArr.add(jsonObj);
+			}
+		}
+		return gson.toJson(jsonArr);  
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/chartHotelGrade.bc", produces="text/plain;charset=UTF-8")
+	public String chartHotelGrade() {
+	
+		List<HashMap<String, String>> hotelCountList = service.chartHotelGrade();
+		
+		Gson gson = new Gson();
+		JsonArray jsonArr = new JsonArray();   // JSONArray (org.json) 와 다름 
+		
+		if(hotelCountList != null ) {
+			for ( HashMap<String, String> map : hotelCountList ) { 
+				
+				JsonObject jsonObj = new JsonObject();  // JSONObject (org.json) 와 다름 
+			
+				jsonObj.addProperty("hotel_Category", map.get("hotel_Category"));
+				jsonObj.addProperty("count", map.get("count"));
+				jsonObj.addProperty("PERCENTAGE", map.get("PERCENTAGE"));
+				
+				jsonArr.add(jsonObj);
+			}
+		}
+		return gson.toJson(jsonArr);  
 	}
 	
 	
@@ -974,6 +1646,262 @@ public class PsbController {
 		} else {
 			mav.addObject("AVG_70",0);
 		}
+		
+		
+		// 상품별 매출액 - 등급
+		List<HashMap<String,Object>> paraMapList3 = service.sales_grade();
+	
+		String gradeStr = "";
+		for ( HashMap<String, Object> map : paraMapList3 ) { 
+			gradeStr += map.get("hotel_Category");
+		}
+		
+		if( ! gradeStr.contains("1")) {
+			mav.addObject("totalCount_G1",0);
+    		mav.addObject("totalPrice_G1",0);
+    		mav.addObject("AVG_G1", 0);
+		}
+		if( ! gradeStr.contains("2")) {
+			mav.addObject("totalCount_G2",0);
+    		mav.addObject("totalPrice_G2",0);
+    		mav.addObject("AVG_G2", 0);
+		}
+		if( ! gradeStr.contains("3")) {
+			mav.addObject("totalCount_G3",0);
+    		mav.addObject("totalPrice_G3",0);
+    		mav.addObject("AVG_G3", 0);
+		}
+		if( ! gradeStr.contains("4")) {
+			mav.addObject("totalCount_G4",0);
+    		mav.addObject("totalPrice_G4",0);
+    		mav.addObject("AVG_G4", 0);
+		}
+		if( ! gradeStr.contains("5")) {
+			mav.addObject("totalCount_G5",0);
+    		mav.addObject("totalPrice_G5",0);
+    		mav.addObject("AVG_G5", 0);
+		}
+		
+	    for ( HashMap<String, Object> map : paraMapList3 ) { 
+	    	
+	    	if ( map.get("hotel_Category").equals("0")) {
+	    		mav.addObject("totalCount_G0",map.get("totalCount"));
+	    		mav.addObject("totalPrice_G0",map.get("totalPrice"));
+	    		mav.addObject("AVG_G0", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_Category").equals("1") ) {
+	    		mav.addObject("totalCount_G1",map.get("totalCount"));
+	    		mav.addObject("totalPrice_G1",map.get("totalPrice"));
+	    		mav.addObject("AVG_G1", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_Category").equals("2") ) {
+	    		mav.addObject("totalCount_G2",map.get("totalCount"));
+	    		mav.addObject("totalPrice_G2",map.get("totalPrice"));
+	    		mav.addObject("AVG_G2", map.get("AVG"));
+	    	}
+	    	
+	    	/*if ( map.get("hotel_Category").equals("4") ) {
+	    		mav.addObject("totalCount_G4",map.get("totalCount"));
+	    		mav.addObject("totalPrice_G4",map.get("totalPrice"));
+	    		mav.addObject("AVG_G4", map.get("AVG"));
+	    	} 
+	    	
+	    	if ( map.get("hotel_Category").equals("5") ) {
+	    		mav.addObject("totalCount_G5",map.get("totalCount"));
+	    		mav.addObject("totalPrice_G5",map.get("totalPrice"));
+	    		mav.addObject("AVG_G5", map.get("AVG"));
+	    	}*/
+		}
+	    
+	    // 상품별 매출액 - 등급
+	    List<HashMap<String,Object>> paraMapList4 = service.sales_addr();
+	    
+	    String addrStr = "";
+		for ( HashMap<String, Object> map : paraMapList4 ) { 
+			addrStr += map.get("hotel_addr1");
+		}
+		
+		if( ! addrStr.contains("서울")) {
+			mav.addObject("totalCount_Seoul",0);
+    		mav.addObject("totalPrice_Seoul",0);
+    		mav.addObject("AVG_Seoul", 0);
+		}
+		if( ! addrStr.contains("경기")) {
+			mav.addObject("totalCount_Gyeongi",0);
+    		mav.addObject("totalPrice_Gyeongi",0);
+    		mav.addObject("AVG_Gyeongi", 0);
+		}
+		if( ! addrStr.contains("인천")) {
+			mav.addObject("totalCount_Incheon",0);
+    		mav.addObject("totalPrice_Incheon",0);
+    		mav.addObject("AVG_Incheon", 0);
+		}
+		if( ! addrStr.contains("강원")) {
+			mav.addObject("totalCount_Gang",0);
+    		mav.addObject("totalPrice_Gang",0);
+    		mav.addObject("AVG_Gang", 0);
+		}
+		if( ! addrStr.contains("대전")) {
+			mav.addObject("totalCount_Daejeon",0);
+    		mav.addObject("totalPrice_Daejeon",0);
+    		mav.addObject("AVG_Daejeon", 0);
+		}
+		if( ! addrStr.contains("충남")) {
+			mav.addObject("totalCount_CN",0);
+    		mav.addObject("totalPrice_CN",0);
+    		mav.addObject("AVG_CN", 0);
+		}
+		if( ! addrStr.contains("충북")) {
+			mav.addObject("totalCount_CB",0);
+    		mav.addObject("totalPrice_CB",0);
+    		mav.addObject("AVG_CB", 0);
+		}
+		if( ! addrStr.contains("대구")) {
+			mav.addObject("totalCount_Daegu",0);
+    		mav.addObject("totalPrice_Daegu",0);
+    		mav.addObject("AVG_Daegu", 0);
+		}
+		if( ! addrStr.contains("경남")) {
+			mav.addObject("totalCount_GN",0);
+    		mav.addObject("totalPrice_GN",0);
+    		mav.addObject("AVG_GN", 0);
+		}
+		if( ! addrStr.contains("경북")) {
+			mav.addObject("totalCount_GB",0);
+    		mav.addObject("totalPrice_GB",0);
+    		mav.addObject("AVG_GB", 0);
+		}
+		if( ! addrStr.contains("울산")) {
+			mav.addObject("totalCount_WS",0);
+    		mav.addObject("totalPrice_WS",0);
+    		mav.addObject("AVG_WS", 0);
+		}
+		if( ! addrStr.contains("부산")) {
+	 		mav.addObject("totalCount_BS",0);
+    		mav.addObject("totalPrice_BS",0);
+    		mav.addObject("AVG_BS", 0);
+		}
+		if( ! addrStr.contains("광주")) {
+			mav.addObject("totalCount_GJ",0);
+    		mav.addObject("totalPrice_GJ",0);
+    		mav.addObject("AVG_GJ", 0);
+		}
+		if( ! addrStr.contains("전남")) {
+			mav.addObject("totalCount_JN",0);
+    		mav.addObject("totalPrice_JN",0);
+    		mav.addObject("AVG_JN", 0);
+		}
+		if( ! addrStr.contains("전북")) {
+			mav.addObject("totalCount_JB",0);
+    		mav.addObject("totalPrice_JB",0);
+    		mav.addObject("AVG_JB", 0);
+		}
+		if( ! addrStr.contains("제주")) {
+			mav.addObject("totalCount_JJ",0);
+    		mav.addObject("totalPrice_JJ",0);
+    		mav.addObject("AVG_JJ", 0);
+		}
+		
+		for ( HashMap<String, Object> map : paraMapList4 ) { 
+			
+	    	if ( map.get("hotel_addr1").equals("서울") ) {
+	    		mav.addObject("totalCount_Seoul",map.get("totalCount"));
+	    		mav.addObject("totalPrice_Seoul",map.get("totalPrice"));
+	    		mav.addObject("AVG_Seoul", map.get("AVG"));
+	    	}
+	    	if ( map.get("hotel_addr1").equals("경기") ) {
+	    		mav.addObject("totalCount_Gyeongi",map.get("totalCount"));
+	    		mav.addObject("totalPrice_Gyeongi",map.get("totalPrice"));
+	    		mav.addObject("AVG_Gyeongi", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_addr1").equals("인천") ) {
+	    		mav.addObject("totalCount_Incheon",map.get("totalCount"));
+	    		mav.addObject("totalPrice_Incheon",map.get("totalPrice"));
+	    		mav.addObject("AVG_Incheon", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_addr1").equals("강원") ) {
+	    		mav.addObject("totalCount_Gang",map.get("totalCount"));
+	    		mav.addObject("totalPrice_Gang",map.get("totalPrice"));
+	    		mav.addObject("AVG_Gang", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_addr1").equals("대전") ) {
+	    		mav.addObject("totalCount_Daejeon",map.get("totalCount"));
+	    		mav.addObject("totalPrice_Daejeon",map.get("totalPrice"));
+	    		mav.addObject("AVG_Daejeon", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_addr1").equals("충남") ) {
+	    		mav.addObject("totalCount_CN",map.get("totalCount"));
+	    		mav.addObject("totalPrice_CN",map.get("totalPrice"));
+	    		mav.addObject("AVG_CN", map.get("AVG"));
+	    	} 
+	    	
+	    	if ( map.get("hotel_addr1").equals("충북") ) {
+	    		mav.addObject("totalCount_CB",map.get("totalCount"));
+	    		mav.addObject("totalPrice_CB",map.get("totalPrice"));
+	    		mav.addObject("AVG_CB", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_addr1").equals("대구") ) {
+	    		mav.addObject("totalCount_Daegu",map.get("totalCount"));
+	    		mav.addObject("totalPrice_Daegu",map.get("totalPrice"));
+	    		mav.addObject("AVG_Daegu", map.get("AVG"));
+	    	} 
+	    	
+	    	if ( map.get("hotel_addr1").equals("경남") ) {
+	    		mav.addObject("totalCount_GN",map.get("totalCount"));
+	    		mav.addObject("totalPrice_GN",map.get("totalPrice"));
+	    		mav.addObject("AVG_GN", map.get("AVG"));
+	    	} 
+	    	
+	    	if ( map.get("hotel_addr1").equals("경북") ) {
+	    		mav.addObject("totalCount_GB",map.get("totalCount"));
+	    		mav.addObject("totalPrice_GB",map.get("totalPrice"));
+	    		mav.addObject("AVG_GB", map.get("AVG"));
+	    	} 
+	    	if ( map.get("hotel_addr1").equals("울산") ) {
+	    		mav.addObject("totalCount_WS",map.get("totalCount"));
+	    		mav.addObject("totalPrice_WS",map.get("totalPrice"));
+	    		mav.addObject("AVG_WS", map.get("AVG"));
+	    	} 
+	    	
+	    	if ( map.get("hotel_addr1").equals("부산") ) {
+	    		mav.addObject("totalCount_BS",map.get("totalCount"));
+	    		mav.addObject("totalPrice_BS",map.get("totalPrice"));
+	    		mav.addObject("AVG_BS", map.get("AVG"));
+	    	} 
+	    	
+	    	if ( map.get("hotel_addr1").equals("광주") ) {
+	    		mav.addObject("totalCount_GJ",map.get("totalCount"));
+	    		mav.addObject("totalPrice_GJ",map.get("totalPrice"));
+	    		mav.addObject("AVG_GJ", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_addr1").equals("전남") ) {
+	    		mav.addObject("totalCount_JN",map.get("totalCount"));
+	    		mav.addObject("totalPrice_JN",map.get("totalPrice"));
+	    		mav.addObject("AVG_JN", map.get("AVG"));
+	    	} 
+	    	if ( map.get("hotel_addr1").equals("전북") ) {
+	    		mav.addObject("totalCount_JB",map.get("totalCount"));
+	    		mav.addObject("totalPrice_JB",map.get("totalPrice"));
+	    		mav.addObject("AVG_JB", map.get("AVG"));
+	    	}
+	    	
+	    	if ( map.get("hotel_addr1").equals("제주") ) {
+	    		mav.addObject("totalCount_JJ",map.get("totalCount"));
+	    		mav.addObject("totalPrice_JJ",map.get("totalPrice"));
+	    		mav.addObject("AVG_JJ", map.get("AVG"));
+	    	}
+	    	
+		}
+
+
 		mav.setViewName("tilesSB/salesStatistic.tilesSBSAT");
 		return mav;
 	}
@@ -1021,29 +1949,12 @@ public class PsbController {
 		}
 		return gson.toJson(jsonArr);  
 	}
-	
-	@RequestMapping(value="/adminReservList.bc")
-	public ModelAndView adminReservList(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
-		mav.setViewName("tilesSB/adminReservList.tilesSBSAT");
-		return mav;
-	}
-	
 
-	@RequestMapping(value="/sellerDetail.bc")
-	public ModelAndView adminSellerDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
-		mav.setViewName("tilesSB/sellerDetail.tilesSBS");
-		return mav;
-	}
-	
-	@RequestMapping(value="/hotelDetail.bc")
-	public ModelAndView adminHotelDetail(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
-		mav.setViewName("tilesSB/hotelDetail.tilesSBS");
-		return mav;
-	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 						//////////////////// 관리자 게시판 ///////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	@RequestMapping(value="/adminCommentBoard.bc")
 	public ModelAndView adminCommentBoard(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
 		
@@ -1052,7 +1963,7 @@ public class PsbController {
 		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
 		
 		int totalCount = 0; // 총 게시물 건수
-		int sizePerPage = 5;  // 한 페이지당 보여줄 게시물 수
+		int sizePerPage = 10;  // 한 페이지당 보여줄 게시물 수
 		int currentShowPageNO = 0 ;// 현재 보여주는 페이지번호로서, 초기치로는 1페이지로 설정함
 		int totalPage = 0 ; // 총 페이지수(웹브라우저상에 보여줄 총 페이지 갯수, 페이지바)
 		
@@ -1703,5 +2614,163 @@ public class PsbController {
 		}
 		return jsonArr.toString();
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+						//////////////////// 예약 내역 ///////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	@RequestMapping(value="/adminReservList.bc")
+	public ModelAndView adminReservList(HttpServletRequest request, HttpServletResponse response, ModelAndView mav) {
+	
+		List<DwoReservationVO> rserveList = null;
+		
+		String str_currentShowPageNO = request.getParameter("currentShowPageNO");
+		
+		int totalCount = 0; // 총 게시물 건수
+		int sizePerPage = 10;  // 한 페이지당 보여줄 게시물 수
+		int currentShowPageNO = 0 ;// 현재 보여주는 페이지번호로서, 초기치로는 1페이지로 설정함
+		int totalPage = 0 ; // 총 페이지수(웹브라우저상에 보여줄 총 페이지 갯수, 페이지바)
+		
+		int startRno = 0;  // 시작 행번호
+		int endRno = 0; // 끝 행번호 
+	
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		
+		if(startDate == null) {
+			startDate="";
+		}
+		if(endDate == null) {
+			endDate="";
+		}
+		
+		String res_startday =  request.getParameter("res_startday");
+		String res_startdayEnd = 	 request.getParameter("res_startdayEnd");
+		if(res_startday == null) {
+			res_startday="";
+		}
+		if(res_startdayEnd == null) {
+			res_startdayEnd="";
+		}
+		
+		String searchType = request.getParameter("searchType"); 
+		String searchWord = request.getParameter("searchWord");
+		
+		if(searchWord==null|| searchWord.trim().isEmpty() ) {
+			searchWord = "";
+		}
+		
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+		
+		paraMap.put("searchType", searchType);
+		paraMap.put("searchWord", searchWord);
+	
+		paraMap.put("startDate", startDate);
+		paraMap.put("res_startdayEnd", res_startdayEnd);
+		
+		paraMap.put("res_startday", res_startday);
+		paraMap.put("endDate", endDate);
+		
+		totalCount = service.getTotalCountRserve(paraMap);	
+		mav.addObject("totalCount", totalCount);
+		
+		// 총 판매자 수 
+		int totalReserve = service.getTotalReserve();
+		mav.addObject("totalReserve", totalReserve);
+		
+		totalPage = (int)Math.ceil( (double)totalCount/sizePerPage );
+		
+		// 게시판에 보여지는 초기화면 
+		if(str_currentShowPageNO == null ) {
+			currentShowPageNO = 1;  // 첫 페이지는 1페이지 
+		}
+		else {
+			try {
+				currentShowPageNO = Integer.parseInt(str_currentShowPageNO);
+				
+				if(currentShowPageNO < 1 || currentShowPageNO > totalPage) {
+					currentShowPageNO = 1;
+				}
+			} catch (NumberFormatException e) {
+				currentShowPageNO = 1;
+			}
+		}
+	
+		startRno = ((currentShowPageNO-1)*sizePerPage) + 1;
+		endRno = startRno + sizePerPage -1;
+		paraMap.put("startRno", String.valueOf(startRno));
+		paraMap.put("endRno", String.valueOf(endRno));
+		
+		// 페이징 처리한 글목록 보여주기 (검색어 유무와는 상관 없음. 모두 포함함)
+		rserveList = service.reserveListWithPaging(paraMap); 
+		
+		// 검색어 값을 유지시키기 위함 
+		mav.addObject("paraMap",paraMap);
+		
+		// === 페이지바 만들기 === /// 
+		String pagebar = "<ul>";
+		
+		int blockSize = 5;
+		// blockSize 는 1개 블럭(토막)당 보여지는 페이지번호의 갯수 이다.
+		
+		int loop = 1;
+		
+		int pageNo = ((currentShowPageNO - 1)/blockSize) * blockSize + 1;
+		// *** !! 공식이다. !! *** //
+		
+		String url = "adminReservList.bc";	
+		// *** [이전] 만들기 *** //    
+		if(pageNo != 1) {
+			pagebar += "&nbsp;<a href='"+url+"?&currentShowPageNO="+ (pageNo-1)
+					+"&startDate="+startDate+"&endDate="+endDate
+					+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+					+"&res_startday="+res_startday +"&res_startdayEnd="+res_startdayEnd+ "'>"+pageNo+"[이전]</a>&nbsp;"; 
+		}
+			
+		while( !(loop>blockSize || pageNo>totalPage) ) {
+		
+			if(pageNo == currentShowPageNO) {
+				pagebar += "&nbsp;<span style='color: red; border: 1px solid gray; padding: 2px 4px;'>"+pageNo+"</span>&nbsp;";				
+			}
+			else {
+				pagebar += "&nbsp;<a style='color:black;'  href='"+url+"?&currentShowPageNO="+pageNo 
+						+"&startDate="+startDate+"&endDate="+endDate
+						+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+						+"&res_startday="+res_startday +"&res_startdayEnd="+res_startdayEnd+ "'>"+pageNo+"</a>&nbsp;"; 
+			}  
+			loop++;
+			pageNo++;
+		}// end of while---------------------------------
+		
+		// *** [다음] 만들기 *** //
+		if( !(pageNo>totalPage) ) {
+
+			pagebar += "&nbsp;<a style='color:black;' href='"+url+"?&currentShowPageNO="+pageNo 
+					+"&startDate="+startDate+"&endDate="+endDate
+					+"&sizePerPage="+sizePerPage+"&searchType="+searchType+"&searchWord="+searchWord
+					+"&res_startday="+res_startday +"&res_startdayEnd="+res_startdayEnd+ "'>"+pageNo+"[다음]</a>&nbsp;"; 
+		}
+		
+		pagebar += "</ul>";
+		
+		mav.addObject("pagebar", pagebar);
+		
+		///////////////////////////////////////////////////////////////////////////////////
+		
+		String gobackURL = MyUtil.getCurrentURL(request); // 우리가 만든 URL 알아오는 메소드 
+		mav.addObject("gobackURL", gobackURL);
+		
+		///////////////////////////////////////////////////////////////////////////////////
+		int endPay = service.getEndPay();
+		mav.addObject("endPay", endPay);
+		
+		mav.addObject("rserveList", rserveList);
+		
+		mav.setViewName("tilesSB/adminReservList.tilesSBSAT");
+		return mav;
+	}
+	
+	
 	
 }	

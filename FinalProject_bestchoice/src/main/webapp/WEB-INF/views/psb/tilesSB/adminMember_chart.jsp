@@ -64,7 +64,7 @@
 	function chart_Member(){
 	
 		  $.ajax({
-			   url: "/bestchoice/chartMemberCount.bc",
+			   url: "<%= request.getContextPath() %>/chartMemberCount.bc",
 			   dataType: "JSON",
 			   success:function(json){
 				   
@@ -415,7 +415,7 @@
 	
 	function chart_Age(){
 	   $.ajax({
-		   url: "/bestchoice/chartMemberCount.bc",
+		   url: "<%= request.getContextPath() %>/chartMemberCount.bc",
 		   dataType: "JSON",
 		   success:function(json){
 			   
@@ -520,7 +520,7 @@
    function chart_Gender(){
 	   
 	   $.ajax({
-		   url: "/bestchoice/chartMemberCount.bc",
+		   url: "<%= request.getContextPath() %>/chartMemberCount.bc",
 		   dataType: "JSON",
 		   success:function(json){
 			   
@@ -620,7 +620,7 @@
 		 */	
 		case "age" :
 			$.ajax({
-				url: "/bestchoice/chartMemberTrend.bc",
+				url: "<%= request.getContextPath() %>/chartMemberTrend.bc",
 				dataType: "JSON",
 				success:function(json){
 					
@@ -2063,7 +2063,7 @@
 			
 		case "gender" :
 			$.ajax({
-				url: "/bestchoice/chartMemberTrend.bc",
+				url: "<%= request.getContextPath() %>/chartMemberTrend.bc",
 				dataType: "JSON",
 				success:function(json){
 					

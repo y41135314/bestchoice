@@ -2,13 +2,16 @@
     pageEncoding="UTF-8"%>
 <%
 	String ctxPath = request.getContextPath();
-%>      
-<style>
+%>     
+<link href="https://fonts.googleapis.com/css?family=Do+Hyeon|Jua&display=swap" rel="stylesheet">
+
+<style type="text/css">
+
 .sidenav {
 	margin-top: 15px;
-	font-family: Arial, Helvetica, sans-serif, 돋움;
-	font-size: 20px;  
+	font-family: 'Jua', sans-serif, 돋움;
 }
+
 .sidenav a {
 	display: block;
 	text-decoration: none;
@@ -20,9 +23,9 @@
 	font-weight: bold;
 	text-align: center;
 	margin-bottom: 20px;
-	font-size: 18px;
+	font-size: 24px;  
 	vertical-align: middle !important;
-	padding: 5px 0;
+	
 }  
 
 </style>

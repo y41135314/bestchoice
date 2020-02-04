@@ -7,6 +7,9 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.project.dws.DwoReservationVO;
+import com.project.kmt.KmtHotelInfoVO;
+import com.project.kmt.KmtSellerMemberVO;
 import com.project.smh.SmhMemberVO;
 
 @Repository
@@ -224,6 +227,167 @@ public class PsbDAO {
 		List<HashMap<String, Object>> paraMap = sqlsession.selectList("psbMapper.sales_age");
 		return paraMap;
 	}
+
+
+	public List<HashMap<String, Object>> sales_grade() {
+		List<HashMap<String, Object>> paraMap = sqlsession.selectList("psbMapper.sales_grade");
+		return paraMap;
+	}
+
+	public List<HashMap<String, Object>> sales_addr() {
+		List<HashMap<String, Object>> paraMap = sqlsession.selectList("psbMapper.sales_addr");
+		return paraMap;
+	}
+	
+	/////////////////////////////////////////////////////////////////////////// 판매자
+	public int getTotalCountSeller(HashMap<String, Object> paraMap) {
+		int count = sqlsession.selectOne("psbMapper.getTotalCountSeller", paraMap);
+		return count;
+	}
+
+	public int getTotalSeller() {
+		int count = sqlsession.selectOne("psbMapper.getTotalSeller");
+		return count;
+	}
+
+	public List<KmtSellerMemberVO> sellerListWithPaging(HashMap<String, Object> paraMap) {
+		List<KmtSellerMemberVO> sellerList = sqlsession.selectList("psbMapper.sellerListWithPaging", paraMap);
+		return sellerList;
+	}
+
+	public KmtSellerMemberVO getOneSeller(String seller_idx) {
+		KmtSellerMemberVO sellervo = sqlsession.selectOne("psbMapper.getOneSeller", seller_idx);
+		return sellervo;
+	}
+
+	public int getHotelCount(String seller_idx) {
+		int count = sqlsession.selectOne("psbMapper.getHotelCount", seller_idx);
+		return count;
+	}
+
+	public int updateSellerStatus(String seller_idx) {
+		HashMap<String, Object> paraMap = new HashMap<String,Object>();
+		paraMap.put("seller_idx", seller_idx);
+		
+		int n = sqlsession.update("psbMapper.updateSellerStatus", paraMap);
+		return n;
+	}
+
+	public List<BoardVO> getSellerBoardList(String seller_Name) {
+		List<BoardVO> sellerBoardList = sqlsession.selectList("psbMapper.getSellerBoardList", seller_Name);
+		return sellerBoardList;
+	}
+
+	public List<HashMap<String, Object>> chart_SellerMonthlyPrice(String seller_idx) {
+		List<HashMap<String, Object>> montlyPriceList = sqlsession.selectList("psbMapper.chart_SellerMonthlyPrice",seller_idx);
+		return montlyPriceList;
+	}
+
+	public List<String> getHotelArr(String seller_idx) {
+		List<String> hotel_idx_Arr = sqlsession.selectList("psbMapper.getHotelArr", seller_idx);
+		return hotel_idx_Arr;
+	}
+
+	public int stopSellerStatus(String seller_idx) {
+		int n = sqlsession.update("psbMapper.stopSellerStatus", seller_idx);
+		return n;
+	}
+
+	/////////////////////////////////////////////////////////////////////////// 호텔
+	
+	public int getTotalCountHotel(HashMap<String, Object> paraMap) {
+		int count = sqlsession.selectOne("psbMapper.getTotalCountHotel", paraMap);
+		return count;
+	}
+
+	public int getTotalHotel() {
+		int count = sqlsession.selectOne("psbMapper.getTotalHotel");
+		return count;
+	}
+
+	public List<KmtHotelInfoVO> hotelListWithPaging(HashMap<String, Object> paraMap) {
+		List<KmtHotelInfoVO> hotelList = sqlsession.selectList("psbMapper.hotelListWithPaging", paraMap);
+		return hotelList;
+	}
+
+	public KmtHotelInfoVO getOneHotel(String hotel_idx) {
+		KmtHotelInfoVO hotelvo = sqlsession.selectOne("psbMapper.getOneHotel", hotel_idx);
+		return hotelvo;
+	}
+
+	public int getRoomCount(String hotel_idx) {
+		int count = sqlsession.selectOne("psbMapper.getRoomCount", hotel_idx);
+		return count;
+	}
+
+	public List<BoardVO> getHotelBoardList(String hotel_Name) {
+		List<BoardVO> hotelBoardList = sqlsession.selectList("psbMapper.getHotelBoardList", hotel_Name);
+		return hotelBoardList;
+	}
+
+	
+	public int updateHotelStatus(String[] hotel_idx) {
+		HashMap<String,Object> paraMap = new HashMap<String,Object>();
+		paraMap.put("hotel_idx", hotel_idx);
+		int n = sqlsession.update("psbMapper.updateHotelStatus", paraMap);
+		return n;
+	}
+
+	public int stopHotelStatus(String[] hotel_idx) {
+		HashMap<String,Object> paraMap = new HashMap<String,Object>();
+		paraMap.put("hotel_idx", hotel_idx);
+		int n = sqlsession.update("psbMapper.stopHotelStatus", paraMap);
+		return n;
+	}
+
+	public List<HashMap<String, Object>> chart_HotelMonthlyPrice(String hotel_idx) {
+		List<HashMap<String, Object>> montlyPriceList = sqlsession.selectList("psbMapper.chart_HotelMonthlyPrice",hotel_idx);
+		return montlyPriceList;
+	}
+
+	public List<HashMap<String, String>> chartHotelLocation() {
+		List<HashMap<String, String>> hotelCountList = sqlsession.selectList("psbMapper.chartHotelLocation");
+		return hotelCountList;
+	}
+
+	public List<HashMap<String, String>> chartHotelGrade() {
+		List<HashMap<String, String>> hotelCountList = sqlsession.selectList("psbMapper.chartHotelGrade");
+		return hotelCountList;
+	}
+
+	public int getSellerStatus(String hotel_idxStr) {
+		int m  = sqlsession.selectOne("psbMapper.getSellerStatus",hotel_idxStr);
+		return m;
+	}
+
+	public String getSellerIdx(String hotel_idxStr) {
+		String idx = sqlsession.selectOne("psbMapper.getSellerIdx",hotel_idxStr);
+		return idx;
+	}
+
+	/////////////////////////////////////////////////////////////////////////// 예약 리스트 
+	
+	public List<DwoReservationVO> reserveListWithPaging(HashMap<String, Object> paraMap) {
+		List<DwoReservationVO> resrveList = sqlsession.selectList("psbMapper.reserveListWithPaging", paraMap);
+		return resrveList;
+	}
+
+	public int getTotalCountRserve(HashMap<String, Object> paraMap) {
+		int count = sqlsession.selectOne("psbMapper.getTotalCountRserve", paraMap);
+		return count;
+	}
+
+	public int getTotalReserve() {
+		int count = sqlsession.selectOne("psbMapper.getTotalReserve");
+		return count;
+	}
+
+	public int getEndPay() {
+		int n = sqlsession.selectOne("psbMapper.getEndPay");
+		return n;
+	}
+
+	
 
 	
 

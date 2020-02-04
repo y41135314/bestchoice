@@ -32,16 +32,21 @@
  	text-align: center;
  }
  
+ .boardWriter {
+ 	color: #ff6666;
+ } 
+ 
  .boardWriter:hover {
  	font-weight: bold;
  	cursor: pointer;
- }
+ 	color: #ff5c33;
+ }  
  
  .adminIdHidden { display:none; }
  .adminIdShow { display:block; }
  
 </style>              
-
+    
 <script>
 	$(document).ready(function(){
 		
@@ -58,11 +63,11 @@
 		
 		$(".title").bind("mouseover",function(event){
 			var $target = $(event.target); 
-			$target.css({"font-weight":"bold", "cursor":"pointer"});
+			$target.css({"font-weight":"bold", "cursor":"pointer","color": "#ff5c33"});
 		});
 		$(".title").bind("mouseout",function(event){
 			var $target = $(event.target); 
-			$target.css({"font-weight":"normal"});
+			$target.css({"font-weight":"normal","color": "black"});
 		});  
 		
 		$("#searchWord").keydown(function(event){
@@ -90,7 +95,7 @@
 				
 				layer.css('position','absolute');
 				layer.css('top', pos.top);    // 레이어 위치 지정
-				layer.css('left', pos.left*1.07);
+				layer.css('left', pos.left*1.05);
 				
 				layer.show();
 			}
@@ -131,7 +136,7 @@
 		<input type="text" id="searchWord" name="searchWord" style="height: 20px;"/>
 	</form>	
 	<table id="adminCommentTable" >
-		<tr style="background-color: #FAFAFA;">
+		<tr style="background-color: #ffe6e6;">
 			<th style="width: 5%;">번호</th>
 			<th style="width: 40%;">제목</th>
 			<th>작성자</th>
@@ -156,15 +161,15 @@
 				   	   		 <c:if test="${boardvo.commentCount > 0}">	 
 						    	<c:if test="${boardvo.fileName == null }">	 
 						   	    	<span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
-						   	    	  ${boardvo.title}&nbsp;
+						   	    	  ${boardvo.title}&nbsp;</span>
 						   	      	  <span style="color: #F7323F; font-size: 9pt;">[${boardvo.commentCount}]</span>
-						   	    	  </span>
+						   	    	  
 						    	</c:if>
 						    	<c:if test="${boardvo.fileName != null }">	 
 						   	    	 <span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
-						   	    	 ${boardvo.title} <img src="<%= request.getContextPath()%>/resources/images/disk.gif" />
+						   	    	 ${boardvo.title} <img src="<%= request.getContextPath()%>/resources/images/disk.gif" /></span>
 						   	    	 &nbsp;<span style="color: #F7323F; font-size: 9pt;">[${boardvo.commentCount}]</span>
-						    		  </span>
+						    		  
 						    	</c:if>
 						     </c:if>
 						    
@@ -190,9 +195,9 @@
 							   	    	</c:forEach>
 						   	    	</span>
 							   	    <span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');" >	 
-							   	    	&nbsp;${boardvo.title}&nbsp;
+							   	    	&nbsp;${boardvo.title}&nbsp;</span>
 							   	    	<span style="color: #F7323F; font-size: 9pt;">[${boardvo.commentCount}]</span>
-						    		</span>
+						    		
 						    	</c:if>
 						    	<c:if test="${boardvo.fileName != null }">
 					    			<span  style="color:red; font-style: italic; padding-left: ${boardvo.depthno * 10 }px;">└
@@ -202,9 +207,9 @@
 						   	    	</span>
 						   	    	<span  class="title"  onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');" >	 
 							   	    	 &nbsp;${boardvo.title}
-							   	    	<img src="<%= request.getContextPath()%>/resources/images/disk.gif" />
+							   	    	<img src="<%= request.getContextPath()%>/resources/images/disk.gif" /></span>
 							   	    	&nbsp;<span style="color: #F7323F; font-size: 9pt;">[${boardvo.commentCount}]</span>
-						    		</span>
+						    		
 						    	</c:if>
 						     </c:if>
 						     

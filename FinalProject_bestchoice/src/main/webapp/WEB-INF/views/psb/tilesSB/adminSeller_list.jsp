@@ -66,7 +66,7 @@
 		<br/>
 		<select name="" id="" style="height: 20px; margin-left: 80px;">
 			<option value="">ID</option>
-			<option value="">사업자명</option>
+			<option value="">판매자명</option>
 		</select>   
 		<input type="text" style="height: 20px;"/>
 		&nbsp;&nbsp;|&nbsp;&nbsp;	
@@ -90,7 +90,7 @@
 			<tr>
 				<th>번호</th>
 				<th>ID</th>
-				<th>사업자명</th>
+				<th>판매자명</th>
 				<th>휴대폰번호</th>
 				<th>이메일</th>
 				<th>가입일자</th>

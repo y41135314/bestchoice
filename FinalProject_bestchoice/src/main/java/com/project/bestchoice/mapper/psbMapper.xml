@@ -490,5 +490,649 @@
 		on V.age = T.age
 	</select>
 	
+	<resultMap type="HashMap" id="sales_gradeMap">
+		<result property="hotel_Category" column="hotel_Category" javaType="String"/>  <!-- key 값과 컬럼명, 리턴값 타입 -->
+		<result property="totalCount" column="RCount" javaType="int"/> 
+		<result property="totalPrice" column="totalPrice" javaType="int"/> 
+		<result property="AVG" column="AVG" javaType="int"/> 
+	</resultMap>
+	
+	<select id="sales_grade"  resultMap="sales_gradeMap">
+       select V.hotel_Category, nvl(totalPrice,0) AS totalPrice, nvl(RCount,0) AS RCount,  nvl(totalPrice/RCount, 0) AS AVG
+		from 
+		    (
+		    select hotel_Category,
+		             sum(res_totalPrice) AS totalPrice
+		    from tbl_here_hotelInfo H left outer join tbl_here_reservation R
+		     on H.hotel_idx = R.fk_hotel_idx
+		     group by hotel_Category
+		     ) V
+		left join 
+		     (select hotel_Category, count(*) AS RCount
+		    from
+		    (
+		    select hotel_idx, hotel_Category
+            from tbl_here_hotelInfo H right outer join tbl_here_reservation R
+		    on H.hotel_idx = R.fk_hotel_idx
+		    )
+		    group by hotel_Category
+		    ) T
+		on V.hotel_Category = T.hotel_Category
+	</select>
+	
+	<resultMap type="HashMap" id="sales_addrMap">
+		<result property="hotel_addr1" column="hotel_addr1" javaType="String"/>  <!-- key 값과 컬럼명, 리턴값 타입 -->
+		<result property="totalCount" column="RCount" javaType="int"/> 
+		<result property="totalPrice" column="totalPrice" javaType="int"/> 
+		<result property="AVG" column="AVG" javaType="int"/> 
+	</resultMap>
+	
+	<select id="sales_addr" resultMap="sales_addrMap">
+		select V.hotel_addr1, nvl(totalPrice,0) AS totalPrice, nvl(RCount,0) AS RCount,  nvl(totalPrice/RCount, 0) AS AVG
+		from 
+		    (
+		    select substr(hotel_addr1,1,2) AS hotel_addr1,
+		             sum(res_totalPrice) AS totalPrice
+		    from tbl_here_hotelInfo H left outer join tbl_here_reservation R
+		     on H.hotel_idx = R.fk_hotel_idx
+		     group by  substr(hotel_addr1,1,2) 
+		     ) V
+		left join 
+		     (select hotel_addr1, count(*) AS RCount
+		    from
+		    (
+		    select hotel_idx, substr(hotel_addr1,1,2) AS hotel_addr1
+            from tbl_here_hotelInfo H right outer join tbl_here_reservation R
+		    on H.hotel_idx = R.fk_hotel_idx
+		    )
+		    group by hotel_addr1
+		    ) T
+		on V.hotel_addr1 = T.hotel_addr1
+        
+	</select>
+	<!--  ===================================== 판매자 ==================================== -->
+	<select id="getTotalCountSeller" resultType="int" parameterType="HashMap">
+     	select count(*) 
+		from
+		(
+		select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+		            seller_Post,seller_homepage,seller_Form,seller_Item,
+		            seller_RepName,seller_registerday, seller_realStatus
+		from 
+		    (
+		    select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+		            seller_Post,seller_homepage,seller_Form,seller_Item,
+		            seller_RepName,to_char(seller_registerday,'yyyymmdd') AS seller_registerday, seller_realStatus
+		    from tbl_here_sellerMember
+		    )
+		  
+	     <if test='seller_realStatus != null '>   
+	        where seller_realStatus = #{seller_realStatus}
+	     </if>
+	     <if test='seller_realStatus == null '>   
+	        where seller_realStatus in (1,0)
+	     </if>
+	      <if test='searchWord != "" '>   
+	            and ${searchType} like '%'|| #{searchWord} ||'%'
+	     </if> 
+	     <if test='startDate != null and startDate != "" '>
+	 	    <if test='endDate != null and endDate != "" '> 
+	           and seller_registerday between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+	     	</if>
+	     </if> 
+		 )
+     </select>
+     
+      <select id="getTotalSeller" resultType="int">
+     	select count(*) 
+		from tbl_here_sellerMember
+     </select>
+    
+      <select id="sellerListWithPaging"  parameterType="HashMap" resultType="com.project.kmt.KmtSellerMemberVO">
+   		  select rno,  nvl(totalPrice,0) AS totalPrice, nvl(totalCount,0) AS totalCount,  seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+                                  seller_Post, seller_RepName, seller_registerday, seller_realStatus
+		  from 
+		  ( select rownum AS rno, totalPrice, totalCount,  seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+		                                  seller_Post, seller_RepName, seller_registerday, seller_realStatus
+		        from 
+		         (
+		               select sum(res_totalPrice) AS totalPrice , count(*) AS totalCount, fk_seller_Id
+		               from 
+		               (
+		               select res_totalPrice, fk_hotel_idx, fk_seller_Id
+		               from 
+		               (
+		                 select res_totalPrice, fk_hotel_idx
+		                 from tbl_here_reservation 
+		               ) R
+		               join 
+		               (select hotel_idx, fk_seller_Id from tbl_here_hotelInfo) H
+		               on R.fk_hotel_idx = H.hotel_idx
+		               )
+		               group by fk_seller_Id
+		         ) V1
+		          right join 
+		          ( select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+		                                  seller_Post, seller_RepName,to_char(seller_registerday,'yyyy-mm-dd') AS seller_registerday, seller_realStatus
+		                from tbl_here_sellerMember
+		                   <if test='seller_realStatus != null '>   
+							        where seller_realStatus = #{seller_realStatus}
+							    </if>
+							    <if test='seller_realStatus == null '>   
+							        where seller_realStatus in (1,0)
+							    </if>
+							    <if test='searchWord != "" '>   
+							            and ${searchType} like '%'|| #{searchWord} ||'%'
+							    </if> 
+							    <if test='startDate != null and startDate != "" '>
+							 	    <if test='endDate != null and endDate != "" '> 
+							           and seller_registerday between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+							     	</if>
+							    </if> 
+		            ) V2
+		          on V1.fk_seller_Id = V2.seller_Id
+		      order by ${orderType} desc
+		     )
+		 <if test='startRno != "" and endRno != "" '> 
+		  where rno between #{startRno} and #{endRno}
+		 </if>
+      </select>	
+      
+      <select id="getOneSeller" resultType="com.project.kmt.KmtSellerMemberVO" parameterType="String">
+      	    select rownum AS rno,  nvl(totalPrice,0) AS totalPrice, nvl(totalCount,0) AS totalCount,  seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+                                  seller_Post, seller_RepName, seller_registerday, seller_realStatus
+	        from 
+	         (
+	               select sum(res_totalPrice) AS totalPrice , count(*) AS totalCount, fk_seller_Id
+	               from 
+	               (
+	               select res_totalPrice, fk_hotel_idx, fk_seller_Id
+	               from 
+	               (
+	                 select res_totalPrice, fk_hotel_idx
+	                 from tbl_here_reservation 
+	               ) R
+	              join
+	               (select hotel_idx, fk_seller_Id from tbl_here_hotelInfo) H
+	               on R.fk_hotel_idx = H.hotel_idx
+	               )
+	               group by fk_seller_Id
+	         ) V1
+	          right join 
+	          ( select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+	                                  seller_Post, seller_RepName,to_char(seller_registerday,'yyyy-mm-dd') AS seller_registerday, seller_realStatus
+	                from tbl_here_sellerMember
+		       ) V2
+	           on V1.fk_seller_Id = V2.seller_Id
+                where seller_idx = #{seller_idx}
+      </select>
+      
+      <select id="getHotelCount" parameterType="String" resultType="int">
+          	select count(*)
+             from 
+              (
+              select seller_Id, seller_idx
+                from tbl_here_sellerMember
+               right join ( select hotel_idx, fk_seller_Id from tbl_here_hotelInfo) H
+                 on seller_Id = H.fk_seller_Id
+              where seller_idx= #{seller_idx}
+              )
+          
+      </select>
+      
+      <update id="updateSellerStatus" parameterType="HashMap">
+      	   update tbl_here_sellerMember set seller_realStatus = 0
+           where seller_idx= #{seller_idx} 
+      </update>
+      
+      <select id="getSellerBoardList" parameterType="String" resultType="com.project.psb.BoardVO">
+      	  	select rno2, rno, adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday
+	     		  , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize 
+		    from 
+		    (
+      	  	select rownum AS rno2, rno, adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday,fk_adminId
+	     		  , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize , status
+			from 
+			(
+			    select rownum AS rno
+			            ,adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday,fk_adminId
+		     		  , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize , status
+			    from 
+			    (
+			        select  adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, to_char(registerday, 'yyyy-mm-dd hh24:mi:ss') as registerday      
+		     			, commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize, status,fk_adminId
+			        from tbl_here_adminBoard
+			        where status = 1
+			        start with fk_seq = 0
+			        connect by prior adminBoard_idx = fk_seq
+			        order siblings by groupno desc, adminBoard_idx asc
+			    ) V        
+			) T
+	       where fk_sellerName = #{seller_Name} and status = 1
+	       )
+	       where rno2 &lt;= 10
+      </select>
+  
+      <select id="chart_SellerMonthlyPrice" resultMap="chartMontlyPriceMap" parameterType="String">
+      		select MONTH, totalPrice, totalCount                
+	         from 
+	         (
+	         select fk_hotel_idx, to_char(res_paymentDay,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
+	         from tbl_here_reservation 
+	         group by fk_hotel_idx, to_char(res_paymentDay,'yyyy-mm') 
+	         ) R 
+	          join 
+	          ( select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+	                                            seller_Post,seller_homepage,seller_Form,seller_Item,
+	                                            seller_RepName, seller_registerday, seller_realStatus, hotel_idx
+	                from 
+	                (
+	                select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+	                                            seller_Post,seller_homepage,seller_Form,seller_Item,
+	                                            seller_RepName,to_char(seller_registerday,'yyyy-mm-dd') AS seller_registerday, seller_realStatus
+	                from tbl_here_sellerMember
+	                ) S left join ( select hotel_idx,fk_seller_Id from tbl_here_hotelInfo) H
+	                 on S.seller_Id = H.fk_seller_Id
+	                 where seller_idx = #{seller_idx}
+	         ) V
+	         on R.fk_hotel_idx = V.hotel_idx
+      </select>
+      
+      <select id="getHotelArr" parameterType="String" resultType="String">
+      	 select hotel_idx
+         from 
+          (
+          select hotel_idx, fk_seller_Id
+          from tbl_here_hotelInfo) V
+          right join (
+           select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
+                     seller_Post,seller_homepage,seller_Form,seller_Item,
+                       seller_RepName,to_char(seller_registerday,'yyyy-mm-dd') AS seller_registerday, seller_realStatus
+         from tbl_here_sellerMember
+         where seller_idx = #{seller_idx}
+         )M
+         on V.fk_seller_ID = M.seller_Id
+      </select>
+      
+      <update id="stopSellerStatus" parameterType="String">
+      	   update tbl_here_sellerMember set seller_realStatus = 1
+           where seller_idx= #{seller_idx} 
+      </update>
+      
+      <!--  ===================================== 호텔  ==================================== -->
+     <select id="getTotalCountHotel" resultType="int" parameterType="HashMap">
+        select count(*)                     
+        from 
+         (
+             select sum(res_totalPrice)  AS totalPrice,  fk_hotel_idx, count(*) AS totalCount  
+             from tbl_here_reservation 
+             group by fk_hotel_idx
+         ) R 
+          right join 
+        (  
+            select hotel_idx, hotel_name, hotel_Category, hotel_addr1, hotel_RepName, hotel_Status, 
+                    to_char(hotel_registerday, 'yyyy-mm-dd') AS hotel_registerday, hotel_email, hotel_phone, seller_id, seller_Name
+            from tbl_here_hotelInfo left join (select seller_id, seller_Name from tbl_here_sellermember) on fk_seller_Id = seller_id
+                <if test='hotel_Status != null '>   
+			        where hotel_Status = #{hotel_Status}
+			    </if>
+			    <if test='hotel_Status == null '>   
+			        where hotel_Status in (1,0)
+			    </if>
+			    <if test='searchWord != "" '>   
+			            and ${searchType} like '%'|| #{searchWord} ||'%'
+			    </if> 
+			    <if test='startDate != null and startDate != "" '>
+			 	    <if test='endDate != null and endDate != "" '> 
+			           and hotel_registerday between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+			     	</if>
+			    </if> 
+			     <if test='hotel_Category != "" and hotel_Category != null '>   
+			            and hotel_Category =  #{hotel_Category}
+			    </if>
+			    <if test='addrArr != "" '>   
+			            and substr( trim(hotel_addr1),1,2) in (  
+			            <foreach collection="addrArr" item="addr" separator=",">
+							#{addr}
+						</foreach> 
+			             )
+			    </if>
+			    <if test='addrArr == "" '>   
+			            and hotel_addr1 like '%'
+			    </if> 
+        )  H
+        on R.fk_hotel_idx = H.hotel_idx
+     </select>
+     
+      <select id="getTotalHotel" resultType="int">
+     	select count(*) 
+		from tbl_here_hotelInfo
+     </select>
+    
+      <select id="hotelListWithPaging"  parameterType="HashMap" resultType="com.project.kmt.KmtHotelInfoVO">
+   		   select rno,  hotel_idx, hotel_name, hotel_Category, hotel_addr1, hotel_RepName, hotel_Status, 
+              	   hotel_registerday, hotel_email, hotel_phone, seller_id, seller_Name,
+	              nvl(totalPrice,0) AS totalPrice , nvl(totalCount,0) AS totalCount          
+	      from 
+	      (
+	       select rownum AS rno,  hotel_idx, hotel_name,hotel_Category, hotel_addr1, hotel_RepName, hotel_Status, 
+	              hotel_registerday, hotel_email, hotel_phone, seller_id, seller_Name,
+	              totalPrice, totalCount                          
+	        from 
+	         (
+	             select sum(res_totalPrice)  AS totalPrice,  fk_hotel_idx, count(*) AS totalCount  
+	             from tbl_here_reservation 
+	             group by fk_hotel_idx
+	         ) R 
+	         right join 
+	        (  
+	            select hotel_idx, hotel_name,  hotel_Category, hotel_addr1, hotel_RepName, hotel_Status, 
+	                    to_char(hotel_registerday, 'yyyy-mm-dd') AS hotel_registerday, hotel_email, hotel_phone, seller_id, seller_Name
+	            from tbl_here_hotelInfo left join (select seller_id, seller_Name from tbl_here_sellermember) on fk_seller_Id = seller_id
+                <if test='hotel_Status != null '>   
+			        where hotel_Status = #{hotel_Status}
+			    </if>
+			    <if test='hotel_Status == null '>   
+			        where hotel_Status in (1,0)
+			    </if>
+			    <if test='searchWord != "" '>   
+			            and ${searchType} like '%'|| #{searchWord} ||'%'
+			    </if> 
+			    <if test='startDate != null and startDate != "" '>
+			 	    <if test='endDate != null and endDate != "" '> 
+			           and hotel_registerday between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+			     	</if>
+			    </if> 
+			     <if test='hotel_Category != "" and hotel_Category != null '>   
+			            and hotel_Category =  #{hotel_Category}
+			    </if>
+			    <if test='addrArr != "" '>   
+			            and substr( trim(hotel_addr1),1,2) in (  
+			            <foreach collection="addrArr" item="addr" separator=",">
+							#{addr}
+						</foreach> 
+			             )
+			    </if>
+			    <if test='addrArr == "" '>   
+			            and hotel_addr1 like '%'
+			    </if> 
+			 )  H
+	        on R.fk_hotel_idx = H.hotel_idx
+	        order by ${orderType} desc
+	        )
+		 <if test='startRno != "" and endRno != "" '> 
+		  where rno between #{startRno} and #{endRno}
+		 </if>
+      </select>	 	
+      
+      <select id="getOneHotel" resultType="com.project.kmt.KmtHotelInfoVO" parameterType="String">
+	       select rownum AS rno,  hotel_idx, hotel_name,hotel_Category, hotel_addr1,hotel_addr2,hotel_addr3, hotel_RepName, hotel_status, 
+	              hotel_registerday, hotel_email, hotel_Phone, seller_id, seller_Name,
+	               nvl(totalPrice,0) AS totalPrice, nvl(totalCount,0) AS totalCount                 
+	        from 
+	         (
+	             select sum(res_totalPrice)  AS totalPrice,  fk_hotel_idx, count(*) AS totalCount  
+	             from tbl_here_reservation 
+	             group by fk_hotel_idx
+	         ) R 
+	         right join 
+	        (  
+	            select hotel_idx, hotel_name,hotel_Category, hotel_addr1,hotel_addr2,hotel_addr3, hotel_RepName, hotel_status, 
+	                    to_char(hotel_registerday, 'yyyy-mm-dd') AS hotel_registerday, hotel_email, hotel_phone, seller_id, seller_Name
+	            from tbl_here_hotelInfo left join (select seller_id, seller_Name from tbl_here_sellermember) on fk_seller_Id = seller_id
+	        )  H
+	        on R.fk_hotel_idx = H.hotel_idx
+	        where hotel_idx = #{hotel_idx} 
+      </select>
+      
+      <select id="getRoomCount" parameterType="String" resultType="int">
+      		select nvl(count(*),0)
+			 from 
+			  (
+			    select hotel_idx, fk_seller_Id
+			    from tbl_here_hotelInfo
+			    ) H left join ( select fk_hotel_idx from tbl_here_roomInfo) R
+			     on H.hotel_idx = R.fk_hotel_idx
+			    where hotel_idx= #{hotel_idx} 
+			  group by hotel_idx
+      </select>	
+      
+      <select id="getHotelBoardList"  parameterType="String" resultType="com.project.psb.BoardVO">
+      		select rno2, rno, adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday
+	     		  , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize 
+		    from 
+		    (
+      	  	select rownum AS rno2, rno, adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday,fk_adminId
+	     		  , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize , status
+			from 
+			(
+			    select rownum AS rno
+			            ,adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, registerday,fk_adminId
+		     		  , commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize , status
+			    from 
+			    (
+			        select  adminBoard_idx, name, title, content, fk_sellerName, fk_hotelName, to_char(registerday, 'yyyy-mm-dd hh24:mi:ss') as registerday      
+		     			, commentCount,  groupno, fk_seq, depthno  , fileName, orgFilename, fileSize, status,fk_adminId
+			        from tbl_here_adminBoard
+			        where status = 1
+			        start with fk_seq = 0
+			        connect by prior adminBoard_idx = fk_seq
+			        order siblings by groupno desc, adminBoard_idx asc
+			    ) V        
+			) T
+	       where fk_hotelName = #{hotel_Name} and status = 1
+	       )
+	       where rno2 &lt;= 10
+      </select>
+      
+     <update id="updateHotelStatus" parameterType="HashMap">
+      	 update tbl_here_hotelInfo set hotel_status = 0
+         where hotel_idx in ( 
+           <foreach collection="hotel_idx" item="idx" separator=",">
+              #{idx}
+           </foreach>
+         
+          )
+      </update> 
+      
+      <update id="stopHotelStatus" parameterType="HashMap">
+      	 update tbl_here_hotelInfo set hotel_status = 1
+         where hotel_idx in ( 
+           <foreach collection="hotel_idx" item="idx" separator=",">
+              #{idx}
+           </foreach>
+           )
+      </update> 
+      
+      <select id="chart_HotelMonthlyPrice"  resultMap="chartMontlyPriceMap" parameterType="String">
+      	 select MONTH, totalPrice, totalCount                
+         from 
+         (
+         select fk_hotel_idx, to_char(res_paymentDay,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
+         from tbl_here_reservation 
+         group by fk_hotel_idx, to_char(res_paymentDay,'yyyy-mm') 
+         ) R 
+          join 
+          ( select hotel_idx
+            from tbl_here_hotelInfo
+            where hotel_idx = #{hotel_idx}
+         ) V
+         on R.fk_hotel_idx = V.hotel_idx
+      </select>
+      
+     <resultMap type="HashMap" id="chartHotelLocationMap">
+     	<result property="hotel_addr1" column="hotel_addr1" javaType="String"/> 
+		<result property="count" column="count" javaType="String"/> 
+		<result property="PERCENTAGE" column="PERCENTAGE" javaType="String"/> 
+	 </resultMap>
+    
+     <select id="chartHotelLocation" resultMap="chartHotelLocationMap">
+        select hotel_addr1, count(*) AS count,  round(  ( count(*)  / ( select count(*) from tbl_here_hotelInfo ) )* 100  , 2) AS PERCENTAGE
+		from 
+		( 
+		   select hotel_Category,  substr(hotel_addr1,1,2) AS hotel_addr1
+		   from tbl_here_hotelInfo
+		) V
+		group by hotel_addr1
+      </select>
+      
+      <resultMap type="HashMap" id="chartHotelGradeMap">
+     	<result property="hotel_Category" column="hotel_Category" javaType="String"/> 
+		<result property="count" column="count" javaType="String"/> 
+		<result property="PERCENTAGE" column="PERCENTAGE" javaType="String"/> 
+	 </resultMap>
+    
+     <select id="chartHotelGrade" resultMap="chartHotelGradeMap">
+        select hotel_Category, count(*) AS count,  round(  ( count(*)  / ( select count(*) from tbl_here_hotelInfo ) )* 100  , 2) AS PERCENTAGE
+		from 
+		( 
+		   select hotel_Category, hotel_addr1
+		   from tbl_here_hotelInfo
+		) V
+		group by hotel_Category
+      </select>
+      
+      <select id="getSellerStatus" parameterType="String" resultType="int">
+   	    select seller_realStatus
+        from tbl_here_sellerMember
+          right join ( select hotel_idx,fk_seller_Id  from tbl_here_hotelInfo where hotel_idx=#{hotel_idxStr}) H
+          on seller_Id = H.fk_seller_Id
+      </select>
+      
+      <select id="getSellerIdx" parameterType="String" resultType="String"> 
+      	 select seller_idx
+          from tbl_here_sellerMember
+          right join ( select hotel_idx,fk_seller_Id  from tbl_here_hotelInfo where hotel_idx=#{hotel_idxStr}) H
+          on seller_Id = H.fk_seller_Id
+      </select>
+      
+      <!--  ===================================== 예약 내역  ==================================== -->
+      
+      <select id="reserveListWithPaging" parameterType="HashMap" resultType="com.project.dws.DwoReservationVO">
+      	   select rno, res_number, fk_member_idx, fk_room_idx, to_char(res_startday,'yyyy-mm-dd') AS res_startday, to_char(res_endday,'yyyy-mm-dd') AS res_endday, 
+      	          res_totalprice, res_paymentDay,res_payment
+                   ,name, hotel_name, seller_name, hotel_idx,seller_idx   
+	      from 
+	      (
+      	  select rownum AS rno,   res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay,
+                  res_payment ,name,  H.hotel_name, seller_name, hotel_idx,seller_idx
+          from   
+          (    
+            select   res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay,res_payment
+                     , M.name
+             from    
+            ( select res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay,res_payment
+              from tbl_here_reservation 
+              where finish_paymentstatus =1 ) R
+            left join 
+              (select member_idx, name from tbl_here_member) M
+            on R.fk_member_idx = M.member_idx 
+         ) M2 
+         left join 
+            (   select hotel_name,room_idx , seller_name, hotel_idx, seller_idx
+                 from 
+                ( select fk_hotel_idx, room_idx from tbl_here_roomInfo ) V1
+                 join ( select  hotel_idx, hotel_name, fk_seller_id, S1.seller_name, S1.seller_idx
+                         from    
+                               (select hotel_idx, hotel_name, fk_seller_id from tbl_here_hotelInfo) H1  
+                         join (select seller_name, seller_id, seller_idx from tbl_here_sellerMember) S1 
+                         on H1.fk_seller_id = S1.seller_id 
+                         )V2
+                on V1.fk_hotel_idx = V2.hotel_idx
+            ) H
+         on M2.fk_room_idx = H.room_idx
+         <if test='searchWord == "" '>   
+			   where seller_name like '%'
+		 </if>
+         <if test='searchWord != "" '>   
+               <if test='searchType.equals("fk_member_idx") '>
+               where ${searchType} = #{searchWord}
+               </if>
+              <if test='! searchType.equals("fk_member_idx") '>
+               where ${searchType} like '%'|| #{searchWord} ||'%'
+               </if>
+		 </if>
+		 <if test='startDate != null and startDate != "" '>
+	 	    <if test='endDate != null and endDate != "" '> 
+	           and res_paymentDay between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+	     	</if>
+		</if> 
+		<if test='res_startday != null and res_startday != "" '>
+	 	    <if test='res_startdayEnd != null and res_startdayEnd != "" '> 
+	           and res_startday between to_date(#{res_startday},'yyyy-mm-dd') and to_date(#{res_startdayEnd},'yyyy-mm-dd')+0.99999
+	     	</if>
+		</if> 
+		 order by res_startday desc
+		  )
+		 <if test='startRno != "" and endRno != "" '> 
+		  where rno between #{startRno} and #{endRno}
+		 </if>
+      </select>
+      
+      <select id="getTotalCountRserve" resultType="int" parameterType="HashMap">
+      	  select count(*)
+	      from 
+	      (
+      	  select rownum AS rno,   res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay,
+                 res_payment, name,  H.hotel_name, seller_name, hotel_idx,seller_idx
+          from      
+          (    
+            select   res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay, res_payment
+                     , M.name
+             from    
+            ( select res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay, res_payment
+              from tbl_here_reservation
+                where finish_paymentstatus =1 ) R 
+            left join 
+              (select member_idx, name from tbl_here_member) M
+            on R.fk_member_idx = M.member_idx 
+         ) M2 
+         left join 
+            (   select hotel_name,room_idx , seller_name, hotel_idx, seller_idx
+                 from 
+                ( select fk_hotel_idx, room_idx from tbl_here_roomInfo ) V1
+                 join ( select  hotel_idx, hotel_name, fk_seller_id, S1.seller_name, S1.seller_idx
+                         from    
+                               (select hotel_idx, hotel_name, fk_seller_id from tbl_here_hotelInfo) H1  
+                         join (select seller_name, seller_id, seller_idx from tbl_here_sellerMember) S1 
+                         on H1.fk_seller_id = S1.seller_id 
+                         )V2
+                on V1.fk_hotel_idx = V2.hotel_idx
+            ) H
+         on M2.fk_room_idx = H.room_idx
+         <if test='searchWord == "" '>   
+			   where seller_name like '%'
+		 </if>	
+         <if test='searchWord != "" '>   
+			   <if test='searchType.equals("fk_member_idx") '>
+               where ${searchType} = #{searchWord}
+               </if>
+              <if test='! searchType.equals("fk_member_idx") '>
+               where ${searchType} like '%'|| #{searchWord} ||'%'
+               </if>
+		 </if>
+		 <if test='startDate != null and startDate != "" '>
+	 	    <if test='endDate != null and endDate != "" '> 
+	           and res_paymentDay between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+	     	</if>
+		</if> 
+		<if test='res_startday != null and res_startday != "" '>
+	 	    <if test='res_startdayEnd != null and res_startdayEnd != "" '> 
+	           and res_startday between to_date(#{res_startday},'yyyy-mm-dd') and to_date(#{res_startdayEnd},'yyyy-mm-dd')+0.99999
+	     	</if>
+		</if> 
+		)
+      </select>
+      
+      <select id="getTotalReserve" resultType="int" >
+      	select count(*) 
+		from tbl_here_reservation
+      </select>
+      
+      <select id="getEndPay" resultType="int">
+      	   select sum(res_totalprice)
+           from tbl_here_reservation
+           where res_endday &lt; sysdate
+      </select>
 </mapper>
 

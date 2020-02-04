@@ -182,8 +182,40 @@ public class KmtHotelInfoVO {
 	public void setFk_seller_Id(String fk_seller_Id) {
 		this.fk_seller_Id = fk_seller_Id;
 	}
-
 	
+	//////////////////////////////////////////추가 
+	private int totalPrice;
+	private int totalCount;
+	
+	
+	public int getTotalPrice() {
+	return totalPrice;
+	}
+	
+	public void setTotalPrice(int totalPrice) {
+	this.totalPrice = totalPrice;
+	}
+	
+	public int getTotalCount() {
+	return totalCount;
+	}
+	
+	public void setTotalCount(int totalCount) {
+	this.totalCount = totalCount;
+	}
+	//////////////////////////////////////////
+	
+	private String seller_Name ;
+	
+	public String getSeller_Name() {
+	return seller_Name;
+	}
+	
+	public void setSeller_Name(String seller_Name) {
+	this.seller_Name = seller_Name;
+	}
+	
+	//////////////////////////////////////////
 	
 	
 	
