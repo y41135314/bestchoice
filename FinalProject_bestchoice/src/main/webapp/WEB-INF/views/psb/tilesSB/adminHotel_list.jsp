@@ -186,7 +186,7 @@
 				
 				<tr id="hotel" style="text-align: center;" onclick="location.href='<%=request.getContextPath()%>/hotelDetail.bc?hotel_idx=${hotelvo.hotel_idx}'" >   
 					<td>${hotelvo.hotel_idx}</td>
-					<td>${hotelvo.hotel_name}</td>
+					<td>${hotelvo.hotel_Name}</td>
 					<c:if test="${hotelvo.hotel_Category ==0 }"><td> 일반</td></c:if>
 					<c:if test="${hotelvo.hotel_Category ==1 }"><td> 특급</td></c:if>
 					<c:if test="${hotelvo.hotel_Category ==2 }"><td> 특1급</td></c:if>

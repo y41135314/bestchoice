@@ -322,7 +322,7 @@
       </select>
       
       <select id="getlastDate" parameterType="String"  resultType="String">
-      	select to_char(max(res_paymentDay),'yyyy-mm-dd') AS lastDate
+      	select to_char(max(RES_PAYMENTDAY),'yyyy-mm-dd') AS lastDate
 		from tbl_here_reservation
 		where fk_member_idx = #{member_idx}
       </select>
@@ -390,31 +390,31 @@
 	<select id="last_yearPrice" resultType="int">
 		select nvl(sum(res_totalPrice),0)
 		from tbl_here_reservation
-		where to_char(res_paymentDay,'yyyy') = '2019'
+		where to_char(RES_PAYMENTDAY,'yyyy') = '2019'
 	</select> 
 	
 	<select id="yearPrice" resultType="int">
 		select nvl(sum(res_totalPrice),0)
 		from tbl_here_reservation
-		where to_char(res_paymentDay,'yyyy') = '2020'
+		where to_char(RES_PAYMENTDAY,'yyyy') = '2020'
 	</select> 
 	
 	<select id="monthPrice" resultType="int">
 		select nvl(sum(res_totalPrice),0)
 		from tbl_here_reservation
-		where to_char(res_paymentDay,'yyyy-mm') = to_char(sysdate, 'yyyy-mm') 
+		where to_char(RES_PAYMENTDAY,'yyyy-mm') = to_char(sysdate, 'yyyy-mm') 
 	</select> 
 	
 	<select id="dayPrice" resultType="int">
 		select nvl(sum(res_totalPrice),0)
 		from tbl_here_reservation
-		where to_char(res_paymentDay,'yyyy-mm-dd') = to_char(sysdate, 'yyyy-mm-dd') 
+		where to_char(RES_PAYMENTDAY,'yyyy-mm-dd') = to_char(sysdate, 'yyyy-mm-dd') 
 	</select> 
 	
 	<select id="searchPrice" resultType="int">
 		select nvl(sum(res_totalPrice),0)
 		from tbl_here_reservation
-		where to_char(res_paymentDay,'yyyy-mm-dd') between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+		where to_char(RES_PAYMENTDAY,'yyyy-mm-dd') between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
 	</select> 
 	
 	<resultMap type="HashMap" id="chartMontlyPriceMap">
@@ -424,10 +424,10 @@
 	</resultMap>
 	
 	<select id="chart_MonthlyPrice" resultMap="chartMontlyPriceMap">
-		select to_char(res_paymentDay,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
+		select to_char(RES_PAYMENTDAY,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
 		from tbl_here_reservation
-		group by to_char(res_paymentDay,'yyyy-mm')
-		order by to_char(res_paymentDay,'yyyy-mm') 
+		group by to_char(RES_PAYMENTDAY,'yyyy-mm')
+		order by to_char(RES_PAYMENTDAY,'yyyy-mm') 
 	</select>
 	
 	<resultMap type="HashMap" id="sales_genderMap">
@@ -556,12 +556,12 @@
 		from
 		(
 		select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
-		            seller_Post,seller_homepage,seller_Form,seller_Item,
+		            seller_Post,seller_homepage,seller_Item,
 		            seller_RepName,seller_registerday, seller_realStatus
 		from 
 		    (
 		    select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
-		            seller_Post,seller_homepage,seller_Form,seller_Item,
+		            seller_Post,seller_homepage,seller_Item,
 		            seller_RepName,to_char(seller_registerday,'yyyymmdd') AS seller_registerday, seller_realStatus
 		    from tbl_here_sellerMember
 		    )
@@ -717,18 +717,18 @@
       		select MONTH, totalPrice, totalCount                
 	         from 
 	         (
-	         select fk_hotel_idx, to_char(res_paymentDay,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
+	         select fk_hotel_idx, to_char(RES_PAYMENTDAY,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
 	         from tbl_here_reservation 
-	         group by fk_hotel_idx, to_char(res_paymentDay,'yyyy-mm') 
+	         group by fk_hotel_idx, to_char(RES_PAYMENTDAY,'yyyy-mm') 
 	         ) R 
 	          join 
 	          ( select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
-	                                            seller_Post,seller_homepage,seller_Form,seller_Item,
+	                                            seller_Post,seller_homepage,seller_Item,
 	                                            seller_RepName, seller_registerday, seller_realStatus, hotel_idx
 	                from 
 	                (
 	                select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
-	                                            seller_Post,seller_homepage,seller_Form,seller_Item,
+	                                            seller_Post,seller_homepage,seller_Item,
 	                                            seller_RepName,to_char(seller_registerday,'yyyy-mm-dd') AS seller_registerday, seller_realStatus
 	                from tbl_here_sellerMember
 	                ) S left join ( select hotel_idx,fk_seller_Id from tbl_here_hotelInfo) H
@@ -746,7 +746,7 @@
           from tbl_here_hotelInfo) V
           right join (
            select seller_Id, seller_idx, seller_Name, seller_No, seller_Phone, seller_Mobile, seller_Addr, 
-                     seller_Post,seller_homepage,seller_Form,seller_Item,
+                     seller_Post,seller_homepage,seller_Item,
                        seller_RepName,to_char(seller_registerday,'yyyy-mm-dd') AS seller_registerday, seller_realStatus
          from tbl_here_sellerMember
          where seller_idx = #{seller_idx}
@@ -948,9 +948,9 @@
       	 select MONTH, totalPrice, totalCount                
          from 
          (
-         select fk_hotel_idx, to_char(res_paymentDay,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
+         select fk_hotel_idx, to_char(RES_PAYMENTDAY,'yyyy-mm') AS MONTH, sum(res_totalPrice) AS totalPrice, count(*) AS totalCount
          from tbl_here_reservation 
-         group by fk_hotel_idx, to_char(res_paymentDay,'yyyy-mm') 
+         group by fk_hotel_idx, to_char(RES_PAYMENTDAY,'yyyy-mm') 
          ) R 
           join 
           ( select hotel_idx
@@ -1009,21 +1009,21 @@
       <!--  ===================================== 예약 내역  ==================================== -->
       
       <select id="reserveListWithPaging" parameterType="HashMap" resultType="com.project.dws.DwoReservationVO">
-      	   select rno, res_number, fk_member_idx, fk_room_idx, to_char(res_startday,'yyyy-mm-dd') AS res_startday, to_char(res_endday,'yyyy-mm-dd') AS res_endday, 
-      	          res_totalprice, res_paymentDay,res_payment
+      	   select rno, res_number, fk_member_idx, fk_room_idx, to_char(RESSTATUS_IN_DAY,'yyyy-mm-dd') AS RESSTATUS_IN_DAY, to_char(RESSTATUS_OUT_DAY,'yyyy-mm-dd') AS RESSTATUS_OUT_DAY, 
+      	          res_totalprice, RES_PAYMENTDAY,res_payment
                    ,name, hotel_name, seller_name, hotel_idx,seller_idx   
 	      from 
 	      (
-      	  select rownum AS rno,   res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay,
+      	  select rownum AS rno,   res_number, fk_member_idx, fk_room_idx, RESSTATUS_IN_DAY, RESSTATUS_OUT_DAY, res_totalprice, RES_PAYMENTDAY,
                   res_payment ,name,  H.hotel_name, seller_name, hotel_idx,seller_idx
           from   
           (    
-            select   res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay,res_payment
+            select   res_number, fk_member_idx, fk_room_idx, RESSTATUS_IN_DAY, RESSTATUS_OUT_DAY, res_totalprice, RES_PAYMENTDAY,res_payment
                      , M.name
              from    
-            ( select res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay,res_payment
+            ( select res_number, fk_member_idx, fk_room_idx, RESSTATUS_IN_DAY, RESSTATUS_OUT_DAY, res_totalprice, RES_PAYMENTDAY,res_payment
               from tbl_here_reservation 
-              where finish_paymentstatus =1 ) R
+              where RES_PAYMENTSTATUS =1 ) R
             left join 
               (select member_idx, name from tbl_here_member) M
             on R.fk_member_idx = M.member_idx 
@@ -1054,15 +1054,15 @@
 		 </if>
 		 <if test='startDate != null and startDate != "" '>
 	 	    <if test='endDate != null and endDate != "" '> 
-	           and res_paymentDay between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+	           and RES_PAYMENTDAY between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
 	     	</if>
 		</if> 
 		<if test='res_startday != null and res_startday != "" '>
 	 	    <if test='res_startdayEnd != null and res_startdayEnd != "" '> 
-	           and res_startday between to_date(#{res_startday},'yyyy-mm-dd') and to_date(#{res_startdayEnd},'yyyy-mm-dd')+0.99999
+	           and RESSTATUS_IN_DAY between to_date(#{res_startday},'yyyy-mm-dd') and to_date(#{res_startdayEnd},'yyyy-mm-dd')+0.99999
 	     	</if>
 		</if> 
-		 order by res_startday desc
+		 order by RESSTATUS_IN_DAY desc
 		  )
 		 <if test='startRno != "" and endRno != "" '> 
 		  where rno between #{startRno} and #{endRno}
@@ -1073,16 +1073,16 @@
       	  select count(*)
 	      from 
 	      (
-      	  select rownum AS rno,   res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay,
+      	  select rownum AS rno,   res_number, fk_member_idx, fk_room_idx, RESSTATUS_IN_DAY, RESSTATUS_OUT_DAY, res_totalprice, RES_PAYMENTDAY,
                  res_payment, name,  H.hotel_name, seller_name, hotel_idx,seller_idx
           from      
           (    
-            select   res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay, res_payment
+            select   res_number, fk_member_idx, fk_room_idx, RESSTATUS_IN_DAY, RESSTATUS_OUT_DAY, res_totalprice, RES_PAYMENTDAY, res_payment
                      , M.name
              from    
-            ( select res_number, fk_member_idx, fk_room_idx, res_startday, res_endday, res_totalprice, res_paymentDay, res_payment
+            ( select res_number, fk_member_idx, fk_room_idx, RESSTATUS_IN_DAY, RESSTATUS_OUT_DAY, res_totalprice, RES_PAYMENTDAY, res_payment
               from tbl_here_reservation
-                where finish_paymentstatus =1 ) R 
+                where RES_PAYMENTSTATUS =1 ) R 
             left join 
               (select member_idx, name from tbl_here_member) M
             on R.fk_member_idx = M.member_idx 
@@ -1113,12 +1113,12 @@
 		 </if>
 		 <if test='startDate != null and startDate != "" '>
 	 	    <if test='endDate != null and endDate != "" '> 
-	           and res_paymentDay between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
+	           and RES_PAYMENTDAY between to_date(#{startDate},'yyyy-mm-dd') and to_date(#{endDate},'yyyy-mm-dd')+0.99999
 	     	</if>
 		</if> 
 		<if test='res_startday != null and res_startday != "" '>
 	 	    <if test='res_startdayEnd != null and res_startdayEnd != "" '> 
-	           and res_startday between to_date(#{res_startday},'yyyy-mm-dd') and to_date(#{res_startdayEnd},'yyyy-mm-dd')+0.99999
+	           and RESSTATUS_IN_DAY between to_date(#{res_startday},'yyyy-mm-dd') and to_date(#{res_startdayEnd},'yyyy-mm-dd')+0.99999
 	     	</if>
 		</if> 
 		)
@@ -1130,9 +1130,9 @@
       </select>
       
       <select id="getEndPay" resultType="int">
-      	   select sum(res_totalprice)
+      	   select nvl(sum(res_totalprice),0)
            from tbl_here_reservation
-           where res_endday &lt; sysdate
+           where RESSTATUS_OUT_DAY &lt; sysdate
       </select>
 </mapper>
 

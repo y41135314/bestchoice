@@ -396,7 +396,7 @@
 	<br/>
    <input type="button" value="호텔리스트페이지로" onclick="location.href='<%=request.getContextPath()%>/adminHotel_list.bc'" style="font-size: 8pt;"/> 
    &nbsp;&nbsp;|&nbsp;&nbsp;
-   <input type="button" value="예약내역 보기" onclick="location.href='<%=request.getContextPath()%>/adminReservList.bc?searchType=hotel_name&searchWord=${hotelvo.hotel_name}&startDate=&endDate=&res_startday=&res_startdayEnd='" style="font-size: 8pt;"/> 
+   <input type="button" value="예약내역 보기" onclick="location.href='<%=request.getContextPath()%>/adminReservList.bc?searchType=hotel_Name&searchWord=${hotelvo.hotel_Name}&startDate=&endDate=&res_startday=&res_startdayEnd='" style="font-size: 8pt;"/> 
    &nbsp;&nbsp;|&nbsp;&nbsp;
    <input type="button" value="상태변경" onclick="location.href='<%=request.getContextPath()%>/updateHotelStatus.bc?hotel_idx=${hotelvo.hotel_idx}&hotel_Status=${hotelvo.hotel_Status}'" style="font-size: 8pt;"/>&nbsp;&nbsp;|&nbsp;&nbsp;
    <input type="button" value="판매페이지 가기" style="font-size: 8pt;"/> 
@@ -417,7 +417,7 @@
 		</tr>
 		<tr>   
 			<td>${hotelvo.hotel_idx} </td>
-			<td>${hotelvo.hotel_name} </td>
+			<td>${hotelvo.hotel_Name} </td>
 			<c:if test="${hotelvo.hotel_Category ==0 }"><td> 일반</td></c:if>
 			<c:if test="${hotelvo.hotel_Category ==1 }"><td> 특급</td></c:if>
 			<c:if test="${hotelvo.hotel_Category ==2 }"><td> 특1급</td></c:if>
@@ -551,9 +551,9 @@
 				<input type="text" name="title" id="title" type="text" placeholder="제목" style="margin: 5px 0;" /><br/>
 				<textarea  name="content" id="content"  style="width: 50%;"></textarea>
 			</div>
-			<div>
+			<div> 
 				<input type="text"  name="fk_sellerName" value="${hotelvo.seller_Name}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly  /> 
-				<input type="text" name="fk_hotelName" value="${hotelvo.hotel_name}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly  /> 
+				<input type="text" name="fk_hotelName" value="${hotelvo.hotel_Name}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly  /> 
 				<input type="text" name="name" value="${(sessionScope.loginadmin).name}" style="font-size: 8pt; width: 7%; margin-bottom: 5px;" class="short"  readonly  />  <%-- ${sessionScope.loginuser.name} --%>
 				<input type="button" id="btnWrite"  value="등록" style="font-size: 8pt; margin-left: 100;"/> 
 			</div>

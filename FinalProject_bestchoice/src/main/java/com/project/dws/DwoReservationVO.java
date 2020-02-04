@@ -8,8 +8,8 @@ public class DwoReservationVO {
 	String fk_room_idx; //방코드
 	String fk_coupon_code;//쿠폰코드
     String res_payment;//(0카드/신용 1카카오페이 2네이버)
-    String res_startday; //입실일 =============================================수정 
-	String res_endday; //퇴실일 =============================================수정 
+    String RESSTATUS_IN_DAY; //입실일 =============================================수정 
+	String RESSTATUS_OUT_DAY; //퇴실일 =============================================수정 
 	String res_totalprice;//최종결제금액  
 	String res_point;//적립금 사용 또는 적립내역    
 	String res_paymentstatus; //예약상태
@@ -85,17 +85,17 @@ public class DwoReservationVO {
 	public void setRes_payment(String res_payment) {
 		this.res_payment = res_payment;
 	}
-	public String getRes_startday() {
-		return res_startday;
+	public String getRESSTATUS_IN_DAY() {
+		return RESSTATUS_IN_DAY;
 	}
-	public void setRes_startday(String res_startday) {
-		this.res_startday = res_startday;
+	public void setRESSTATUS_IN_DAY(String RESSTATUS_IN_DAY) {
+		this.RESSTATUS_IN_DAY = RESSTATUS_IN_DAY;
 	}
-	public String getRes_endday() {
-		return res_endday;
+	public String getRESSTATUS_OUT_DAY() {
+		return RESSTATUS_IN_DAY;
 	}
-	public void setRes_endday(String res_endday) {
-		this.res_endday = res_endday;
+	public void setRESSTATUS_OUT_DAY(String RESSTATUS_OUT_DAY) {
+		this.RESSTATUS_OUT_DAY = RESSTATUS_OUT_DAY;
 	}
 	public String getRes_totalprice() {
 		return res_totalprice;
