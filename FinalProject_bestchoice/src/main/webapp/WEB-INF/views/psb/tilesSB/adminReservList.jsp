@@ -113,7 +113,6 @@
 				<th>회원번호</th>
 				<th>회원이름</th>
 				<th>호텔명</th>
-				<th>방코드</th>
 				<th>판매자</th>
 				<th>결제금액</th>
 				<th>결제일</th>
@@ -125,7 +124,7 @@
 		<tbody>
 			<c:if test="${ rserveList == null }">
 				<tr>   
-					<td colspan="11">예약내역이 없습니다.</td>
+					<td colspan="10">예약내역이 없습니다.</td>
 				</tr>
 		   </c:if>
 	
@@ -136,15 +135,14 @@
 					<td>${reservo.fk_member_idx}</td>
 					<td class="gobtn" onclick="location.href = '<%= request.getContextPath() %>/memberDetail.bc?member_idx=${reservo.fk_member_idx}'">${reservo.name}</td>
 					<td  >${reservo.hotel_name}</td>
-					<td>${reservo.fk_room_idx}</td>
 					<td >${reservo.seller_name}</td>
 					<td><fmt:formatNumber value="${reservo.res_totalprice}" pattern="#,###"/>원</td>
 					<td>${reservo.res_paymentDay}</td>
 					<c:if test="${reservo.res_payment == 0 }"><td>카드</td></c:if>
 					<c:if test="${reservo.res_payment == 1 }"><td>카카오페이</td></c:if>
 					<c:if test="${reservo.res_payment == 2 }"><td>네이버</td></c:if>
-					<td>${reservo.res_startday}</td>
-					<td>${reservo.res_endday}</td>
+					<td>${reservo.RESSTATUS_IN_DAY}</td>
+					<td>${reservo.RESSTATUS_OUT_DAY}</td>
 				</tr>
 				</c:forEach>
 		   </c:if>
