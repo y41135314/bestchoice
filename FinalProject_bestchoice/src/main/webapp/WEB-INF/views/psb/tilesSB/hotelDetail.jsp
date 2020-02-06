@@ -399,8 +399,8 @@
    <input type="button" value="예약내역 보기" onclick="location.href='<%=request.getContextPath()%>/adminReservList.bc?searchType=hotel_name&searchWord=${hotelvo.hotel_Name}&startDate=&endDate=&res_startday=&res_startdayEnd='" style="font-size: 8pt;"/> 
    &nbsp;&nbsp;|&nbsp;&nbsp;
    <input type="button" value="상태변경" onclick="location.href='<%=request.getContextPath()%>/updateHotelStatus.bc?hotel_idx=${hotelvo.hotel_idx}&hotel_Status=${hotelvo.hotel_Status}'" style="font-size: 8pt;"/>&nbsp;&nbsp;|&nbsp;&nbsp;
-   <input type="button" value="판매페이지 가기" style="font-size: 8pt;"/> 
-   	    
+   <input type="button" value="판매페이지 가기" style="font-size: 8pt;" onclick="location.href='<%=request.getContextPath()%>/roomDetail.bc?hotel_idx=${hotelvo.hotel_idx}'"/> 
+   	
     <table id="tableHotelDetail" style="text-align: center;">
 		<tr style="background-color: #FAFAFA;"> 
 			<th>호텔번호</th>
