@@ -516,6 +516,195 @@
 	<!-- FAQ 끝 -->
 	
 	
+	<!-- 검색 시작 -->
+	
+	 <select id="getHotelList" parameterType="com.project.yhj.search.YhjSearchVO" resultType="com.project.yhj.search.YhjSearchResultVO">
+		
+		select  tblUnderCon.hotel_idx as hotel_idx
+	        , hotelImage_wasFileName 
+	        , hotel_name
+	        , hotel_category
+	        , gradePerHotel
+	        , tblUnderCon.roomprice as roomprice
+	        , hotel_addr1
+	        , hotel_geo_x
+	        , hotel_geo_y
+	    from 
+	    (    
+	        select  hotel_idx , min (sumprice ) as roomprice
+	        from 
+	        (
+	            select *
+	            from
+	            ( select * from tbl_here_hotelInfo 
+	            	where hotel_status = 1
+	            	<!-- hotel_Category 혹은 hotel_grade -->
+					<if test="hotelInfoList != null">
+						and hotel_category in 
+						<foreach collection="hotelInfoList" item="type" open="(" close=")" separator=",">
+							#{type}
+						</foreach>
+					
+					</if>
+	            ) A
+	            join
+	            ( select * from tbl_here_roomInfo 
+		            <!-- 인원수 -->
+		        	where #{room_Person} between  room_person and room_addperson	
+	            ) B
+	            on a.hotel_idx = b.fk_hotel_idx
+	            join 
+	            (   
+	                select a.fk_room_idx
+	                , sum(a.roomprice) + ( to_number(#{room_Person}) -2 )*(select room_addpercharge from tbl_here_roomInfo where room_idx = a.fk_room_idx )  as sumprice 
+	                from tbl_here_roomPrice A
+	                left join
+	                (
+	                    select fk_room_idx, count(*) as cnt
+	                    from 
+	                    ( select * from tbl_here_roomPrice where roomprice_quantity > 0 )
+	                    where roomprice_date &gt;= to_date( #{startday} ,'yyyy-mm-dd') 
+	                    and roomprice_date &lt; (to_date( #{endday} ,'yyyy-mm-dd'))  
+	                    group by fk_room_idx
+	                ) B
+	                on a.fk_room_idx = b.fk_room_idx
+	                where b.cnt = ( to_date( #{endday} ,'yyyy-mm-dd') - to_date( #{startday} ,'yyyy-mm-dd') )  
+	                and a.roomprice_quantity >0 
+	                and roomprice_date &gt;= to_date( #{startday} ,'yyyy-mm-dd') and roomprice_date &lt; (to_date( #{endday} ,'yyyy-mm-dd')) 
+	                group by a.fk_room_idx
+	            ) C
+	            on b.room_idx = c.fk_room_idx
+	            join 
+	            ( select fk_room_idx from tbl_here_bed 
+	            	<!-- 침대유형 -->
+					<if test="bedList != null">
+						where 
+						<foreach collection="bedList" item="type" separator=" and ">
+							${type} = 1
+						</foreach>
+					</if>
+	             )D
+	            on c.fk_room_idx = d.fk_room_idx
+	            join 
+	            ( select fk_room_idx from tbl_here_service 
+	            	<!-- 내부객시설 -->
+					<if test="serviceList != null">
+						where 
+						<foreach collection="serviceList" item="type" separator=" and ">
+							${type} = 1
+						</foreach>
+					</if>
+	            ) E
+	            on c.fk_room_idx = e.fk_room_idx
+	            join 
+	            ( select fk_room_idx from tbl_here_theme 
+		            <!-- 이색테마유형 -->
+					<if test="themeList != null">
+						where 
+						<foreach collection="themeList" item="type" separator=" and ">
+							${type} = 1
+						</foreach>
+					</if>
+	            ) F
+	            on c.fk_room_idx = f.fk_room_idx
+	            join 
+	            ( select fk_room_idx from tbl_here_spa 
+		            <!-- 스파유형 -->
+					<if test="spaList != null">
+						where
+						<foreach collection="spaList" item="type" separator=" and ">
+							${type} = 1
+						</foreach>
+					</if>
+	            
+	            ) G
+	            on c.fk_room_idx = g.fk_room_idx
+	        ) wholeJoinTable
+        	<!-- 조건문 추가하기 -->
+        	
+            <!-- 검색어 -->
+             <if test="searchWord != null">
+             	where hotel_Name || hotel_Addr1 ||' '|| hotel_Addr2 || hotel_Addr3 || hotel_phone || room_name 
+            
+            		like '%'||#{searchWord}||'%'
+             </if>
+	             
+	             
+	        group by hotel_idx
+	    ) tblUnderCon
+	    left join 
+	    ( select hotelimage_wasfilename, fk_hotel_idx from tbl_here_hotelImage ) I
+	    on tblUnderCon.hotel_idx = i.fk_hotel_idx 
+	    left join
+	        (
+	            select  hotel_idx as fk_hotel_idx
+	            , round( avg(totalGradePerCount), 1 ) as gradePerHotel
+	            from 
+	            (
+	                select  a.hotel_idx, d.totalGradePerCount
+	                from 
+	                ( select hotel_idx from tbl_here_hotelInfo where hotel_status = 1 ) A
+	                left join
+	                ( select res_number, fk_hotel_idx from tbl_here_reservation ) B
+	                on a.hotel_idx = b.fk_hotel_idx
+	                left join 
+	                ( select fk_res_number, seq from tbl_here_finish ) C
+	                on b.res_Number = c.fk_res_number
+	                left join
+	                ( select fk_seq , (grade0+grade1+grade2+grade3+grade4)/5 as totalGradePerCount from tbl_here_review ) D
+	                on c.seq = d.fk_seq
+	            )
+	            group by hotel_idx
+	        ) H
+	    on tblUnderCon.hotel_idx = h.fk_hotel_idx
+	    left join 
+	    ( select hotel_idx, hotel_name, hotel_category, hotel_addr1, hotel_geo_x, hotel_geo_y from tbl_here_hotelInfo ) J
+	    on j.hotel_idx = tblUnderCon.hotel_idx
+	    
+	   <!--  정렬 (1 평점,2 거리,3 낮은가격,4 높은가격)  -->
+	   <choose>
+	   		<when test='orderBy == "1"'>
+	   			order by gradePerHotel desc
+	   		</when>
+	   		<when test='orderBy == "2"'>
+	   			order by sqrt(power(abs(#{latitude}-hotel_geo_x),2) + power(abs(#{longitude}-hotel_geo_y),2)) asc
+	   		</when>
+	   		<when test='orderBy == "3"'>
+	   			order by roomprice asc
+	   		</when>
+	   		<when test='orderBy == "4"'>
+	   			order by roomprice desc
+	   		</when>
+	   </choose>
+	
+	 </select> 
+	
+	
+	<select id="getAutoCompleteList" parameterType="String" resultType="String">
+		
+		select searchlist
+		from
+		(
+		select hotel_name as searchlist 
+		from
+		(select hotel_name from tbl_here_hotelInfo)
+		union 
+		( select hotel_addr1 from tbl_here_hotelInfo)
+		union
+		( select room_name from tbl_here_roomInfo)
+		 
+		union
+		( select hotel_addr1 ||' '|| hotel_addr2 from tbl_here_hotelInfo )
+		)
+		where searchlist like'%'||#{searchWord}||'%'
+		order by searchlist asc
+		
+		
+	</select>	
+	
+	
+	
+	<!-- 검색 끝 -->
 	
 </mapper>
 
