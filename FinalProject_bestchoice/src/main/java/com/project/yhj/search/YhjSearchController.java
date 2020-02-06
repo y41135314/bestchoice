@@ -27,28 +27,10 @@ public class YhjSearchController {
 		request.setAttribute("searchVO", svo);
 		
 		
-		/*if(hotelList != null) {
-			
-			String jsonStr = "";
-			JSONArray jsonArr = new JSONArray();
-			
-			for( YhjSearchResultVO srvo : hotelList) {
-				
-				JSONObject jsonObj = new JSONObject();
-				
-				jsonObj.put("hotel_geo_x", srvo.getHotel_geo_x() );
-				jsonObj.put("hotel_geo_y", srvo.getHotel_geo_y() );
-				
-				jsonArr.put(jsonObj);
-			}
-			
-			jsonStr = jsonArr.toString();
-			request.setAttribute("jsonHotelArr", jsonStr);
-			
-		}*/
-		
 		return "yhj/search/searchMain.tiles1";
 	}
+	
+	
 	
 	@ResponseBody
 	@RequestMapping(value="/search/mainJson.bc", produces="text/plain;charset=UTF-8")
