@@ -8,47 +8,39 @@ public class DwoReservationVO {
 	String fk_room_idx; //방코드
 	String fk_coupon_code;//쿠폰코드
     String res_payment;//(0카드/신용 1카카오페이 2네이버)
-    String RESSTATUS_IN_DAY; //입실일 =============================================수정 
-	String RESSTATUS_OUT_DAY; //퇴실일 =============================================수정 
+    String resstatus_in_day; //입실일
+	String resstatus_out_day; //퇴실일
 	String res_totalprice;//최종결제금액  
 	String res_point;//적립금 사용 또는 적립내역    
 	String res_paymentstatus; //예약상태
 	String finish_paymentstatus;//결제 상태 (0:예약전 1: 결제 o )
 	String finish_addpoint;//추가적립금
-    String res_paymentDay;//결제일
-		
-	///////////////////////////////////////////////////// 추가 
-	String name  ;
-	String hotel_name;
-	String seller_name;
+	String res_paymentDay; //결제일
+	String mpointCash; //사용적립금
+	
+	String hotel_name;  //호텔이름 
+	String room_name; // 룸타임
+	String room_checkintime; // 체크인시간
+	String room_checkouttime; // 체크아웃 시간
+	
+/// 추가 할것
+String name  ;
+String seller_name;
+
 	
 	
 	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getHotel_name() {
-		return hotel_name;
-	}
-	public void setHotel_name(String hotel_name) {
-		this.hotel_name = hotel_name;
-	}
-	public String getSeller_name() {
-		return seller_name;
-	}
-	public void setSeller_name(String seller_name) {
-		this.seller_name = seller_name;
-	}
-/////////////////////////////////////////////////////
-	
-	public String getRes_paymentDay() {
-		return res_paymentDay;
-	}
-	public void setRes_paymentDay(String res_paymentDay) {
-		this.res_paymentDay = res_paymentDay;
-	}
+	return name;
+}
+public void setName(String name) {
+	this.name = name;
+}
+public String getSeller_name() {
+	return seller_name;
+}
+public void setSeller_name(String seller_name) {
+	this.seller_name = seller_name;
+}
 	public String getRes_number() {
 		return res_number;
 	}
@@ -85,17 +77,17 @@ public class DwoReservationVO {
 	public void setRes_payment(String res_payment) {
 		this.res_payment = res_payment;
 	}
-	public String getRESSTATUS_IN_DAY() {
-		return RESSTATUS_IN_DAY;
+	public String getResstatus_in_day() {
+		return resstatus_in_day;
 	}
-	public void setRESSTATUS_IN_DAY(String RESSTATUS_IN_DAY) {
-		this.RESSTATUS_IN_DAY = RESSTATUS_IN_DAY;
+	public void setResstatus_in_day(String resstatus_in_day) {
+		this.resstatus_in_day = resstatus_in_day;
 	}
-	public String getRESSTATUS_OUT_DAY() {
-		return RESSTATUS_IN_DAY;
+	public String getResstatus_out_day() {
+		return resstatus_out_day;
 	}
-	public void setRESSTATUS_OUT_DAY(String RESSTATUS_OUT_DAY) {
-		this.RESSTATUS_OUT_DAY = RESSTATUS_OUT_DAY;
+	public void setResstatus_out_day(String resstatus_out_day) {
+		this.resstatus_out_day = resstatus_out_day;
 	}
 	public String getRes_totalprice() {
 		return res_totalprice;
@@ -127,8 +119,42 @@ public class DwoReservationVO {
 	public void setFinish_addpoint(String finish_addpoint) {
 		this.finish_addpoint = finish_addpoint;
 	}
+	public String getRes_paymentDay() {
+		return res_paymentDay;
+	}
+	public void setRes_paymentDay(String res_paymentDay) {
+		this.res_paymentDay = res_paymentDay;
+	}
+	public String getMpointCash() {
+		return mpointCash;
+	}
+	public void setMpointCash(String mpointCash) {
+		this.mpointCash = mpointCash;
+	}
+	public String getHotel_name() {
+		return hotel_name;
+	}
+	public void setHotel_name(String hotel_name) {
+		this.hotel_name = hotel_name;
+	}
+	public String getRoom_name() {
+		return room_name;
+	}
+	public void setRoom_name(String room_name) {
+		this.room_name = room_name;
+	}
+	public String getRoom_checkintime() {
+		return room_checkintime;
+	}
+	public void setRoom_checkintime(String room_checkintime) {
+		this.room_checkintime = room_checkintime;
+	}
+	public String getRoom_checkouttime() {
+		return room_checkouttime;
+	}
+	public void setRoom_checkouttime(String room_checkouttime) {
+		this.room_checkouttime = room_checkouttime;
+	}
 	
-	
-	
-	
+
 }

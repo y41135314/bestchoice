@@ -113,4 +113,19 @@
 	<!-- 양현재 타일즈 끝 -->
 	
 	
+
+	<!-- 도우석 타일즈 -->
+	<definition name="layout-tiles_dws" template="/WEB-INF/tiles/layout/layout-tiles_dws.jsp"> 
+		<put-attribute name="header" value="/WEB-INF/tiles/tile_dws/header_dws.jsp" />
+		<put-attribute name="head_div" value="/WEB-INF/tiles/tile_dws/head_div_dws.jsp" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/tile_dws/footer_dws.jsp" />
+	</definition>
+	
+	<definition name="*/*.tiles_dws" extends="layout-tiles_dws">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	<!--  도우석 타일즈 끝
+	 -->
+	
 </tiles-definitions>       
