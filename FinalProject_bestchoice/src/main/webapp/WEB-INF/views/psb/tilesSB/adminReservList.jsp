@@ -141,8 +141,8 @@
 					<c:if test="${reservo.res_payment == 0 }"><td>카드</td></c:if>
 					<c:if test="${reservo.res_payment == 1 }"><td>카카오페이</td></c:if>
 					<c:if test="${reservo.res_payment == 2 }"><td>네이버</td></c:if>
-					<td>${reservo.RESSTATUS_IN_DAY}</td>
-					<td>${reservo.RESSTATUS_OUT_DAY}</td>
+					<td>${reservo.resstatus_in_day}</td>
+					<td>${reservo.resstatus_out_day}</td>
 				</tr>
 				</c:forEach>
 		   </c:if>
