@@ -19,7 +19,7 @@
 		
 		#div_searchWord {
 			
-			padding: 95px 0 30px 0;
+			padding: 115px 0 30px 0;
 	    	text-align: center;
 		}
 		
@@ -307,7 +307,7 @@
 		
 		#div_searchWord {
 			
-			padding: 95px 0 30px 0;
+			padding: 115px 0 30px 0;
 	    	text-align: center;
 		}
 		
