@@ -39,7 +39,7 @@
   .agreeTitle{
   		width: 1400px;
   	    margin: 0 auto;
-  	    background-color: #ffffff;
+
   }
   
   .agreeTitle > h5{
@@ -97,9 +97,7 @@
   .agree3 > .agree3_1 > .agree3_1_1{
   		font-size: 8pt;
   } 	
-	
-	
-		
+
 <%-- ------------------------------------------------------------------------------------- --%>
 * {box-sizing: border-box}
 
@@ -117,14 +115,9 @@ body, html {
   float: left;
   border: none;
   outline: none;
-  cursor: pointer;
   padding: 14px 16px;
   font-size: 17px;
   width: 25%;
-}
-
-.tablink:hover {
-  background-color: #777;
 }
 
 /* Style the tab content (and add height:100% for full page content) */
@@ -209,6 +202,63 @@ tr > td > input {
 	cursor: pointer;
 }
 
+<%-- ------------------------------------------------------------------------------------- --%>
+
+.nextbutton1{
+	width: 160px;
+	height: auto;
+	border-radius: 10px;
+	border: 0.5px solid silver;
+	background-color: #ff8080;
+	color: aqua;
+}  
+
+.nextbutton2{
+	width: 160px;
+	height: auto;
+	border-radius: 10px;
+	border: 0.5px solid silver;
+	background-color: #ff8080;
+	color: aqua;
+}
+
+.nextbutton3{
+	width: 160px;
+	height: auto;
+	border-radius: 10px;
+	border: 0.5px solid silver;
+	background-color: #ff8080;
+	color: aqua;
+}
+
+.nextbutton4{
+	width: 320px;
+	height: 50px;
+	border-radius: 10px;
+	border: 0.5px solid silver;
+	background-color: #ff8080;
+	color: aqua;
+}
+
+.idcheckbtn{
+	width: 100px;
+	height: auto;
+	border-radius: 5px;
+	border: 0.5px solid silver;
+	background-color: #ff8080;
+	color: aqua;
+}
+
+.addrcheckbtn{
+	width: 100px;
+	height: auto;
+	border-radius: 5px;
+	border: 0.5px solid silver;
+	background-color: #ff8080;
+	color: aqua;
+}   
+
+
 </style>
 <%-- --------------------------------------- C S S 끝 ----------------------------------------------------------------- --%>
 <%-- ---------------------------------------S C R I P T 시작----------------------------------------------------------- --%>
@@ -218,66 +268,89 @@ tr > td > input {
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4a2dc2dd247eb470ae70b4db429fb7ee&libraries=services,clusterer,drawing"></script>
 <script type="text/javascript">
 
-function openPage(pageName,elmnt,color) {
-	  var i, tabcontent, tablinks;
-	  tabcontent = document.getElementsByClassName("tabcontent");
-	  for (i = 0; i < tabcontent.length; i++) {
-	    tabcontent[i].style.display = "none";
-	  }
-	  tablinks = document.getElementsByClassName("tablink");
-	  for (i = 0; i < tablinks.length; i++) {
-	    tablinks[i].style.backgroundColor = "";
-	  }
-	  document.getElementById(pageName).style.display = "block";
-	  elmnt.style.backgroundColor = color;
-	}
-
-	// Get the element with id="defaultOpen" and click on it
-	// document.getElementById("defaultOpen").click();
-	
-		
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $(document).ready(function(){
 	
-	$(".tablink1").trigger("click");
+	$(".tabcontent1").show();
+	$(".tablink1").css("background-color","red");
+	$(".nextbutton1").prop("disabled",true);
+	$(".tabcontent2").hide();
+	$(".tabcontent3").hide();
+	$(".tabcontent4").hide();
+	$(".complete2").hide();
+
+//  약관동의 체크박스 전체해제 / 전체선택
+//	1. 체크박스 (전체선택)
+	$("input:checkbox[id=allcheck]").click(function(){
+
+		var bool = $(this).prop("checked"); 
+		
+		$("input:checkbox[name=agree]").prop("checked", bool);
+	});
+
+//	2. 체크박스 (전체해제)	
+	$("input:checkbox[name=agree]").click(function(){
+	 
+	 var flag = false;
+
+	 $("input:checkbox[name=agree]").each(function() {
+		 var bool = $(this).prop("checked");
+		 if(!bool) {
+			 $("input:checkbox[id=allcheck]").prop("checked", false);
+			 flag = true;
+			 return false;
+		 }
+	 });
+
+	 if(!flag)
+		 $("input:checkbox[id=allcheck]").prop("checked", true); 
+	});
 	
-	// 아이디 중복확인
+// 아이디 중복확인
 	$("#Home > div:nth-child(4) > div > table > tbody > tr:nth-child(1) > td:nth-child(4) > button").click(function(){
 		
-		var seller_id_con = $("form[name=hotelRegisForm] input[name=seller_Id]").val();
-		
-		if(seller_id_con.trim() == "" ){
-			alert("아이디를 다시 입력해주세요.");
-			$("form[name=hotelRegisForm] input[name=seller_Id]").focus();
+		var seller_Id = $("form[name=hotelRegisForm] input[name=seller_Id]").val();
+		var regExpId = /^[A-Za-z0-9]{5,15}$/;
+		var boolId = regExpId.test($("#seller_Id").val());
+//		1. 아이디 검사 (정규표현식)			
+
+		if($("#seller_Id").val().trim() == ""){
+			alert("아이디는 필수입니다~~꼭 입력해주세요. ID 중복검사도 필수입니다.");
+			$(this).html("");
 			return false;
 		}
-		
+		// 정규표현
+		if(!boolId){
+			alert("아이디는 영문 대/소문자 및 숫자 사용만 가능하며 5-15자 입니다. ID 중복검사도 필수입니다.");
+			$(this).html("");
+			return false;
+		}
 		$.ajax({
-			
 			url: "<%= request.getContextPath() %>/seller/checkId.bc",
 			type: "GET",
-			data: { "seller_Id": $("form[name=hotelRegisForm] input[name=seller_Id]").val()  },
+			data: {seller_Id: seller_Id},
 			dataType: "json",
 			success: function(json){
-				
-					if(json.n == "0"){
+
+					 if(json.n == "0"){
 						alert(json.msg);
+						$(".nextbutton1").prop("disabled",false);
+						return;
 					}
 					else{
 						alert(json.msg);
 						$("#Home > div:nth-child(4) > div > table > tbody > tr:nth-child(1) > td:nth-child(3) > input[type=text]").val("");
-					}
-				
+						$(".nextbutton1").prop("disabled",true);
+						$(".nextbutton1").css("cursor","pointer");
+						return;
+					}			 
 				}, 
 			error: function(request, status, error){
-				
 				alert("code: "+request.status+"\n"+"message: "+request.responseTest+"\n"+"error: "+error);
 			}
-			
 		}); 
 	});
-	
 	
 	// 사용자 주소 입력하기
 	$("#Home > div:nth-child(4) > div > table > tbody > tr:nth-child(21) > td:nth-child(4) > button").click(function(){
@@ -299,32 +372,8 @@ $(document).ready(function(){
 	
 	
 	// 호텔 주소 입력하기
-	$("#News > div:nth-child(4) > div:nth-child(1) > table > tbody > tr:nth-child(7) > td:nth-child(4) > button").click(function(){
-		/* new daum.Postcode({
-			oncomplete: function(data) {
-				$("input[name=hotel_Post]").val(data.zonecode);
-				$("input[name=hotel_Addr1]").val(data.sido);    // 큰주소                        예> 서울특별시 종로구 인사로 17 
-			    $("input[name=hotel_Addr2]").val(data.sigungu+" "+data.query);
-			    $("input[name=hotel_Addr3]").focus();
-			    
-			    const geocoder = new daum.maps.services.Geocoder();
+	$("#hotelAddrSearch").click(function(){
 
-                geocoder.addressSearch(address, (result, status) => {
-                    if(status === daum.maps.services.Status.OK){
-                        const { x, y } = result[0];
-
-                        resolve({ lat: y, lon: x })
-                    }else{
-                        reject();
-                    }
-		                });
-		            })
-		        }).then(result => {
-		            // 위, 경도 결과 값
-		        });
-			}
-		}).open(); */
-		
 		new daum.Postcode({
 		    oncomplete: function(data) {
 		    	
@@ -332,7 +381,7 @@ $(document).ready(function(){
 				$("input[name=hotel_Addr1]").val(data.sido);    // 큰주소                        예> 서울특별시 종로구 인사로 17 
 			    $("input[name=hotel_Addr2]").val(data.sigungu+" "+data.query);
 			    $("input[name=hotel_Addr3]").focus();
-		    	
+
 			    const geocoder = new daum.maps.services.Geocoder();
 			    
 		        Promise.resolve(data).then(o => {
@@ -341,9 +390,9 @@ $(document).ready(function(){
 		            return new Promise((resolve, reject) => {
 		                const geocoder = new daum.maps.services.Geocoder();
 		
-		                geocoder.addressSearch(address, (result, status) =>{
+		                geocoder.addressSearch(address, (result, status) =>{ 
 		                    if(status === daum.maps.services.Status.OK){
-		                        const { x, y } = result[0];
+		                        const { x, y } = result[0]; 
 		
 		                        $("input[name=hotel_GEO_X]").val(y);
 		                        $("input[name=hotel_GEO_Y]").val(x);
@@ -352,45 +401,319 @@ $(document).ready(function(){
 		                        reject();
 		                    }
 		                });
-		            })
+		            });
 		        }).then(result => { // 위, 경도 결과 값	        
 		        });
 		    }
 		}).open();
-		
-		
-		
-		
 	});
-	
-	// 주소 사용하기  hotel_Post seller_Post
-	
-	
-
 
 }); // end of $(document).ready(function()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function nextStep1(){
+// 	$(".tablink2").trigger("click");
+	var flag = false;
+	var seller_Id = $("form[name=hotelRegisForm] input[name=seller_Id]").val();
+	var regExpId = /^[A-Za-z0-9]{5,15}$/;
+	var boolId = regExpId.test($("#seller_Id").val());
+	var regExpPassword = /^.*(?=^.{5,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/g;
+	var boolPassword = regExpPassword.test($("#seller_Pwd").val());
+	var regExpName = /^[가-힣a-zA-Z0-9]{3,15}$/;
+	var boolName = regExpName.test($("#seller_Name").val());
+	var regExpRepName = /^[가-힣a-zA-Z0-9]{3,15}$/;
+	var boolRepName = regExpRepName.test($("#seller_Name").val());
+	var regExpNo = /^[A-Za-z0-9]{9,11}$/;
+	var boolNo = regExpId.test($("#seller_No").val());
+	var regExpMobile = /^[0-9]{8,20}$/;
+	var boolMobile = regExpMobile.test($("#seller_Mobile").val());  
+	var regExpPhone = /^[0-9]{8,20}$/;
+	var boolPhone = regExpMobile.test($("#seller_Phone").val());
 	
+
+//	2. 비밀번호 검사 (정규표현식)
+	// 공백
+	if($("#seller_Pwd").val().trim() == ""){
+		alert("비밀번호는 필수입니다~~꼭 입력해주세요");
+		flag = false;
+		$(this).html("");
+		return;
+	}		
+	else if(!boolPassword){
+		alert("비밀번호는 영문(대/소문자)+숫자+특수기호 의 조합이여야 하며 8-16자 입니다.");
+		flag = false;
+		$(this).html("");
+		return;
+	} else {flag = true;}
+	
+//	3. 비밀번호 확인 검사
+	// 공백
+	if($("#seller_PwdCheck").val().trim() == ""){
+		alert("비밀번호 확인은 필수입니다~~");
+		flag = false;
+		$(this).html("");
+		return;
+	}				
+	else if( $("#seller_Pwd").val() != $("#seller_PwdCheck").val() ){
+		alert("비밀번호가 서로 다르네요~~다시 입력해주세요");
+		flag = false;
+		$(this).html("");
+		return;
+	} else {flag = true;}
+	
+//	4. 사업자명 검사			
+	// 공백
+	if( $("#seller_Name").val().trim() == ""){
+		alert("사업자명은 필수입니다~(공백X) 꼭 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return; 
+	}
+	else if(!boolName){
+		alert("사업자명은 영대/소문자/한글/숫자 로 3자 이상 15자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+
+//	5. 대표자명 검사			
+	// 공백
+	if( $("#seller_RepName").val().trim() == ""){
+		alert("대표자명은 필수입니다~(공백X) 꼭 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolRepName){
+		alert("대표자명은 영대/소문자/한글/숫자 로 3자 이상 15자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+	
+//	6. 사업자번호 검사		
+	// 공백
+	if( $("#seller_No").val().trim() == ""){
+		alert("사업자번호는 필수입니다~(공백X) 꼭 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolNo){
+		alert("사업자번호는 숫자만 가능하며 9자 이상 11자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+	
+//	7. 대표휴대전화 검사		
+	// 공백
+	if( $("#seller_Mobile").val().trim() == ""){
+		alert("휴대전화번호는 필수입니다~(공백X) 꼭 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolMobile){
+		alert("휴대전화번호는 숫자만 가능하며 8자 이상 20자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+
+//	8. 대표전화번호 검사			
+	// 공백
+	if( $("#seller_Phone").val().trim() == ""){
+		alert("대표전화번호는 필수입니다~(공백X) 꼭 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolPhone){
+		alert("대전화번호는 숫자만 가능하며 8자 이상 20자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+
+//	9. 주소 검사	
+	//공백
+	if( $("#seller_Addr").val().trim() == ""){
+		alert("주소는 필수입니다~~");
+		flag = false;
+		$(this).html("");
+		return;
+	} else {flag = true;}
+
+//	12. 다음단계 넘어가기	
+	if(flag == true){
+		$(".tabcontent1").hide();
+		$(".tablink2").css("background-color","red");
+		$(".tabcontent2").show();
+
+	}
+	else{
+		alert("혹시 ID 중복검사는 하셨나요?");
+	}
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function nextStep2(){
+	var flag = false;
+	var regExpName = /^[가-힣a-zA-Z0-9]{3,15}$/;
+	var boolName = regExpName.test($("#hotel_Name").val());
+	var regExpRepName = /^[가-힣a-zA-Z0-9]{3,15}$/;
+	var boolRepName = regExpRepName.test($("#hotel_RepName").val());
+	// 체크박스는 생략 밑에서 바로
+	// 주소도 밑에서 바로 
+	var regExpPhone = /^[0-9]{8,20}$/;
+	var boolPhone = regExpPhone.test($("#hotel_Phone").val());
+	var regExpFax = /^[0-9]{8,20}$/;
+	var boolFax = regExpFax.test($("#hotel_Fax").val());
+	var regExpEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/
+	var boolEmail = regExpEmail.test($("#hotel_Email").val());
+	var regExpHomepage = /^(((http(s?))\:\/\/)?)([0-9a-zA-Z\-]+\.)+[a-zA-Z]{2,6}(\:[0-9]+)?(\/\S*)?$/
+	var boolHomepage = regExpHomepage.test($("#hotel_Homepage").val());
+	var checkbox = $("")
 	
-}
+	
+//  1. 호텔명 (정규표현)
+	if( $("#hotel_Name").val().trim() == ""){
+		alert("호텔명은 필수입니다~(공백X) 꼭 입력해주세요. 3-15자");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolName){
+		alert("호텔명은 영대소문자/한글/숫자 가능하며 3자 이상 15자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+	
+//  2. 호텔대표자명 (정규표현)
+	if( $("#hotel_RepName").val().trim() == ""){
+		alert("호텔대표자명은 필수입니다~(공백X) 꼭 입력해주세요. 3-15자");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolRepName){
+		alert("호텔대표자명은 영대소문자/한글/숫자 가능하며 3자 이상 15자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+	
+//  3. 호텔유형 (검사)
+	if($("input:checkbox[id=hotel_Category1]").is(":checked") && $("input:checkbox[id=hotel_Category1]").val()=="0" ){
+		flag = true;
+	}else if($("input:checkbox[id=hotel_Category2]").is(":checked") && $("input:checkbox[id=hotel_Category1]").val()=="1" ){
+		flag = true;
+	}else if($("input:checkbox[id=hotel_Category3]").is(":checked") && $("input:checkbox[id=hotel_Category1]").val()=="2" ){
+		flag = true;
+	}
+	else{
+		alert("호텔유형을 선택해주세요.");
+		flag = false;
+		return;
+	}
 
-// 회원가입하기
+//  4. 호텔주소 (검사)
+	if( $("#hotel_Addr1").val().trim() == ""){
+		alert("주소검색을 통해 주소를 꼭 입력해주세요")
+		flag = false;
+		return;
+	}else{flag = true;}
+	
+//  5. 호텔홈페이지 (정규표현)  
+	if( $("#hotel_Homepage").val().trim() == ""){
+		return;
+	}else if(!boolHomepage){
+		alert("홈페이지 형식에 맞지 않습니다. 예)www.abc.co.kr");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+
+//  6. 호텔전화번호 (정규표현)	
+	if( $("#hotel_Phone").val().trim() == ""){
+		alert("호텔전화번호는 필수입니다~(공백X) 꼭 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolPhone){
+		alert("휴대전화번호는 숫자만 가능하며 8자 이상 20자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+
+//  7. 호텔팩스 (정규표현)
+	if( $("#hotel_Fax").val().trim() == ""){
+		alert("팩스번호는 필수입니다~(공백X) 꼭 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolFax){
+		alert("팩스번호는 숫자만 가능하며 8자 이상 20자 이하입니다~~~");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+
+//  8. 호텔이메일 (정규표현)
+	if( $("#hotel_Email").val().trim() == ""){
+		alert("호텔이메일은 필수입니다~(공백X) 꼭 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return;
+	}	else if(!boolEmail){
+		alert("이메일형식에 맞지 않습니다~다시 입력해주세요.");
+		flag = false;
+		$(this).value("");
+		return;
+	}else {flag = true;}
+		
+//	9. 다음단계 넘어가기	
+	if(flag == true){
+		$(".tabcontent2").hide();
+		$(".tablink1").css("background-color","red");
+		$(".tablink2").css("background-color","red");
+		$(".tablink3").css("background-color","red");
+		$(".tabcontent3").show();
+	}
+	else{
+		alert("입력이 잘되었나요?? 다시 확인해주세요.")
+		return;
+	}
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function nextStep3(){
+	
+	 if($("input:checkbox[id=allcheck]").prop("checked")){
+			$(".tabcontent3").hide();
+			$(".tablink1").css("background-color","red");
+			$(".tablink2").css("background-color","red");
+			$(".tablink3").css("background-color","red");
+			$(".tablink4").css("background-color","red");
+			$(".tabcontent4").show();
+		}
+		else{
+			alert("약관에 동의 하셨나요?? 다시 확인해주세요.")
+			return;
+		}
+
+	}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function registerGo(){
 	
 	var frm = document.hotelRegisForm;
 	frm.action = "<%= request.getContextPath()%>/seller/registerSeller.bc";
 	frm.method="POST";
 	frm.submit();
-}
+	
+	$(".complete1").hide();
+	$(".complete2").show();
 
-<%-- ---------------------------------------- 			정 규 표 현 식		 --------------------------------------------- --%>
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
+	}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	다음 주소 검색		 
 function openDaumPOST() {
 	new daum.Postcode({
@@ -403,9 +726,8 @@ function openDaumPOST() {
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-<%-- ----------------------------------------------------------------------------------------------------------------- --%>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 </script>
 <%-- ---------------------------------------S C R I P T 끝------------------------------------------------------------- --%>
  
@@ -424,16 +746,18 @@ function openDaumPOST() {
 	</div>
 
 </div>
-
-<button class="tablink tablink1" onclick="openPage('Home', this, 'red')" id="defaultOpen" >판매자 정보<span style="float: right;">>>></span></button>
-<button class="tablink" onclick="openPage('News', this, 'red')" >호텔 정보<span style="float: right;">>>></span></button>
-<button class="tablink" onclick="openPage('Contact', this, 'red')">약관 동의<span style="float: right;">>>></span></button>
-<button class="tablink" onclick="openPage('About', this, 'red')">가입 완료</button>
-<%-- --------------------------------------------------------------------------------------------------- --%>
+<div style="width: 100%;">
+	<div style="width: 25%; display: inline-block;" class="tablink tablink1">판매자 정보<span style="float: right;">>>></span></div>
+	<div style="width: 25%; display: inline-block;" class="tablink tablink2">호텔 정보<span style="float: right;">>>></span></div>
+	<div style="width: 25%; display: inline-block;" class="tablink tablink3">약관 동의<span style="float: right;">>>></span></div>
+	<div style="width: 25%; display: inline-block;" class="tablink tablink4">가입 완료</div>
+</div>
+<%-- -------------------------------------------------------------------------------------------------------------- --%>
+<%-- 판매자 정보 가입 --------------------------------------------------------------------------------------------------- --%>
 
 <form name="hotelRegisForm" enctype="multipart/form-data" >
 
-<div id="Home" class="tabcontent">
+<div id="Home" class="tabcontent tabcontent1">
   
   <div style="width: 100%; height: 20px;">
 	  	<div style="width: 15%; display: inline-block;">
@@ -456,38 +780,38 @@ function openDaumPOST() {
 	  			<tr>
 	  				<th>사업자 ID</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="seller_Id" /></td>
-	  				<td style="border: none;"><button type="button" onclick="">ID check</button> </td>
+	  				<td><input style="width:100%;" type="text" id="seller_Id" name="seller_Id" placeholder="영문 대/소 및 숫자포함 5자 이상 15자 이하 " /></td>
+	  				<td style="border: none;"><button class="idcheckbtn" id="idcheckbtn" type="button" onclick="">ID check</button> </td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>비밀번호</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="password" name="seller_Pwd" /></td>
+	  				<td><input style="width:100%;" type="password" id="seller_Pwd" name="seller_Pwd" placeholder="영문 대/소 및 숫자포함 5자 이상 15자 이하 " /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>비밀번호확인</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="password" /></td>
+	  				<td><input style="width:100%;" type="password" id="seller_PwdCheck" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>사업자명</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="seller_Name" /></td>
+	  				<td><input style="width:100%;" type="text" id="seller_Name" name="seller_Name" placeholder="영대소문/한글/숫자 포함 3자 이상 15자 이하 " /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>대표자명</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="seller_RepName" /></td>
+	  				<td><input style="width:100%;" type="text" id="seller_RepName" name="seller_RepName" placeholder="영문 대/소 및 숫자포함 3자 이상 15자 이하 " /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>사업자번호</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="tel" name="seller_No" /></td>
+	  				<td><input style="width:100%;" type="tel" id="seller_No" name="seller_No" placeholder="숫자 9자 이상 11자 이하 " /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
@@ -499,32 +823,32 @@ function openDaumPOST() {
 	  			<tr>
 	  				<th>대표휴대전화</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" maxlength="14" id="seller_Phone" name="seller_Mobile" placeholder="예) 0212345678" value="" type="tel" autocomplete="off" /></td>
+	  				<td><input style="width:100%;" maxlength="14" id="seller_Mobile" name="seller_Mobile" placeholder="숫자 8자 이상 20자 이하" value="" type="text" autocomplete="off" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>대표전화번호</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="tel" name="seller_Phone" /></td>
+	  				<td><input style="width:100%;" type="text" id="seller_Phone" name="seller_Phone" placeholder="숫자 8자 이상 20자 이하" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>대표 홈페이지</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="seller_homepage" /></td>
+	  				<td><input style="width:100%;" type="text" id="seller_homepage" name="seller_homepage"  placeholder="예)www.abc.co.kr" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>사업자소재지</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="seller_Addr" /></td>
-	  				<td style="border: none;"><button type="button" >주소 검색</button> </td>
+	  				<td><input style="width:100%;" type="text" id="seller_Addr" name="seller_Addr" /></td>
+	  				<td style="border: none;"><button type="button" class="addrcheckbtn" >주소 검색</button> </td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>우편번호</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" readonly="readonly" name="seller_Post" /></td>
+	  				<td><input style="width:100%;" type="text" readonly="readonly" id="seller_Post" name="seller_Post" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
@@ -539,16 +863,12 @@ function openDaumPOST() {
 	  				</td>
 	  			</tr>
 	  			<tr style="height: 30px;"></tr>
-	  			<tr>
-	  				<th style="border: none;">
-	  					<button style="border: none;" type="button" onclick="nextStep1();">다음 단계</button>
-	  				</th>
-	  			</tr>
 	  		</table>
+	  		<div style="height: 30px; width: 100%;"></div>
+			<button type="button" class="nextbutton1" id="nextbutton1" style="border: none; float: right; " onclick="nextStep1();">다음 단계</button>
+			<div style="height: 30px; width: 100%;"></div>
 	  	</div>
-	  	
 
-  	  	
   </div>
   
   <div style="width: 13%; display: inline-block;">
@@ -563,8 +883,13 @@ function openDaumPOST() {
 
   
 </div>
-<%-- --------------------------------------------------------------------------------------------------- --%>
-<div id="News" class="tabcontent">
+
+
+<%-- -------------------------------------------------------------------------------------------------------------- --%>
+<%-- 호텔 정보 가입 --------------------------------------------------------------------------------------------------- --%>
+
+
+<div id="News" class="tabcontent tabcontent2">
  <div style="width: 100%; height: 20px;">
 	  	<div style="width: 15%; display: inline-block;">
 	  	</div>
@@ -574,7 +899,6 @@ function openDaumPOST() {
 		<div style="width: 13%; display: inline-block;">
 	  	</div>
   </div>
-  <div style="width:100%; height: 25px;"></div>
   <div style="width: 15%; display: inline-block;">
   </div>
   
@@ -586,69 +910,56 @@ function openDaumPOST() {
 	  			<tr>
 	  				<th>호텔 명</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="hotel_Name" /></td>
+	  				<td><input style="width:100%;" type="text" id="hotel_Name" name="hotel_Name" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>호텔 대표자명</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="hotel_RepName" /></td>
+	  				<td><input style="width:100%;" type="text" id="hotel_RepName" name="hotel_RepName" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>호텔 유형</th>
 	  				<td style="width: 30px; border: none;"></td>
 	  				<td style="border: 0px;">
-	  					<input type="checkbox" value="0" name="hotel_Category" class="hotel_Category" /> 일반
-	  					<input type="checkbox" value="1" name="hotel_Category" class="hotel_Category" /> 특급
-	  					<input type="checkbox" value="2" name="hotel_Category" class="hotel_Category" /> 특1급
-	  					<%-- <span style="font-size: 8pt;">(별도 심사후 upgrade가 가능합니다)</span> --%>
+	  					<input type="checkbox" value="0" name="hotel_Category" id="hotel_Category1" class="hotel_Category" /> 일반
+	  					<input type="checkbox" value="1" name="hotel_Category" id="hotel_Category2" class="hotel_Category" disabled="disabled" /> 특급
+	  					<input type="checkbox" value="2" name="hotel_Category" id="hotel_Category3" class="hotel_Category" disabled="disabled" /> 특1급
 	  				</td>
 	  			</tr>
-	  			<%-- <tr style="height: 7px;"></tr>
-	  			<tr>
-	  				<th>호텔 등급</th>
-	  				<td style="width: 30px; border: none;"></td>
-	  				<td style="border: none;"><select style="width:20%;">
-	  						<option name="hotel_Grade" value="5">5 등급</option>
-	  						<option name="hotel_Grade" value="4">4 등급</option>
-	  						<option name="hotel_Grade" value="3">3 등급</option>
-	  						<option name="hotel_Grade" value="2">2 등급</option>
-	  						<option name="hotel_Grade" value="1">기타 등급</option>	
-	  					</select>
-	  				</td>
-	  			</tr> --%>
+
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th><span style="float: left;">호텔 주소</span> <span style="font-size: 6pt; float: right; text-align: bottom;">(시/도)</span></th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" readonly="readonly" name="hotel_Addr1" /></td>
-	  				<td style="border: none;"><button style="height:80%;" type="button" onclick="">주소 찾기</button> </td>
+	  				<td><input style="width:100%;" type="text" readonly="readonly" id="hotel_Addr1" name="hotel_Addr1" /></td>
+	  				<td style="border: none;"><button style="height:80%;" type="button" id="hotelAddrSearch" onclick="">주소 찾기</button> </td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th><span style="float: left; color: #f1f1f1;">호텔 주소</span> <span style="font-size: 6pt; float: right;">(시/구/군/면/동)</span></th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" readonly="readonly" name="hotel_Addr2" /></td>
+	  				<td><input style="width:100%;" type="text" readonly="readonly" id="hotel_Addr2" name="hotel_Addr2" /></td>
 	  				
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th><span style="float: left; display: none; color: #f1f1f1;">호텔 주소</span> <span style="font-size: 6pt; float: right;">(상세주소)</span></th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="hotel_Addr3" /></td>
+	  				<td><input style="width:100%;" type="text" id="hotel_Addr3" name="hotel_Addr3" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>우편번호</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="hotel_Post" /></td>
+	  				<td><input style="width:100%;" readonly="readonly" type="text" id="hotel_Post" name="hotel_Post" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>호텔 홈페이지</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="hotel_Homepage" /></td>
+	  				<td><input style="width:100%;" type="text" id="hotel_Homepage" name="hotel_Homepage" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
@@ -660,35 +971,33 @@ function openDaumPOST() {
 	  			<tr>
 	  				<th>호텔 팩스번호</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="tel" name="hotel_Fax" /></td>
+	  				<td><input style="width:100%;" type="tel" id="hotel_Fax" name="hotel_Fax" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>호텔 이메일</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="text" name="hotel_Email" /></td>
+	  				<td><input style="width:100%;" type="text" id="hotel_Email" name="hotel_Email" /></td>
 	  			</tr>
 	  			<tr style="height: 7px;"></tr>
 	  			<tr>
 	  				<th>호텔 이미지</th>
 	  				<td style="width: 30px; border: none;"></td>
-	  				<td><input style="width:100%;" type="file" name="attach" /></td>
+	  				<td><input style="width:100%; border: 0.5px solid silver; border-radius: 5px; " type="file" id="hotelImage_FileName" name="hotelImage_FileName" /></td>
 	  			</tr>
 	  			<tr style="display:none;">
 	  				<th>호텔 GEO X</th>
-	  				<td><input type="text" readonly="readonly" name="hotel_GEO_X" /> </td>
+	  				<td><input type="text" readonly="readonly" id="hotel_GEO_X" name="hotel_GEO_X" /> </td>
 	  				<th>호텔 GEO Y</th>
-	  				<td><input type="text" readonly="readonly" name="hotel_GEO_Y" /> </td>
+	  				<td><input type="text" readonly="readonly" id="hotel_GEO_Y" name="hotel_GEO_Y" /> </td>
 	  				<td style="width: 30px; border: none;"></td>
 	  				<td style="border: 0px;"></td>
 	  			</tr>
 	  			<tr style="height: 30px;"></tr>
-	  			<tr>
-	  				<th style="border: none;">
-	  					<button type="button" onclick="nextStep2();" style="border: none;">다음 단계</button>
-	  				</th>
-	  			</tr>
 	  		</table>
+	  		<div style="height: 30px; width: 100%;"></div>
+			<button type="button" class="nextbutton2" id="nextbutton1" style="border: none; float: right; " onclick="nextStep2();">다음 단계</button>
+			<div style="height: 30px; width: 100%;"></div>
 	  	</div>
 	  	
 	  	<div>
@@ -711,8 +1020,12 @@ function openDaumPOST() {
 </div>
 
 </form>
-<%-- --------------------------------------------------------------------------------------------------- --%>
-<div id="Contact" class="tabcontent" style="height: 860px;	">
+
+
+<%-- -------------------------------------------------------------------------------------------------------------- --%>
+<%-- 약관 동의           --------------------------------------------------------------------------------------------------- --%>
+
+<div id="Contact" class="tabcontent tabcontent3" style="height: 860px;	">
 	<div style="width: 100%; height: 20px;">
 	  	<div style="width: 15%; display: inline-block;">
 	  	</div>
@@ -790,15 +1103,17 @@ function openDaumPOST() {
 						</p>
 					</div>
 				</div>
-		
-	
-	
 			<br/>
 	 		</div>
 	 		<div style="height: 30px;">
 	 		</div>
+	 		<div style="height: 30px; width: 100%;"></div>
+			<button type="button" class="nextbutton3" id="nextbutton3" style="border: none; float: right; " onclick="nextStep3();">다음 단계</button>
+			<div style="height: 30px; width: 100%;"></div>
+	 		
   </div>
   
+    	
   
   <div style="width: 13%; display: inline-block;">
   
@@ -806,48 +1121,35 @@ function openDaumPOST() {
 
   <div style="width: 100%; height: 70px;">
   </div>
-  
-  <div class="btnx">	
-		<button type="button" onclick="registerGo();">회 원 가 입</button>
-  </div>
-  
+
 </div>
 <%-- --------------------------------------------------------------------------------------------------- --%>
-<div id="About" class="tabcontent">
+<%-- 최종 가입 --------------------------------------------------------------------------------------------------- --%>
+<div id="About" class="tabcontent tabcontent4">
   <div style="width: 100%; height: 20px;">
 	  	<div style="width: 10%; display: inline-block;">
 	  	</div>
-	  	<div style="width: 79%; display: inline-block; text-align: left; font-size: 18pt; font-weight: bold;">
-	  	가입 완료
+	  	
+	  	<div class="complete1" style="width: 79%; display: inline-block; text-align: left; font-size: 18pt; font-weight: bold;">
+	  		<div style="width:30%; display: inline-block;"></div>
+	  		<div style="width:15%; display: inline-block;">
+				<button type="button" class="nextbutton4" id="nextbutton4" style="border: none; float:none; ; "  onclick="registerGo();">가입 하기</button>
+			</div>
+			<div style="width:42%; display: inline-block;"></div>
 	 	</div>
+	 	
+	 	<div class="complete2" style="width: 79%; text-align:center; display: inline-block; text-align: left; font-size: 18pt; font-weight: bold;">
+
+	  		<p style="text-align: center;">감사합니다.^^</p> 
+	  		<p style="text-align: center;">승인후 가입이 최종 완료됩니다.</p>
+	  		<p style="text-align: center;">승인이 되려면 객실등록은 필수입니다</p>
+
+	 	</div>
+	 	
 		<div style="width: 9%; display: inline-block;">
 	  	</div>
   </div>
-  
-  <div style="width: 10%; display: inline-block;">
-  </div>
-  
-  <div style="width: 79%; display: inline-block;">
-  	
-	  	<div style="width: 100%; height: 10px;">
-	  	</div>
-	  	
-	  	<div style="width: 25%; display: inline-block;">
-	  		
-	  	</div>
-	  	
-	  	<div style="width: 60%; display: inline-block;">
-	  		<p>감사합니다.^^</p> 
-	  		<p>승인후 가입이 최종 완료됩니다.</p>
-	  		<p>승인이 되려면 객실등록은 필수입니다</p>
-	  	</div>
-  	  	
-  </div>
-  
-  <div style="width: 9%; display: inline-block;">
-  
-  </div>
-  
+   
 </div>
 <%-- --------------------------------------------------------------------------------------------------- --%>
 
