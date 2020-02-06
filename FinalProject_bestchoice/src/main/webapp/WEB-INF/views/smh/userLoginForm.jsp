@@ -10,12 +10,6 @@
 
 <jsp:include page="/WEB-INF/views/psb/header.jsp"/>
 
-
-  
-
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -256,13 +250,45 @@ function here_Login() {
             	<span><i class="icon-ic_login_kakaotalk"><img  class="Logo_img" src="<%= ctxPath%>/resources/images/minha_images/kakao_ico.png"/></i>카카오톡으로 로그인</span>
             </button>
             
-       
-            <a  id="naver_id_login" class='btn_start btn_naver' href="https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=r3Mjf4OpPMMq8Lib0JKw&redirect_uri=https%3A%2F%2Fwww.goodchoice.kr%2Fuser%2FnaverLoginProcess&state=5e654b04ea11a2d316e58c949656e4ff"  >
+            	<%@ page import="java.net.URLEncoder" %>
+				<%@ page import="java.security.SecureRandom" %>
+				<%@ page import="java.math.BigInteger" %>
+			<%
+			  String clientId = "R46jg0rrGm3pHMtVmrNi";
+			  String redirectURI = URLEncoder.encode("http://localhost:9090/bestchoice/callbackNaverLogin.bc", "UTF-8");
+			  SecureRandom random = new SecureRandom();
+			  String state = new BigInteger(130, random).toString();
+			  String apiURL = "https://nid.naver.com/oauth2.0/authorize?response_type=code";
+			  apiURL += "&client_id=" + clientId;
+			  apiURL += "&redirect_uri=" + redirectURI;
+			  apiURL += "&state=" + state;
+			  session.setAttribute("state", state);
+			%>
+			
+          <%--   <a  id="naver_id_login" class='btn_start btn_naver' href="<%=ctxPath %>/userNaverLogin.bc"  >
             	<span><i class="icon-ic_login_naver"></i>
             		   <img class="Logo_img naveerLogo" src="<%= ctxPath%>/resources/images/minha_images/naver_ico.png" />네이버로 로그인
         	    </span>
             </a>
-           
+            --%>
+		  <center>
+		<script type = "text/javascript" src = "https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js" charset="utf-8"></script>
+		 
+		<div id = "naver_id_login"></div>
+		     
+		<script type="text/javascript">  
+		      
+		         var naver_id_login = new naver_id_login("R46jg0rrGm3pHMtVmrNi", "http://localhost:9090/bestchoice/callbackNaverLogin.bc");    // Client ID, CallBack URL 삽입
+		                                            // 단 'localhost'가 포함된 CallBack URL
+		         var state = naver_id_login.getUniqState();
+		            
+		         naver_id_login.setButton("green", 3, 73);
+		         naver_id_login.setDomain("http://localhost:9090/bestchoice/userLogin.bc");    //  URL
+		         naver_id_login.setState(state);
+		         naver_id_login.setPopup();
+		         naver_id_login.init_naver_id_login();
+		</script>
+		</center>
             
             <p class="space_or"><span>또는</span></p>
             <div class="inp_type_1 ico_email form-errors">
@@ -283,6 +309,7 @@ function here_Login() {
                 </form>
                </section>
               </div>
+
       
 </body>
 </html>

@@ -1,7 +1,14 @@
 package com.project.smh;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Resource;
@@ -9,10 +16,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.tools.ant.taskdefs.condition.Http;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.GenericTypeAwareAutowireCandidateResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +34,8 @@ import com.project.common.SHA256;
 
 import sun.security.action.GetIntegerAction;
 
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.google.gson.JsonParser;
 import com.project.common.AES256;
 //=== #30. 컨트롤러 선언 ===
 @Component
@@ -35,12 +48,12 @@ public class SmhController {
 	@Autowired   // Type에 따라 알아서 Bean 을 주입해준다.
 	private  SmhService service;
 	
-	
+
 	// === 로그인 폼 페이지 요청  ===  
 	@RequestMapping(value="/userLogin.bc")
-	public ModelAndView hereUserLogin(ModelAndView mav) {
+	public ModelAndView hereUserLogin(ModelAndView mav, HttpServletRequest request) {
 		
-		mav.setViewName("smh/userLoginForm");
+	    mav.setViewName("smh/userLoginForm");
 		return mav;
 	}
 	
@@ -317,4 +330,184 @@ public class SmhController {
 			return mav;
 		}
 	}*/
+	
+	// 네이버 로그인 
+	@RequestMapping(value = "/userNaverLogin.bc")
+	public String userNaverLogin(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		
+		return "smh/userNaverLogin";
+	}
+	
+	// 네이버 로그인 콜백 주소  
+	@RequestMapping(value = "/callbackNaverLogin.bc")
+	public String userNaverLoginCallback(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		   
+		return "smh/callbackNaverLogin";
+	}
+		
+	//   
+	@RequestMapping(value = "/personalInfo.bc")
+	public void personalInfo(HttpServletRequest request) throws Exception{
+		
+		/*  OAuth2AccessToken oauthToken;
+			oauthToken = naverLoginBO.getAccessToken(session, code, state);
+			
+			//1. 로그인 사용자 정보를 읽어온다.
+			apiResult = naverLoginBO.getUserProfile(oauthToken); //String형식의 json데이터
+			*//** apiResult json 구조
+			{"resultcode":"00",
+			"message":"success",
+			"response":{"id":"33666449","nickname":"shinn****","age":"20-29","gender":"M","email":"sh@naver.com","name":"\uc2e0\ubc94\ud638"}}
+			**//*
+			
+			//2. String형식인 apiResult를 json형태로 바꿈
+			JsonParser parser = new JsonParser();
+			Object obj = parser.parse(apiResult);
+			JSONObject jsonObj = (JSONObject) obj;
+			//3. 데이터 파싱
+			//Top레벨 단계 _response 파싱
+			JSONObject response_obj = (JSONObject)jsonObj.get("response");
+
+			//response의 데이터값 파싱
+			String email = (String)response_obj.get("email");
+			String pwd = "naver" ;
+			String name = (String)response_obj.get("name");
+			String nickname = (String)response_obj.get("nickname");
+			String gender = "";
+			if(   "F".equals((String)response_obj.get("gender"))  ) {
+				gender = "2";
+			}else if ( "M".equals((String)response_obj.get("gender")) ) {
+				gender = "1";
+			}else {
+				gender = null;
+			}
+			
+			String encryPassword = SHA256.encrypt(pwd);
+			
+			SmhMemberVO smhmbrvo = new SmhMemberVO();
+			// 암호화 집어넣기 		 
+			smhmbrvo.setPwd(encryPassword);
+			smhmbrvo.setEmail(email);
+			smhmbrvo.setName(name);
+			smhmbrvo.setNickname(nickname);
+			smhmbrvo.setGender(gender);
+	        
+			int n = service.memberInsert(smhmbrvo);
+	         
+			//4.파싱 닉네임 세션으로 저장
+			session.setAttribute("loginuser",smhmbrvo); //세션 생성
+*/		    
+			
+		/* String token = "AAAAN3AqIy-Hsz2i7ssRz_DqurcRhNEo9L6NTMgCGUBWmeV_6bEEih0e0iCjqfKCUZ8qVRUYkhnCVM9lkznzNKgHlr0";// 네이버 로그인 접근 토큰;
+		    String header = "Bearer " + token; // Bearer 다음에 공백 추가
+		    try {
+			    String apiURL = "https://openapi.naver.com/v1/nid/me";
+			    URL url = new URL(apiURL);
+			    HttpURLConnection con = (HttpURLConnection)url.openConnection();
+			    con.setRequestMethod("GET");
+			    con.setRequestProperty("Authorization", header);
+			    int responseCode = con.getResponseCode();
+			    BufferedReader br;
+			    if(responseCode==200) { // 정상 호출
+			    br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			    } else { // 에러 발생
+			    br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+			    }
+			    String inputLine;
+			    StringBuffer response = new StringBuffer();
+			    while ((inputLine = br.readLine()) != null) {
+			    response.append(inputLine);
+			    }
+			    br.close();
+			    System.out.println(response.toString());
+		    
+		    } catch (Exception e) {
+		    	System.out.println(e);
+		    }
+		
+	
+		*/
+	}
+	
+	// 자동입력 
+	@ResponseBody
+	@RequestMapping(value="/naverInsert.bc", method={RequestMethod.GET}, produces="text/plain;charset=UTF-8" )
+	public String naverInsert(HttpServletRequest request) {
+		
+		String email = request.getParameter("email");
+		String name = request.getParameter("name") + "(네이버)";
+		String nickname = request.getParameter("nickname");
+		String gender = request.getParameter("gender");
+		String ageStr = request.getParameter("age");
+	
+		String age = ageStr.substring(0, 2);
+		
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+		
+		int birthyear = year - Integer.parseInt(age);
+		
+		String birthdayStr = request.getParameter("birthday");
+		
+		String birthday =  String.valueOf(birthyear) + birthdayStr.substring(0, 2) + birthdayStr.substring(3, 5);
+		
+		HashMap<String, String> paraMap = new HashMap<String, String>(); 
+	 	paraMap.put("email", email);
+		paraMap.put("pwd",  SHA256.encrypt("naver"));  
+		
+		SmhMemberVO loginuser = service.getLoginMember(paraMap); // 암호화가 되어진상태에서 mapper로 간다. 
+		
+		int m = 0;
+		if(loginuser == null) {
+			
+			// 비밀번호 암호화 		     
+			String encryPassword = SHA256.encrypt( "naver" );
+			
+			SmhMemberVO smhmbrvo = new SmhMemberVO();
+			
+			// 암호화 집어넣기 		 
+			smhmbrvo.setPwd(encryPassword);
+			smhmbrvo.setEmail(email);
+			smhmbrvo.setName(name);
+			smhmbrvo.setNickname(nickname);
+			
+			if(   "F".equals( gender)  ) {
+				smhmbrvo.setGender("2");
+			}else if ( "M".equals( gender) ) {
+				smhmbrvo.setGender("1");
+			}else {
+				smhmbrvo.setGender("");
+			}
+
+			smhmbrvo.setHp1("");
+			smhmbrvo.setHp2("");
+			smhmbrvo.setHp3("");
+			smhmbrvo.setBirthday(birthday);
+			
+			int n = service.memberInsert(smhmbrvo);
+			
+			if( n==1 ) {
+				
+				HashMap<String, String> paraMap2 = new HashMap<String, String>(); 
+			 	paraMap2.put("email", email);
+				paraMap2.put("pwd",  SHA256.encrypt("naver"));  
+				loginuser = service.getLoginMember(paraMap2); // 암호화가 되어진상태에서 mapper로 간다. 
+				
+				HttpSession session = request.getSession();
+				session.setAttribute("loginuser", loginuser);
+				
+				m=1;
+			}
+			
+		}	
+		else {
+			HttpSession session = request.getSession();
+			session.setAttribute("loginuser", loginuser);
+			m=1;
+		}
+	
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("result",m);
+		return jsonObj.toString();
+	}
+	
 }
