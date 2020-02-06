@@ -302,7 +302,7 @@ function here_Login() {
             <button class="here_login_btn" id="btnLOGIN"><span>로그인</span></button>
              <button class="here_login_btn" style="background-color: "><span>판매자 로그인</span></button>
                <div class="link_half">
-                    <div><span ><a id="findPwd" href="<%=ctxPath%>/findPwdForm.bc">비밀번호 재설정</a></span></div>
+                    <div><span ><a id="findPwd" href="<%=ctxPath%>/userFindPwdForm.bc">비밀번호 재설정</a></span></div>
                     <div><span><a href="#">판매자 회원가입</a></span></div>
                </div>
                

@@ -251,13 +251,13 @@ $(document).ready(function(){
 	
 	
 });	
-//회원가입 정보 보내기 
-function joinRegister() {
-	var frm = document.regiesterForm;
-   	  frm.method = "POST";  
-   	  frm.action = "<%= ctxPath %>/userRegisterForm.bc"; 
-   	  frm.submit();
-}
+	//회원가입 정보 보내기 
+	function joinRegister() {
+		var frm = document.regiesterForm;
+	   	  frm.method = "POST";  
+	   	  frm.action = "<%= ctxPath %>/userRegisterForm.bc"; 
+	   	  frm.submit();
+	}
 </script>
 
 </head>

@@ -127,5 +127,31 @@
 	</definition>
 	<!--  도우석 타일즈 끝
 	 -->
+	 
+	 <!-- ==== SMH 내정보 MyPage tiles 설정시작  ==== -->
+	<definition name="layout-tilesSMH" template="/WEB-INF/tiles/layout/tilesMH/layout-tilesUserMyPage.jsp"> 
+		<put-attribute name="header" value="/WEB-INF/tiles/layout/tilesMH/header.jsp" />
+		<put-attribute name="header2" value="/WEB-INF/tiles/layout/tilesMH/userMyPageHeader2.jsp" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="sideinfo" value="/WEB-INF/tiles/layout/tilesMH/userPagesideinfo.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/layout/tilesMH/footer.jsp" />
+	</definition>
+
+	<definition name="*.tilesSMH" extends="layout-tilesSMH">
+		<put-attribute name="content" value="/WEB-INF/views/smh/{1}.jsp"/>
+	</definition>
+	<definition name="*/*.tilesSMH" extends="layout-tilesSMH">
+		<put-attribute name="content" value="/WEB-INF/views/smh/{1}/{2}.jsp"/>
+	</definition>
+	<definition name="*/*/*.tilesSMH" extends="layout-tilesSMH">
+		<put-attribute name="content" value="/WEB-INF/views/smh/{1}/{2}/{3}.jsp"/>
+	</definition>
+	
+	<definition name="*/*.tilesSMH" extends="layout-tilesSMH">
+		<put-attribute name="sideinfo" value="/WEB-INF/views/smh/{1}/{2}.jsp"/>
+	</definition>
+	
+	
+	<!-- ==== SMH 내정보 MyPage tiles 설정 끝 ==== -->
 	
 </tiles-definitions>       

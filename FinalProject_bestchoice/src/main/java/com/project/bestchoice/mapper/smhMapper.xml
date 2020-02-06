@@ -16,7 +16,7 @@
 	<!--로그인처리   -->
 	<select id="getLoginMember" resultType="com.project.smh.SmhMemberVO" parameterType="HashMap">
 
-		     select member_idx,name,email
+		     select member_idx,name,email,nickname, hp1, hp2, hp3,mstatus
 			  , trunc( months_between(sysdate, lastLoginDate) ) AS lastlogindategap 
               , trunc( months_between(sysdate, lastpwdChangeDate) ) AS lastpwdChangeDate 
 			 from tbl_here_member 
@@ -46,10 +46,47 @@
       insert into tbl_here_mpoint(fk_member_idx, mpointCash)
       values(#{memberIdx}, #{memberPoint})
    </insert>
+   
+   <!-- 회원정보 업데이트  -->
+   <update id="InfoUpdate" parameterType="com.project.smh.SmhMemberVO"  >
+    update tbl_here_member set nickname = #{nickname}
+                      , name = #{name}
+                      , hp1 = #{hp1}
+                      , hp2 = #{hp2}
+                      , hp3 = #{hp3}
+	where email = #{email}
+   </update>
+   
 
-	<!-- <select id="isUserExist" parameterType="HashMap"  resultType="_boolean"  >
+	<!--비밀번호 찾기에서 회원이 존재하는지 확인  -->
+	<select id="isUserExist" parameterType="HashMap"  resultType="String"  >
 	select * from tbl_here_member where email = #{email}
-	</select> -->
+	</select>
+	
+	<!-- 회원 포인트 삭제  -->
+	<delete id="pointDelete" >
+	delete from tbl_here_mpoint where fk_member_idx = #{member_idx}
+	</delete>
+	
+	<!--회원 탈퇴 (mstatus => 0 변경 )  -->
+	<update id="memberUpdate" parameterType="int">
+	update tbl_here_member set mstatus = 0 
+	where member_idx = #{member_idx}
+	</update>
+	
+	<!-- 임시발송된 비밀번호 DB에 업데이트  -->
+	<update id="pwdUpdate" parameterType="HashMap">
+	update tbl_here_member set pwd = #{pwd}
+	where email = #{email}
+	</update>
+	
+	<!-- 회원의 포인트 조회해 오기   -->
+	<select id="getUserPoint" parameterType="HashMap" resultType="String"     >
+	select mpointcash
+	from   tbl_here_mpoint  
+	where fk_member_idx = #{memberidx}
+	</select>
+	
 	
 </mapper>
 

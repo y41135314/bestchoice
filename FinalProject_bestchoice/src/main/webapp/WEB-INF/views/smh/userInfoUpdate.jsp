@@ -8,12 +8,14 @@
 	var gobackURL = "${requestScope.gobackURL}";
 	
 	if(loginuser != null && (gobackURL == null || gobackURL == "") ) {
-		location.href="<%= ctxPath%>/main.bc"; 
+		alert("업데이트 성공!!");
+		location.href="<%= ctxPath%>/myPage.bc"; 
 		/*로그인성공시 시작페이지로 가라.  */	
 	}
 	else if(loginuser != null && (gobackURL != null && gobackURL != "") ) { 
-		location.href=gobackURL;
-		/* 돌아갈 페이지로 가라 */
+		alert("업데이트 성공!~");
+		location.href="<%= ctxPath%>/myPage.bc"; 
+
 	}
 	
 </script>  

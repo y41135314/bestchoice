@@ -9,6 +9,9 @@ import javax.mail.Session;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.common.AES256;
 
@@ -65,12 +68,48 @@ public class SmhService {
 
 		return n;
 	}
+	// 회원정보 불러오기 
+	public SmhMemberVO getUserinfo(HashMap<String, String> paraMap) {
+	
+		SmhMemberVO userinfo = dao.getUserinfo(paraMap);
+		return userinfo;
+	}
+	// 회원정보 업데이트 
+	public int InfoUpdate(SmhMemberVO smhvo) {
+		int n =  dao.InfoUpdate(smhvo);
+		return n;
+	}
+	//  인증메일을 보내기전에 유저의 아이디가 있는지 확인
+	public String isUserExist(String email) {
+		String userExist =  dao.isUserExist(email);
+		return userExist;
+	}
 
-	/*//  인증메일을 보내기전에 유저의 아이디가 있는지 확인 
-	public boolean isUserExist(HashMap<String, String> paraMap) {
-		boolean bool =   dao.isUserExist(paraMap);
-		return bool;
-	}*/
+	// 회원탈퇴 
+	@Transactional(rollbackFor={Throwable.class})  
+	public int add_transaction(SmhMemberVO smhvo) {
+		
+		int n = dao.pointDelete(smhvo);
+		int m = dao.memberUpdate(smhvo.getMember_idx());
+		System.out.println("smhvovovooovov"+smhvo);
+		System.out.println("idxidxidx"+smhvo.getMember_idx());
+		return (n+m);
+		
+	}
+
+	// 임시발송된 비밀번호 DB에 업데이트 
+	public int pwdUpdate(HashMap<String, String> paraMap) {
+		int m = dao.pwdUpdate(paraMap);
+		return m;
+	}
+
+	public String getUserPoint(HashMap<String, String> paraMap) {		
+		 String point =dao.getUserPoint(paraMap);
+		 return point;
+	}
+
+	
+
 
 
 	

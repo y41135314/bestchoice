@@ -37,11 +37,7 @@ public class SmhDAO {
 		sqlsession.update("smhMapper.setLastLoginDate", paraMap);
 	}
 
-	//  인증메일을 보내기전에 유저의 아이디가 있는지 확인 
-	public boolean isUserExist(HashMap<String, String> paraMap) {
-		boolean bool = sqlsession.selectOne("smhMapper.isUserExist", paraMap);
-		return bool;
-	}
+
 	// 회원가입 이메일 중복체크 
 	public int userEmailCheck(String email) {
 		int n = sqlsession.selectOne("smhMapper.userEmailCheck", email);
@@ -65,6 +61,57 @@ public class SmhDAO {
 	      return n ;
 
 	}
+	// 회원 1명의 정보 불러오기 
+	public SmhMemberVO getUserinfo(HashMap<String, String> paraMap) {
+		SmhMemberVO userinfo = sqlsession.selectOne("smhMapper.getUserinfo", paraMap);
+		return userinfo;
+	}
+	// 회원의 정보 업데이트 하기 
+	public int InfoUpdate(SmhMemberVO smhvo){
+		
+		int n = sqlsession.update("smhMapper.InfoUpdate", smhvo);
+		return n;
+	}
+	
+	//  인증메일을 보내기전에 유저의 아이디가 있는지 확인 
+	public String isUserExist(String email) {
+		String userExist = sqlsession.selectOne("smhMapper.isUserExist", email);
+		return userExist;
+	}
+
+	// 회원포인트 삭제 
+	public int pointDelete(SmhMemberVO smhvo) {
+		int m = sqlsession.delete("smhMapper.pointDelete", smhvo);
+		return m;
+	}
+	
+
+	public int memberUpdate(int member_idx) {
+		int n = sqlsession.update("smhMapper.memberUpdate", member_idx);
+		return n;
+	}
+
+	// 임시발송된 비밀번호 DB에 업데이트 
+	public int pwdUpdate(HashMap<String, String> paraMap) {
+		int m = sqlsession.update("smhMapper.pwdUpdate", paraMap);
+		return m;
+	}
+	// 로그인 유저 포인트 가져오기 
+	public int getUserPoint(int memberidx) {
+		int n = sqlsession.selectOne("smhMapper.getUserPoint",memberidx );
+		return n;
+		
+	}
+
+	public String getUserPoint(HashMap<String, String> paraMap) {
+		String point =sqlsession.selectOne("smhMapper.getUserPoint",paraMap );
+		 return point;
+		
+	}
+	
+	
+
+	
 
 	
 	

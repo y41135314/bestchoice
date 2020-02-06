@@ -8,47 +8,31 @@
  String ctxPath = request.getContextPath();
 %> 
 
-
-
-
-  
-
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <style type="text/css">
 body {
+	text-align: center;
+	font-family: "Apple SD Gothic Neo","맑은 고딕","맑은고딕","Malgun Gothic",sans-serif;
+	font-size: 14pt;
 
-text-align: center;
-font-family: "Apple SD Gothic Neo","맑은 고딕","맑은고딕","Malgun Gothic",sans-serif;
-font-size: 14pt;
 }
+div {
+margin: auto;
 
-.layer_fix section {
-    width: 336px;
-    margin: 100px auto 0 auto;
 }
 
 #main_Logo_img{
 	width: 150px;
 	height: 50px;
 	margin-bottom: 20px;
+	margin: auto;
 }
 
-.layer_fix .btn_start {
-    display: block;
-    position: relative;
-    margin-bottom: 8px;
-    border-radius: 4px;
-    text-align: center;
-    width: 336px;
-    height: 56px;
-    font-size: 16px;   
-}
+
+/* 이메일입력칸 겉 border */
 .inp_type_1 {
     position: relative;
     margin-bottom: 8px;
@@ -56,41 +40,33 @@ font-size: 14pt;
     border-radius: 4px;
     box-sizing: border-box;
     height: 48px;
-    padding: 0 16px 0 46px;    
+    padding: 0 16px 0 46px;   
+    width:336px; 
+    margin: auto;
+   
 }
-
-.inp_type_1 input {
-    position: relative;
-    top: 11px;
-    width: 100%;
-    height: 24px;
-    font-size: 18px;
-    border: none;
-    outline:none;
-}
-	span i {
-	
+span i {	
 	top: 1px;
-	    padding-right: 7px;
-	    font-size: 26px;
-	   
+    padding-right: 7px;
+    font-size: 26px;	   
+}
+
+.Logo_img {vertical-align: middle;
+	 
 	}
-	.Logo_img {vertical-align: middle;}
 
-
-
-.findPwdForm{
+.findPwdForm {
     height: 56px;
     font-size: 18px;
     background: #f7323f;    
     display: block;
-    width: 100%;
-    margin-top: 16px;
+    width:336px;
+    margin-top: 16px !important;
     border-radius: 6px;
     color: #fff;
     text-align: center;
     border: none;
-	
+    margin: auto;	
 }
 	.Logo_img2{
 	vertical-align: middle;
@@ -115,64 +91,110 @@ font-size: 14pt;
  margin-bottom: 80px;
 }
 
+/*form 전체크기  */
+.userFindPwdForm {
 
+height: 320px;
+width: 336px;
+margin: auto;
+margin-top: 100px;
+}
 
+/* 비밀번호설정 박스  */
+.inp_type_1 {
+    height: 48px;
+    padding: 0 16px 0 46px;
+}
+
+.inp_type_1 input {
+    position: relative;
+    top: 11px;
+    width: 100%;
+    height: 24px;
+    font-size: 18px;
+    border: none;
+    outline:none;
+}
+.sub_title {
+	display: block;
+    margin: 30px 0 10px 0;
+    font-size: 18px;
+    height: 26px;
+}
+.txt_top {
+    margin: 12px 0 18px 0;
+    color: rgba(0,0,0,0.56);
+    text-align: center;
+    font-size: 15px;
+}
 
 </style>
+
+<script type="text/javascript" src="<%=ctxPath%>/resources/js/jquery-3.3.1.min.js"></script>
+
 <script type="text/javascript">
-
-
 $(document).ready(function(){
-	 
-	/*  $("#btnLOGIN").click(function() {
-		 here_Login();
-		 
-	 }); */
-	 
-	 $("#email").keydown(function(event){
-			
-			if(event.keyCode == 13) { // 엔터를 했을 경우
-				here_Login();
-			}
-	 }); // end of $("#email").keydown();-----------------------	
-	 
-}); // end of $(document).ready()---------------------------	 
+	$("#btnPwdFind").click(function() {
+		goFindPw();
+	});	
+});	// end of $(document).ready()---------------------------	 
+	
+	function goFindPw(){
 
+		// 인증번호 받기 클릭시 
+	 	var emailVal = $("#pwdFind_btn").val().trim();
+		
+		if(emailVal == ""){
+			alert("이메일을 입력하세요");
+			$("#myPwdFindNav").css('display', '');
+			$("#myPwdFindNav").css('width', '30%');
+			return;
+		}
+		
+		var frm = document.userPwdFind;
+		frm.method = "POST";
+		frm.action = "<%= ctxPath %>/findPwdEmailCheck.bc";
+		frm.submit(); 
+	
+		$("#myPwdFindNav").css('display', '');
+		$("#myPwdFindNav").css('width', '30%');
 
-function here_Login() {
-
-
-	 var frm = document.loginFrm;
-	 
-	 frm.action = "<%=ctxPath%>/loginEnd.bc";
-	 frm.method = "POST";
-	 frm.submit();
-	 
-} // end of function func_Login(event)-----------------------------
-
-
+		$("#myPwdFindNav").css('display', '');
+		$("#myPwdFindNav").css('width', '30%');
+	};
 
 </script>
 
 </head>
 <body>
-<div class="layer_fix">
+<div id="myPwdFindNav" class="sidenav layer_fix">
    <section> 
-   <form name="loginFrm">
-	<div class="fix_title">
-                <strong class="logo"><a href="main.bc"><img id="main_Logo_img" src="<%= ctxPath%>/resources/images/minha_images/main_Logo.png"></a></strong>
-    </div>
+   <form name="userPwdFind" class="userFindPwdForm">
+   
+		<div class="fix_title">
+	     	<strong class="logo"><a href="main.bc"><img id="main_Logo_img" src="<%= ctxPath%>/resources/images/minha_images/main_Logo.png"></a></strong>
+	    </div>
+		<strong class="sub_title">비밀번호 재설정</strong>
+	    <p class="txt_top">
+	            회원가입 시 등록한 이메일 주소를 입력하시면<br/>임시 비밀번호를 전송해 드립니다.
+	    </p>
 
-            <div class="inp_type_1 ico_email form-errors">
-                <input type="email" id="email" name="email" placeholder="이메일 주소" required class="required" value=""
-                       data-msg-required="이메일 주소를 입력해 주세요."/>
-            </div>
-            
-            <button class="findPwdForm" id="btnLOGIN"><span>인증번호 받기 </span></button>
-               
-                </form>
-               </section>
-              </div>
+	    <div class="pop_login_errors">
+		    <ul>
+		    </ul>
+	     </div>
+	     <div class="inp_type_1 ico_email form-errors">
+	         <input type="email" id="pwdFind_btn" name="email" class="inputPwdFind" placeholder="이메일 주소를 입력해주세요." />
+	     </div>
+	            
+	     <button class="findPwdForm" id="btnPwdFind" name="pwd"><span>임시비밀번호 받기</span></button>               
+    </form>
+    
+    
+	    
+    
+   </section>
+</div>
       
 </body>
 </html>
