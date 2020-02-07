@@ -6,7 +6,194 @@
 <!-- 루트 엘리먼트 & 네임 스페이스 설정 ( 프로젝트 전체 내에서 유일해야 한다.) -->
 <!-- namespace 는 보통 파일명 ( 프로젝트 내에서 고유해야 한다. ) -->
 <mapper namespace="kmtMapper" >
+	
+	<!-- 아이디 중복 검사 -->
+	<select id="checkSellerId" parameterType="String" resultType="int">
+		select count(*) from tbl_here_sellerMember where seller_id = #{seller_Id}
+	</select>
+	
+	<!-- 판매자 회원가입 -->
+	<insert id="registerSeller" parameterType="com.project.kmt.KmtSellerMemberVO">
+		
+		insert into tbl_here_sellerMember 
+		( seller_idx, seller_id, seller_pwd, seller_name, seller_no, seller_regday, seller_phone, seller_mobile, seller_addr 
+		, seller_post, seller_repName, seller_homepage, seller_registerday, seller_realStatus ) 
+		values ( seq_tbl_here_sellerMember.nextval, #{seller_Id}, #{seller_Pwd}, #{seller_Name}, #{seller_No}
+		, to_date(#{seller_Regday}, 'yyyy-mm-dd' ), #{seller_Phone}, #{seller_Mobile}, #{seller_Addr}
+		, #{seller_Post}, #{seller_RepName}, #{seller_homepage} , sysdate, 1  )
+	</insert>
+
+	<!-- 호텔 등록하기 -->
+	<insert id="registerHotel" parameterType="com.project.kmt.KmtHotelInfoVO" >
+		
+		insert into tbl_here_hotelInfo 
+		( hotel_idx, hotel_name, hotel_category
+		, hotel_addr1, hotel_addr2, hotel_addr3, hotel_post
+		, hotel_repname, hotel_homepage, hotel_status
+		, fk_seller_id, hotel_registerday, hotel_phone, hotel_fax, hotel_email
+		, hotel_geo_x, hotel_geo_y )
+		
+		values 
+		( seq_tbl_here_hotelInfo.nextval, #{hotel_Name},#{hotel_Category}
+		,#{hotel_Addr1},#{hotel_Addr2},#{hotel_Addr3},#{hotel_Post}
+		,#{hotel_RepName},#{hotel_Homepage}, 1, 
+		#{fk_seller_Id}, sysdate ,#{hotel_Phone},#{hotel_Fax},#{hotel_Email}
+		,#{hotel_GEO_X},#{hotel_GEO_Y} )
+		
+	</insert>
+
+	<!-- 입력한 호텔 idx 가져오기  -->
+	<select id="getHotelIdx" parameterType="com.project.kmt.KmtHotelInfoVO" resultType="String">
+		select hotel_idx from tbl_here_hotelInfo where fk_seller_id = #{fk_seller_Id} and hotel_name = #{hotel_Name}
+	</select>
+	
+	<!-- 호텔 이미지 등록하기 -->
+	<insert id="insertHotelImage" parameterType="HashMap">
+		insert into tbl_here_hotelImage ( hotelimage_number, hotelimage_filename, hotelimage_wasfilename, fk_hotel_idx )
+		values ( seq_tbl_here_hotelImage.nextval, #{hotelimage_filename},#{hotelimage_wasfilename},#{fk_hotel_idx} )
+	</insert>
+
+	<!-- 판매자 로그인하기 -->
+	<select id="sellerLogin" parameterType="HashMap" resultType="com.project.kmt.KmtSellerMemberVO">
+		
+		select  seller_idx as seller_idx, seller_id as seller_Id, seller_pwd as seller_Pwd
+		        , seller_name as seller_Name, seller_no as seller_No
+		        , to_char(seller_regday, 'yyyy-mm-dd') as seller_Regday
+		        , seller_phone as seller_Phone, seller_mobile as seller_Mobile, seller_addr as seller_Addr
+		        , seller_post as seller_Post, seller_repname as seller_RepName, seller_homepage
+		        , to_char(seller_registerday, 'yyyy-mm-dd') as seller_registerday
+		        , seller_realstatus as seller_realStatus
+		from tbl_here_sellerMember 
+		where seller_id = #{seller_id} and seller_pwd = #{seller_pwd} 
+		
+	</select>
+	
+	<!-- 판매자 소유의 호텔 중 제일 처음 등록한 것 가져오기 -->
+	<select id="getFk_hotel_idx" parameterType="String" resultType="String">
+		select hotel_idx from tbl_here_hotelInfo 
+		where hotel_status = 1 and fk_seller_id=#{seller_id} and rownum = 1
+		order by hotel_idx asc
+	</select>
+	
+	<resultMap type="HashMap" id="roomPriceMap">
+		<result property="room_idx" 	column="room_idx" 	javaType="String" />
+		<result property="room_name" 	column="room_name" 	javaType="String" />
+		<result property="fk_hotel_idx" 	column="fk_hotel_idx" 	javaType="String" />
+		<result property="roomprice_seqno" 	column="roomprice_seqno" 	javaType="String" />
+		<result property="roomprice" 	column="roomprice" 	javaType="String" />
+		<result property="roomprice_date" 	column="roomprice_date" 	javaType="String" />
+		<result property="roomprice_quantity" 	column="roomprice_quantity" 	javaType="String" />
+	</resultMap>
+	<select id="getRoomPriceList" parameterType="HashMap" resultMap="roomPriceMap">
+		select room_idx, room_name,  fk_hotel_idx, roomprice_seqno, roomprice
+				, to_char(roomprice_date,'yyyy-mm-dd') as roomprice_date, roomprice_quantity
+		from ( select room_idx, room_name, fk_hotel_idx from tbl_here_roomInfo  where fk_hotel_idx= #{fk_hotel_idx}  ) 
+ 		left join  ( select * from tbl_here_roomprice  where roomprice_date = 
+ 		<if test="logdate == null">
+ 			to_date(to_char( sysdate,'yyyy-mm-dd') ,'yyyy-mm-dd')
+ 		</if>
+ 		<if test="logdate != null">
+ 			to_date(#{logdate} , 'yyyy-mm-dd' )
+ 		</if>
+ 		)
+	    on room_idx = fk_room_idx
+	    order by room_idx asc
+	</select>
 
 
+	<!--  -->
+	<resultMap type="HashMap" id="hotelListMap">
+		<result property="hotel_idx" 	column="hotel_idx" 	javaType="String" />
+		<result property="hotel_name" 	column="hotel_name" 	javaType="String" />
+	</resultMap>
+	<select id="getHotelListOfUser" parameterType="String" resultMap="hotelListMap">
+		select hotel_idx, hotel_name from tbl_here_hotelInfo
+		where hotel_status = 1 and fk_seller_id = #{seller_Id}
+	</select>
+	
+	
+	
+	<insert id="roomRegister" parameterType="HashMap">
+		insert into tbl_here_roomInfo ( room_idx, room_name, room_checkintime, room_checkouttime, room_person, room_addperson, room_addpercharge, fk_hotel_idx )
+		values( seq_tbl_here_roomInfo.nextval, #{room_name}, #{ROOM_CHECKINTIME}, #{ROOM_CHECKOUTTIME}, #{ROOM_PERSON}, #{ROOM_ADDPERSON}
+		, #{ROOM_ADDPERCHARGE} , #{fk_hotel_idx} )
+	</insert>
+	
+	<insert id="spaRegister" parameterType="HashMap">
+		
+		insert into tbl_here_spa ( fk_room_idx, spa_wpool, spa_sauna, spa_massage, spa_hinokki, spa_openbath, spa_halfpool, spa_tv)
+		values( #{fk_room_idx}
+		, nvl(#{SPA_WPOOL, jdbcType=INTEGER},0)
+		, nvl(#{SPA_SAUNA, jdbcType=INTEGER},0)
+		, nvl(#{SPA_MASSAGE, jdbcType=INTEGER},0)
+		, nvl(#{SPA_HINOKKI, jdbcType=INTEGER},0)
+		, nvl(#{SPA_OPENBATH, jdbcType=INTEGER},0)
+		, nvl(#{SPA_HALFPOOL, jdbcType=INTEGER},0)
+		, nvl(#{SPA_TV, jdbcType=INTEGER},0) )
+		
+	</insert>
+	
+	<insert id="themeRegister" parameterType="HashMap">
+		
+		insert into tbl_here_theme ( fk_room_idx, theme_mooin, theme_party, theme_mirror, theme_doublefloor, theme_princess, 
+		theme_terras, theme_ocean, theme_lake, theme_sky )
+		values( #{fk_room_idx}
+		, nvl(#{THEME_MOOIN, jdbcType=INTEGER},0)
+		, nvl(#{THEME_PARTY, jdbcType=INTEGER},0)
+		, nvl(#{THEME_MIRROR, jdbcType=INTEGER},0)
+		, nvl(#{THEME_DOUBLEFLOOR, jdbcType=INTEGER},0)
+		, nvl(#{THEME_PRINCESS, jdbcType=INTEGER},0)
+		, nvl(#{THEME_TERRAS, jdbcType=INTEGER},0)
+		, nvl(#{THEME_OCEAN, jdbcType=INTEGER},0)
+		, nvl(#{THEME_LAKE, jdbcType=INTEGER},0)
+		, nvl(#{THEME_SKY, jdbcType=INTEGER},0) )
+	</insert>
+	
+	<insert id="bedRegister" parameterType="HashMap">
+		
+		insert into tbl_here_bed ( fk_room_idx, bed_single, bed_double, bed_twin, bed_ondol)
+		values( #{fk_room_idx}
+		,nvl(#{BED_SINGLE, jdbcType=INTEGER},0)
+		,nvl(#{BED_DOUBLE, jdbcType=INTEGER},0)
+		,nvl(#{BED_TWIN, jdbcType=INTEGER},0)
+		,nvl(#{BED_ONDOL, jdbcType=INTEGER},0) )
+	</insert>
+	
+	<insert id="serviceRegister" parameterType="HashMap">
+		
+		insert into tbl_here_service( fk_room_idx, SERVICE_SPA , SERVICE_MINIBAR , SERVICE_WIFI, SERVICE_TOWEL , SERVICE_TV, SERVICE_AIRCONDITIONER
+		, SERVICE_FRIDGE, SERVICE_IRON, SERVICE_BATHTUB, SERVICE_HAIRDRYER, SERVICE_KITCHEN, SERVICE_SHOWERROOM )
+		values( #{fk_room_idx}
+		,nvl(#{SERVICE_SPA, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_MINIBAR, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_WIFI, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_TOWEL, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_TV, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_AIRCONDITIONER, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_FRIDGE, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_IRON, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_BATHTUB, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_HAIRDRYER, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_KITCHEN, jdbcType=INTEGER},0)
+		,nvl(#{SERVICE_SHOWERROOM, jdbcType=INTEGER},0) )
+
+	</insert>
+	
+	<select id="getFk_Room_Idx" parameterType="HashMap" resultType="String">
+		select room_idx from tbl_here_roomInfo where fk_hotel_idx = #{fk_hotel_idx} and room_name = #{room_name}
+	</select>
+	
+	<!-- 방 가격 insert 하기 -->
+	<insert id="insertRoomPrice" parameterType="HashMap">
+		insert into tbl_here_roomPrice ( fk_room_idx, roomprice_seqno, roomprice, roomprice_date, roomprice_quantity)
+		values ( #{fk_room_idx}, seq_here_roomPrice.nextval, #{roomprice}, to_date(#{logdate},'yyyy-mm-dd') , #{roomprice_quantity} )
+	</insert>
+	
+	<!-- 방 가격 update 하기 -->
+	<update id="updateRoomPrice" parameterType="HashMap">
+		update tbl_here_roomPrice set roomprice = #{roomprice} , roomprice_quantity = #{roomprice_quantity}
+		where roomprice_date = to_date(#{logdate},'yyyy-mm-dd') and roomprice_seqno = #{ roomprice_seqno }
+	</update>
+	
 </mapper>
 

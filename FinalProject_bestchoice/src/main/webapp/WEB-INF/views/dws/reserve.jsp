@@ -118,7 +118,7 @@
  					alert("사용가능한 포인트 보다 사용액이 더큽니다.");
  					return;
  				};
- 				
+ 				$("input[name=mpointCash]").val(mpointCash)
 				$("#payAmt").text(numberWithCommas(String(amount - mpointCash))) 				
  				$("#mpointCash").val($("input[name=mpointCash]").val().replace(/,/g,""))
 			});
@@ -128,7 +128,7 @@
 		function payInit(){
 			 var IMP = window.IMP; // 생략해도 괜찮습니다.
 			  IMP.init("imp81295048"); // "imp00000000" 대신 발급받은 "가맹점 식별코드"를 사용합니다.
-		} /// 아임포트
+		}
 		
 		function validation(){
 			if($("#payMethod").select().val() == '' || $("#payMethod").select().val() == null ){
@@ -157,6 +157,44 @@
 				alert("휴대폰인증을 진행해주세요");
 			} 
 			
+			//핸드폰인증
+			function sendAuthCode(){
+
+				var phone = $("#phone").val();
+
+				
+
+				sendSms(phone);
+
+			}
+	       //확인
+			function sendCode(){
+				var  certification = $("#certification").val();
+			
+			}
+			 
+			
+			
+			/* SMS인증 FUNCTION:시작 */
+			function sendSms(phone) { 
+				$.ajax({ 
+					url: "<%=request.getContextPath()%>/sendSms.bc", 
+					data: { receiver: phone }, 
+					type: "post", 
+					success: function(result) {
+						if (result != "fail") {
+							$(".input-wrap").show();
+							$("#authCodehidden").val(result);
+						} 
+						else { 
+							alert("인증번호 전송에 실패했습니다."); 
+						} 
+					} 
+				});
+			} ///////////핸드폰 인증
+
+			
+			
 			
 			if($("input[name=member_idx]").val() =='' || $("input[name=member_idx]").val() == null){
 				if(confirm("로그인후 결제 가능합니다 로그인 페이지로 이동하시겠습니까?")){
@@ -167,7 +205,7 @@
 			}			
 			
 			return true;
-		}
+		} // // end of login
 		
 		function numberWithCommas(str) {
 		    return str.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -192,45 +230,6 @@
 			  return result
 		}
 		
-		
-		
-		//핸드폰인증
-		function sendAuthCode(){
-
-			var phone = $("#phone").val();
-
-			
-
-			sendSms(phone);
-
-		} ///sendAuthCode 인증 ------------
-		
-       //확인
-		function sendCode(){
-			var  certification = $("#certification").val();
-		        alert("확인되었습니다.");
-		}///end of sendCOde ----------------------
-		 
-		
-		
-		/* SMS인증 FUNCTION:시작 */
-		function sendSms(phone) { 
-			$.ajax({ 
-				url: "<%=request.getContextPath()%>/sendSms.bc", 
-				data: { receiver: phone }, 
-				type: "post", 
-				success: function(result) {
-					if (result != "fail") {
-						$(".input-wrap").show();
-						$("#authCodehidden").val(result);
-					} 
-					else { 
-						alert("인증번호 전송에 실패했습니다."); 
-					} 
-				} 
-			});
-		} /////////////////////////////////////////////end of send sms
-		
 	</script>
 	
 </head>
@@ -248,7 +247,7 @@
 	        <input type="hidden" name="buyer_tel" value="${member.hp1}-${member.hp2}-${member.hp3}"> <!--구매자 폰번호-->
 	        <input type="hidden" name="amount" value="${reservation.res_totalprice}"><!--결제금액-->
 		</form>
-			<input type="hidden" name="mpointCash" value="">
+			<input type="hidden" name="mpointCash" value="${reservation.mpointCash}">
 			<input type="hidden" name="member_idx" value="${member.member_idx}">
             <div class="reserve-payment">
                 <p class="tit">예약자 정보</p>
@@ -259,16 +258,31 @@
                     </div> 
                     <p class="txt-warning" style="visibility: hidden;">한글,영문,숫자만 입력이 가능합니다.</p><!-- 개발 -->
                 </div>
+                
                 <div class="input-wrap">
-                   <label for="phone">휴대폰 번호</label>
+                    <label for="phone">휴대폰 번호</label>
                     <p class="txt">개인 정보 보호를 위해 안심번호로 숙소에 전송됩니다.</p>
                     <div class="input-element add-btn">
                         <input type="text" id="phone" placeholder="체크인시 필요한 정보입니다.">
                       <button type="button" class="ui-button __square-small __black" id="authCodeSend" name="authCodeSend" onclick="sendAuthCode()">
-									인증번호 전송</button>
+									인증번호 전송
+									</button>
                     </div>
-                    <p class="txt-warning" style="visibility: hidden;">휴대폰 번호를 확인해주세요.</p><!-- 개발 -->
+                    <p class="txt-warning" style="visibility: hidden;" id="authCodehidden">휴대폰 번호를 확인해주세요.</p><!-- 개발 -->
                 </div>
+                <!-- s:개발, 인증번호 전송시 보여지는 영역 -->
+                <div class="input-wrap">
+                    <label for="certification"><b>인증번호</b></label>
+                    <div class="input-element add-btn add-timer">
+                        <input type="text" id="certification" placeholder="체크인시 필요한 정보입니다.">
+                        <input style="width: 150px; padding: 0;" class="inputPwd" type="hidden" id="authCodehidden">
+                        <!-- <span class="timer">3:00</span> -->
+                       <button type="button" class="ui-button __square-small __black" id="authCodeSend" name="authCodeSend" onclick="sendCode()">
+									확인</button>
+                    </div>
+                </div>
+                <!-- //e:개발, 인증번호 전송시 보여지는 영역 -->
+                
                 <div class="input-wrap" style="float: left; width: 500px;">
                     <label for="phone">적립금 조회</label>
                     <div class="input-element add-btn">
@@ -283,28 +297,20 @@
 						<button id="mpointCashBtn">적립금사용</button>
                     </div> 
                 </div>
-                <!-- s:개발, 인증번호 전송시 보여지는 영역 -->
-             		 <div class="input-wrap">
-                    <label for="certification"><b>인증번호</b></label>
-                    <div class="input-element add-btn add-timer">
-                        <input type="text" id="certification" placeholder="체크인시 필요한 정보입니다.">
-                        <input style="width: 150px; padding: 0;" class="inputPwd" type="hidden" id="authCodehidden">
-                        <!-- <span class="timer">3:00</span> -->
-                       <button type="button" class="ui-button __square-small __black" id="authCodeSend" name="authCodeSend" onclick="sendCode()">
-									확인	</button>
-                    </div>
-                </div>
-                <!-- //e:개발, 인증번호 전송시 보여지는 영역 -->
+                <!-- 적립금   -->
+                
+                <!--이벤트  조회-->
+                
                 <!-- s:개발, 비회원시 보여지는 영역 -->
-                <div class="benefits-guide">
+             <%--    <div class="benefits-guide">
                     <c:if test="${member eq null}">
                     <a href="/userLogin.bc">
                         <p>로그인 후 예약하시면<br/>할인 쿠폰과 추가 혜택을 받을 수 있어요</p>
                         <span>로그인</span>
                     </a>
                     </c:if>
-                </div>
-              
+                </div> --%>
+                <!-- //e:개발, 비회원시 보여지는 영역 -->
                 
                 <!-- s:개발, 로그인시 보여지는 영역 -->
                 <!-- <div class="member-payment">
@@ -375,4 +381,3 @@
 
 </body>
 </html>
-    

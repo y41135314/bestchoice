@@ -36,5 +36,17 @@ public class DwsDAO {
 	public String selectMpointCash(String meber_idx) {
 		return sqlsession.selectOne("dwsMapper.selectMpointCash",meber_idx);
 	}
+
+	public void insertReservation(DwoReservationVO reservationVO){
+		sqlsession.insert("dwsMapper.insertReservation",reservationVO);
+	}
+
+	public String selectResNumber() {
+		return sqlsession.selectOne("dwsMapper.selectResNumber");
+	}
+
+	public void updateDeductionMpointCash(DwoReservationVO dwoReservation) {
+		sqlsession.update("dwsMapper.updateDeductionMpointCash",dwoReservation);
+	}
 	
 }

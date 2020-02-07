@@ -1,5 +1,9 @@
 show user;
 
+select*from hotellinfo;
+select*
+from tbl_here_hotelInfo;
+
 create table tbl_here_member
 ( member_idx            number   not null                --  회원번호
 , email                 varchar2(200) not null     --  회원아이디(이메일로함)

@@ -7,7 +7,76 @@
 <!-- namespace 는 보통 파일명 ( 프로젝트 내에서 고유해야 한다. ) -->
 <mapper namespace="dwsMapper" >
 
-	
+	<select id="selectMember" parameterType="String" resultType="com.project.smh.SmhMemberVO">
+		SELECT 
+			   MEMBER_IDX,
+			   NAME ,
+			   HP1 ,
+			   HP2 ,
+			   HP3 ,
+			   EMAIL
+		FROM TBL_HERE_MEMBER 
+		WHERE MEMBER_IDX = #{member_idx}
 
+	</select>
+	<select id="selectReservation" parameterType="String" resultType="com.project.dws.DwoReservationVO">
+		SELECT c.RES_NUMBER,
+			   c.RES_RECEIPT,
+			   c.FK_MEMBER_IDX,
+			   c.FK_ROOM_IDX,
+			   c.FK_COUPON_CODE,
+			   c.RES_PAYMENT,
+			   c.RESSTATUS_IN_DAY,
+			   c.RESSTATUS_OUT_DAY,
+			   c.RES_TOTALPRICE,
+			   c.RES_POINT,
+			   a.hotel_name,
+			   b.room_name,
+			   b.room_checkintime,
+			   b.room_checkouttime
+		FROM tbl_here_hotelInfo a , tbl_here_roomInfo b , TBL_HERE_RESERVATION c 
+		WHERE a.HOTEL_IDX = b.FK_HOTEL_IDX  
+			  AND c.FK_ROOM_IDX = b.ROOM_IDX
+			  AND RES_NUMBER = #{fk_member_idx}
+		
+	</select>
+	 
+	<update id="updateReservation" parameterType="com.project.dws.DwoReservationVO">
+		UPDATE TBL_HERE_RESERVATION 
+		SET RES_PAYMENT = #{res_payment} , 
+		RES_POINT = #{mpointCash}
+	     AMOUNT = #{amount}
+		WHERE RES_NUMBER = #{res_number}
+	</update>
+	
+	<insert id="insertFinish" parameterType="com.project.dws.DwoReservationVO">
+		INSERT INTO TBL_HERE_FINISH ( SEQ , FK_RES_NUMBER , FINISH_ADDPOINT , FINISH_PAYMENTSTATUS )
+		VALUES ( seq_here_finish.nextval , #{res_number} , #{finish_addpoint} , #{res_paymentstatus} )
+	</insert>
+
+	<update id="updatePayStatus" parameterType="com.project.dws.DwoReservationVO">
+		UPDATE TBL_HERE_RESERVATION 
+		SET RES_PAYMENTSTATUS = #{res_paymentstatus} 
+		WHERE RES_NUMBER = #{res_number}
+	</update>
+	
+	<select id="selectMpointCash" parameterType="String" resultType="String"> 
+		SELECT MPOINTCASH 
+		FROM TBL_HERE_MPOINT 
+		WHERE fk_member_idx = #{res_number}
+	</select>
+	
+	<update id="updateDeductionMpointCash" parameterType="com.project.dws.DwoReservationVO">
+		UPDATE TBL_HERE_MPOINT
+		SET MPOINTCASH = ( 
+						   SELECT MPOINTCASH - nvl(#{mpointCash},0)
+						   FROM TBL_HERE_MPOINT 
+						   WHERE FK_MEMBER_IDX = #{res_number}
+						   )
+		WHERE FK_MEMBER_IDX = #{res_number}
+ 
+		
+	</update>
+	
 </mapper>
 

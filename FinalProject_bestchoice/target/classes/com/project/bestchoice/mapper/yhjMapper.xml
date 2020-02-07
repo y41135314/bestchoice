@@ -7,9 +7,704 @@
 <!-- namespace 는 보통 파일명 ( 프로젝트 내에서 고유해야 한다. ) -->
 <mapper namespace="yhjMapper" >
 
-	<select id="getDate" resultType="String">
-		select to_char(sysdate , 'yyyy-mm-dd hh24:mi:ss') from dual
+
+
+	<!-- 자주묻는질문 시작  -->
+	
+	<select id="getQuestionList" parameterType="String" resultType="com.project.yhj.question.YhjQuestionVO">
+		
+		select no, fk_admin_idx, category, title, content, writeday, to_char(reviseday, 'yyyy-mm-dd hh24:mi:ss') as reviseday, status
+		from tbl_here_question where category = #{category} and status = 1 
+		order by no desc
+		
 	</select>
+
+	<insert id="questionWrite" parameterType="com.project.yhj.question.YhjQuestionVO">
+		
+		insert into tbl_here_question ( no, fk_admin_idx, category, title, content, writeday )
+		values( seq_here_question.nextval, #{fk_admin_idx}, #{category}, #{title}, #{content}, sysdate )
+	
+	</insert>
+
+	<update id="questionRevise" parameterType="com.project.yhj.question.YhjQuestionVO">
+		
+		update tbl_here_question set title = #{title}, content=#{content} , category =#{category} , reviseday = sysdate
+		where no = #{no} and fk_admin_idx = #{fk_admin_idx}
+		
+	</update>
+
+	<select id="getOneQuestion" parameterType="String" resultType="com.project.yhj.question.YhjQuestionVO">
+		
+		select no, fk_admin_idx, category, title, content, writeday, reviseday, status
+		from tbl_here_question where no = #{no} and status = 1
+		
+	</select>
+	
+	<update id="questionDelete" parameterType="String">
+		update tbl_here_question set status = 0 where no = #{no}
+	</update>
+
+	<!-- 자주묻는질문 끝 -->
+
+
+
+	<!-- 공지사항 시작 -->
+
+	<select id="getNoticeTotalCount" resultType="int">
+		select count(*) from tbl_here_notice where status = 1
+	</select>
+
+	<select id="getNoticeList" parameterType="HashMap" resultType="com.project.yhj.notice.YhjNoticeVO">
+		
+		select no, fk_admin_idx, title, content, writeday, reviseday, status
+		from (
+		    select row_number() over(order by no desc) as rno , no, fk_admin_idx  
+		            , title, content
+		            , to_char(writeday,'yyyy-mm-dd') as writeday
+		            , to_char(reviseday,'yyyy-mm-dd') as reviseday
+		            , status
+		    from tbl_here_notice
+		    where status = 1
+		)
+		where rno between #{startRno} and #{endRno}
+		
+	</select>
+
+	<select id="getOneNotice" parameterType="String" resultType="com.project.yhj.notice.YhjNoticeVO">
+		select no, fk_admin_idx, title, content 
+			, to_char(writeday,'yyyy-mm-dd') as writeday
+	        , to_char(reviseday,'yyyy-mm-dd') as reviseday
+	        , status
+	    from tbl_here_notice 
+	    where status = 1 and no = #{no}    
+	</select>
+
+	<insert id="writeOneNotice" parameterType="com.project.yhj.notice.YhjNoticeVO">
+		insert into tbl_here_notice ( no, fk_admin_idx, title, content, writeday, status)
+		values( seq_here_notice.nextval, #{fk_admin_idx}, #{title}, #{content}, default, default)
+	</insert>
+
+	<update id="reviseOneNotice" parameterType="com.project.yhj.notice.YhjNoticeVO">
+		update tbl_here_notice set title = #{title}, content = #{content}, reviseday = sysdate
+		where no = #{no} and fk_admin_idx = #{fk_admin_idx}
+	</update>
+	
+	<update id="noticeDelete" parameterType="String">
+		update tbl_here_notice set status = 0 where no = #{no}
+	</update>
+
+	<!-- 공지사항 끝 -->
+	
+	
+	
+	<!-- 이벤트 시작 -->
+	
+	<insert id="insertEvent" parameterType="HashMap">
+		insert into tbl_here_admin_event ( event_code, fk_admin_idx, event_name, event_createday, event_discountMon, event_discountPct, event_startday, event_endday, event_explain, event_status )
+		values( seq_here_admin_event.nextval , #{fk_admin_idx}, #{event_name}, sysdate, #{event_discountMon}, #{event_discountPct}, to_date(#{event_startday}, 'yyyy-mm-dd')  , to_date(#{event_endday}, 'yyyy-mm-dd'), #{event_explain}, 1 )
+	</insert>
+	
+	<select id="getEventCode" parameterType="HashMap" resultType="int">
+		select event_code
+		from tbl_here_admin_event
+		where fk_admin_idx = #{fk_admin_idx} and event_name = #{event_name} and event_explain = #{event_explain}        
+      	and event_discountmon = #{event_discountMon} and event_discountpct = #{event_discountPct} and event_createday = sysdate
+	</select>
+	
+	<insert id="insertEventImage" parameterType="HashMap">
+		insert into tbl_here_admin_event_img ( no, fk_event_code, orgFilename, wasFilename, status, main )
+		values ( seq_here_admin_event_img.nextval, #{fk_event_code}, #{orgFilename}, #{wasFilename}, 1 , #{main} )
+	</insert>
+	
+	<select id="getEventTotalCount" resultType="int">
+		select count(*) from tbl_here_admin_event where event_status != 0
+	</select>
+	
+	
+	<resultMap type="HashMap" id="eventMainMap">
+		<result property="event_code" 	column="event_code" 	javaType="String" />
+ 		<result property="event_name" 	column="event_name" 	javaType="String" />
+ 		<result property="event_startday" 	column="event_startday" 	javaType="String" />
+ 		<result property="event_endday" 	column="event_endday" 	javaType="String" />
+ 		<result property="event_status" 	column="event_status" 	javaType="String" />
+ 		<result property="wasfilename" 	column="wasfilename" 	javaType="String" />
+	</resultMap>
+	
+	<select id="getEventList" parameterType="HashMap" resultMap="eventMainMap" >
+		select rno, event_code, event_name, event_startday, event_endday, event_status, wasfilename
+		from
+		(
+		select row_number() over(order by event_code desc) as rno
+		    , event_code, event_name, event_startday, event_endday, event_status,  wasfilename
+		
+		from (
+		    select A.event_code , A.event_name 
+		        , A.event_startday
+		        , A.event_endday
+		        , A.event_status
+		        , B.wasfilename
+		    from 
+		    (   select event_code, event_name 
+		        , to_char(event_startday, 'yyyy-mm-dd') as event_startday
+		        , to_char(event_endday, 'yyyy-mm-dd') as event_endday
+		        , event_status
+		        from tbl_here_admin_event 
+		        where event_status != 0 
+		    ) A
+		    join 
+		    (
+		        select no, fk_event_code, orgfilename, wasfilename
+		        from 
+		        tbl_here_admin_event_img 
+		        where main = 1 and status =1 
+		    ) B
+		    on A.event_code = B.fk_event_code
+		)
+		)
+		where rno between #{startRno} and #{endRno}
+	</select>
+	
+	
+	<resultMap type="HashMap" id="eventOneMap">
+		<result property="event_code" 	column="event_code" 	javaType="String" />
+ 		<result property="admin_name" 	column="admin_name" 	javaType="String" />
+ 		<result property="event_name" 	column="event_name" 	javaType="String" />
+ 		<result property="event_createday" 	column="event_createday" 	javaType="String" />
+ 		<result property="event_discountmon" 	column="event_discountmon" 	javaType="String" />
+ 		<result property="event_discountpct" 	column="event_discountpct" 	javaType="String" />
+ 		<result property="event_startday" 	column="event_startday" 	javaType="String" />
+ 		<result property="event_endday" 	column="event_endday" 	javaType="String" />
+ 		<result property="event_explain" 	column="event_explain" 	javaType="String" />
+	</resultMap>
+	<select id="getOneEvent" parameterType="String" resultMap="eventOneMap">
+		select event_code, b.name as admin_name, event_name
+			, to_char( event_createday , 'yyyy-mm-dd') as event_createday
+			, nvl(event_discountmon,0) as event_discountmon 
+            , nvl(event_discountpct,0) as event_discountpct
+			, to_char( event_startday , 'yyyy-mm-dd') as event_startday
+			, to_char( event_endday , 'yyyy-mm-dd') as event_endday
+			, event_explain
+		from tbl_here_admin_event a
+        join tbl_here_adminmember b
+        on a.fk_admin_idx = b.admin_idx
+        
+        where event_status != 0 and event_code = #{event_code}
+	</select>
+	
+	
+	<resultMap type="HashMap" id="eventImgList">
+		<result property="no" 	column="no" 	javaType="String" />
+ 		<result property="fk_event_code" 	column="fk_event_code" 	javaType="String" />
+ 		<result property="orgfilename" 	column="orgfilename" 	javaType="String" />
+ 		<result property="wasfilename" 	column="wasfilename" 	javaType="String" />
+ 		<result property="main" 	column="main" 	javaType="String" />
+	</resultMap>
+	<select id="getOneEventImg" parameterType="String" resultMap="eventImgList">
+		select no, fk_event_code, orgfilename, wasfilename, main
+		from tbl_here_admin_event_img where fk_event_code = #{event_code} and status = 1 order by no asc
+	</select>
+	
+	<update id="reviseEvent" parameterType="HashMap">
+		update tbl_here_admin_event set event_name = #{event_name} , event_discountMon = #{event_discountMon} 
+		, event_discountPct = #{event_discountPct}	
+		, event_startday = to_date(#{event_startday}, 'yyyy-mm-dd')	
+		, event_endday = to_date(#{event_endday}, 'yyyy-mm-dd')	
+		, event_explain = #{event_explain}
+		where event_code = #{event_code} and fk_admin_idx = #{fk_admin_idx}
+	</update>
+	
+	<update id="deleteEventImg" parameterType="String">
+		update tbl_here_admin_event_img set status = 0 
+		where fk_event_code = #{event_code}
+	</update>
+	
+	<update id="deleteEvent" parameterType="String">
+		update tbl_here_admin_event set event_status = 0 
+		where event_code = #{event_code}
+	</update>
+	
+	
+	<resultMap type="HashMap" id="eventOneMapWithLagLead">
+		<result property="prev_event_code" 	column="prev_event_code" 	javaType="String" />
+ 		<result property="prev_event_name" 	column="prev_event_name" 	javaType="String" />
+ 		<result property="prev_event_startday" 	column="prev_event_startday" 	javaType="String" />
+ 		<result property="prev_event_endday" 	column="prev_event_endday" 	javaType="String" />
+ 		<result property="event_code" 	column="event_code" 	javaType="String" />
+ 		<result property="event_name" 	column="event_name" 	javaType="String" />
+ 		<result property="event_discountmon" 	column="event_discountmon" 	javaType="String" />
+ 		<result property="event_discountpct" 	column="event_discountpct" 	javaType="String" />
+ 		<result property="event_startday" 	column="event_startday" 	javaType="String" />
+ 		<result property="event_endday" 	column="event_endday" 	javaType="String" />
+ 		<result property="event_explain" 	column="event_explain" 	javaType="String" />
+ 		<result property="event_status" 	column="event_status" 	javaType="String" />
+ 		<result property="next_event_code" 	column="next_event_code" 	javaType="String" />
+ 		<result property="next_event_name" 	column="next_event_name" 	javaType="String" />
+ 		<result property="next_event_startday" 	column="next_event_startday" 	javaType="String" />
+ 		<result property="next_event_endday" 	column="next_event_endday" 	javaType="String" />
+	</resultMap>
+	
+	<select id="getOneEventWithLagLead" parameterType="String" resultMap="eventOneMapWithLagLead">
+		select V.* 
+		from 
+		(
+		select  lag(event_code, 1) over(order by event_code desc ) as prev_event_code
+		        , lag(event_name, 1) over(order by event_code desc ) as prev_event_name
+		        ,  lag(to_char(event_startday, 'yyyy-mm-dd') , 1) over(order by event_code desc)  as prev_event_startday
+		        ,  lag(to_char(event_endday, 'yyyy-mm-dd') , 1) over(order by event_code desc)  as prev_event_endday
+		        , event_code, event_name, event_discountmon, event_discountpct
+		        , to_char( event_startday, 'yyyy-mm-dd') as event_startday
+		        , to_char( event_endday, 'yyyy-mm-dd') as event_endday
+		        , event_explain
+		        , event_status
+		        , lead(event_code, 1) over(order by event_code desc ) as next_event_code
+		        , lead(event_name, 1) over(order by event_code desc ) as next_event_name
+		        , lead( to_char(event_startday, 'yyyy-mm-dd') , 1) over(order by event_code desc)  as next_event_startday
+		        , lead(to_char(event_endday, 'yyyy-mm-dd') , 1) over(order by event_code desc) as next_event_endday
+		from tbl_here_admin_event where event_status != 0
+		) V
+		where event_code = #{event_code}
+	</select>
+	
+	
+	<select id="checkCoupon" parameterType="HashMap" resultType="int">
+		select count(*)
+		from tbl_here_admin_coupon A join tbl_here_member_coupon B
+		on A.coupon_code = B.fk_coupon_code
+		where A.fk_event_code = #{event_code} and B.fk_idx = #{fk_idx}
+	</select>
+	
+	
+	<insert id="giveCoupon" parameterType="HashMap">
+		insert into tbl_here_admin_coupon ( coupon_code, fk_admin_idx, fk_event_code, coupon_type, coupon_name
+		, coupon_createday, coupon_discountMon, coupon_discountPct, coupon_startday, coupon_endday, coupon_status)
+		values (
+			seq_here_admin_coupon.nextval
+			, ( select fk_admin_idx from tbl_here_admin_event where event_code = #{event_code} and event_status != 0)
+			, #{event_code}
+			, #{coupon_type}
+			, ( select event_name from tbl_here_admin_event where event_code = #{event_code} and event_status != 0)
+			, sysdate
+			, ( select event_discountMon from tbl_here_admin_event where event_code = #{event_code} and event_status != 0)
+			, ( select event_discountPct from tbl_here_admin_event where event_code = #{event_code} and event_status != 0)
+			, sysdate
+			, add_months(sysdate, 12)
+			, default
+		)
+	</insert>
+	
+	<select id="getCouponCode" resultType="String">
+		select coupon_code from (select coupon_code from tbl_here_admin_coupon order by coupon_code desc) where rownum = 1
+	</select>
+	
+	<insert id="giveCouponToUser" parameterType="HashMap">
+		insert into tbl_here_member_coupon ( no, fk_idx, fk_coupon_code)
+		values( seq_here_member_coupon.nextval, #{fk_idx}, #{fk_coupon_code} )
+	</insert>
+	
+	<update id="useCoupon" parameterType="HashMap">
+		update tbl_here_admin_coupon set coupon_status = 0, coupon_useday = sysdate
+		where coupon_code = #{fk_coupon_code}
+	</update>
+	
+	<update id="useCouponForPoint" parameterType="HashMap">
+		
+		update tbl_here_mpoint 
+		set mpointCash = mpointCash + ( select coupon_discountmon from tbl_here_admin_coupon where coupon_code = #{fk_coupon_code} )
+		where fk_member_idx = #{fk_idx}
+		
+	</update>
+	
+	<update id="updateEventStatus">
+		
+		update tbl_here_admin_event set event_status = 2
+		where sysdate > event_endday and event_status = 1
+		
+	</update>
+	
+	<!-- 이벤트 끝 -->
+	
+	<!-- FAQ 시작 -->
+	
+	<insert id="insertMemberFaq" parameterType="com.project.yhj.faq.YhjMemberFaqVO">
+		insert into tbl_here_faq ( no, fk_idx, type, phone, content, writeday, status )
+		values ( seq_here_faq.nextval, #{fk_idx}, #{type}, #{phone}, #{content}, sysdate, default )
+	</insert>
+	
+	<select id="getFaqTotalCount" parameterType="String" resultType="int">
+		select  count(*)
+		from 
+		( select * from tbl_here_faq order by no desc ) A
+		left join 
+		tbl_here_faq_reply B
+		on a.no = b.fk_no
+		where a.fk_idx = #{fk_idx}
+	</select>
+	
+	<select id="getFaqList" parameterType="HashMap" resultType="com.project.yhj.faq.YhjAllFaqVO">
+		
+		select X.*
+		from
+		(
+			select row_number() over(order by no desc) as rno, V.*
+			from 
+			(
+				select  a.no as no
+				        , a.fk_idx as fk_idx
+				        , a.type as type
+				        , a.phone as phone
+				        , a.content as content
+				        , to_char(a.writeday,'yyyy-mm-dd') as writeday
+				        , a.status as status
+				        , b.no as rep_no
+				        , b.fk_no as rep_fk_no
+				        , b.fk_admin_idx as rep_admin_idx
+				        , b.content as rep_content
+				        , to_char(b.writeday,'yyyy-mm-dd hh24:mi:ss') as rep_writeday
+				        , b.status as rep_status
+				from 
+				( select * from tbl_here_faq order by no desc ) A
+				left join 
+				tbl_here_faq_reply B
+				on a.no = b.fk_no
+			) V
+		) X
+		where rno between #{startRno} and #{endRno} and fk_idx = #{fk_idx}
+		
+	</select>
+	
+	
+	<select id="getFaqAdminTotalCount" parameterType="HashMap" resultType="int">
+		select count(*)
+			from 
+			(
+                select T.* from 
+                (
+                    select  a.no as no
+                            , a.fk_idx as fk_idx
+                            , a.type as type
+                            , a.phone as phone
+                            , a.content as content
+                            , to_char(a.writeday,'yyyy-mm-dd') as writeday
+                            , a.status as status
+                            , b.no as rep_no
+                            , b.fk_no as rep_fk_no
+                            , b.fk_admin_idx as rep_admin_idx
+                            , b.content as rep_content
+                            , to_char(b.writeday,'yyyy-mm-dd hh24:mi:ss') as rep_writeday
+                            , b.status as rep_status
+                    from 
+                    ( select * from tbl_here_faq 
+                        where status = 1
+                        <choose>
+                        	<when test='category == "0"'>
+                        		
+                        	</when>
+                        	<otherwise>
+                        		and type = #{category}
+                        	</otherwise>
+                        </choose>
+                        
+                        <choose>
+                        	<when test='period =="0"'>
+                        		
+                        	</when>
+                        	<when test='period =="1"'>
+                        		and sysdate-writeday between 0 and 7
+                        	</when>
+                        	<when test='period =="2"'>
+                        		and sysdate-writeday between 0 and 30
+                        	</when>
+                        </choose>
+                        
+                        order by no desc ) A
+                    left join 
+                    ( select * from tbl_here_faq_reply where status = 1 ) B
+                    on a.no = b.fk_no
+                ) T
+                
+                <choose>
+					<when test='replyStatus =="0"'>
+					
+					</when>
+					<when test='replyStatus =="1"'>
+						where rep_no is null
+					</when>
+					<when test='replyStatus =="2"'>
+						where rep_no is not null
+					</when>
+                </choose>
+               
+			) V
+	</select>
+	
+	<select id="getAdminFaqList" parameterType="HashMap" resultType="com.project.yhj.faq.YhjAllFaqVO">
+		select X.*
+		from
+		(
+			select row_number() over(order by no desc) as rno, V.*
+			from 
+			(
+                select T.* from 
+                (
+                    select  a.no as no
+                            , a.fk_idx as fk_idx
+                            , a.type as type
+                            , a.phone as phone
+                            , a.content as content
+                            , to_char(a.writeday,'yyyy-mm-dd') as writeday
+                            , a.status as status
+                            , b.no as rep_no
+                            , b.fk_no as rep_fk_no
+                            , c.name as rep_admin_idx
+                            , b.content as rep_content
+                            , to_char(b.writeday,'yyyy-mm-dd hh24:mi:ss') as rep_writeday
+                            , b.status as rep_status
+                    from 
+                    ( select * from tbl_here_faq 
+                        where status = 1
+                        <choose>
+                        	<when test='category == "0"'>
+                        		
+                        	</when>
+                        	<otherwise>
+                        		and type = #{category}
+                        	</otherwise>
+                        </choose>
+                        
+                        <choose>
+                        	<when test='period =="0"'>
+                        		
+                        	</when>
+                        	<when test='period =="1"'>
+                        		and sysdate-writeday between 0 and 7
+                        	</when>
+                        	<when test='period =="2"'>
+                        		and sysdate-writeday between 0 and 30
+                        	</when>
+                        </choose>
+                        order by no desc ) A
+                    left join 
+                    ( select * from tbl_here_faq_reply where status = 1 ) B
+                    on a.no = b.fk_no
+                    left join
+                    tbl_here_adminmember C
+                    on b.fk_admin_idx = c.admin_idx
+                ) T
+                <choose>
+					<when test='replyStatus =="0"'>
+					
+					</when>
+					<when test='replyStatus =="1"'>
+						where rep_no is null
+					</when>
+					<when test='replyStatus =="2"'>
+						where rep_no is not null
+					</when>
+                </choose>
+			) V
+		) X
+		where rno between #{startRno} and #{endRno}
+	</select>
+	
+	<insert id="writeFaqAdminReply" parameterType="HashMap">
+		
+		insert into tbl_here_faq_reply ( no, fk_no, fk_admin_idx, content, writeday, status)
+		values( seq_here_faq_reply.nextval, #{fk_no},#{fk_admin_idx},#{content}, sysdate, default)
+		
+	</insert>
+	
+	<!-- FAQ 끝 -->
+	
+	
+	<!-- 검색 시작 -->
+	
+	 <select id="getHotelList" parameterType="com.project.yhj.search.YhjSearchVO" resultType="com.project.yhj.search.YhjSearchResultVO">
+		
+		select  tblUnderCon.hotel_idx as hotel_idx
+	        , hotelImage_wasFileName 
+	        , hotel_name
+	        , hotel_category
+	        , gradePerHotel
+	        , tblUnderCon.roomprice as roomprice
+	        , hotel_addr1
+	        , hotel_geo_x
+	        , hotel_geo_y
+	    from 
+	    (    
+	        select  hotel_idx , min (sumprice ) as roomprice
+	        from 
+	        (
+	            select *
+	            from
+	            ( select * from tbl_here_hotelInfo 
+	            	where hotel_status = 1
+	            	<!-- hotel_Category 혹은 hotel_grade -->
+					<if test="hotelInfoList != null">
+						and hotel_category in 
+						<foreach collection="hotelInfoList" item="type" open="(" close=")" separator=",">
+							#{type}
+						</foreach>
+					
+					</if>
+	            ) A
+	            join
+	            ( select * from tbl_here_roomInfo 
+		            <!-- 인원수 -->
+		        	where #{room_Person} between  room_person and room_addperson	
+	            ) B
+	            on a.hotel_idx = b.fk_hotel_idx
+	            join 
+	            (   
+	                select a.fk_room_idx
+	                , sum(a.roomprice) + ( to_number(#{room_Person}) -2 )*(select room_addpercharge from tbl_here_roomInfo where room_idx = a.fk_room_idx )  as sumprice 
+	                from tbl_here_roomPrice A
+	                left join
+	                (
+	                    select fk_room_idx, count(*) as cnt
+	                    from 
+	                    ( select * from tbl_here_roomPrice where roomprice_quantity > 0 )
+	                    where roomprice_date &gt;= to_date( #{startday} ,'yyyy-mm-dd') 
+	                    and roomprice_date &lt; (to_date( #{endday} ,'yyyy-mm-dd'))  
+	                    group by fk_room_idx
+	                ) B
+	                on a.fk_room_idx = b.fk_room_idx
+	                where b.cnt = ( to_date( #{endday} ,'yyyy-mm-dd') - to_date( #{startday} ,'yyyy-mm-dd') )  
+	                and a.roomprice_quantity >0 
+	                and roomprice_date &gt;= to_date( #{startday} ,'yyyy-mm-dd') and roomprice_date &lt; (to_date( #{endday} ,'yyyy-mm-dd')) 
+	                group by a.fk_room_idx
+	            ) C
+	            on b.room_idx = c.fk_room_idx
+	            join 
+	            ( select fk_room_idx from tbl_here_bed 
+	            	<!-- 침대유형 -->
+					<if test="bedList != null">
+						where 
+						<foreach collection="bedList" item="type" separator=" and ">
+							${type} = 1
+						</foreach>
+					</if>
+	             )D
+	            on c.fk_room_idx = d.fk_room_idx
+	            join 
+	            ( select fk_room_idx from tbl_here_service 
+	            	<!-- 내부객시설 -->
+					<if test="serviceList != null">
+						where 
+						<foreach collection="serviceList" item="type" separator=" and ">
+							${type} = 1
+						</foreach>
+					</if>
+	            ) E
+	            on c.fk_room_idx = e.fk_room_idx
+	            join 
+	            ( select fk_room_idx from tbl_here_theme 
+		            <!-- 이색테마유형 -->
+					<if test="themeList != null">
+						where 
+						<foreach collection="themeList" item="type" separator=" and ">
+							${type} = 1
+						</foreach>
+					</if>
+	            ) F
+	            on c.fk_room_idx = f.fk_room_idx
+	            join 
+	            ( select fk_room_idx from tbl_here_spa 
+		            <!-- 스파유형 -->
+					<if test="spaList != null">
+						where
+						<foreach collection="spaList" item="type" separator=" and ">
+							${type} = 1
+						</foreach>
+					</if>
+	            
+	            ) G
+	            on c.fk_room_idx = g.fk_room_idx
+	        ) wholeJoinTable
+        	<!-- 조건문 추가하기 -->
+        	
+            <!-- 검색어 -->
+             <if test="searchWord != null">
+             	where hotel_Name || hotel_Addr1 ||' '|| hotel_Addr2 || hotel_Addr3 || hotel_phone || room_name 
+            
+            		like '%'||#{searchWord}||'%'
+             </if>
+	             
+	             
+	        group by hotel_idx
+	    ) tblUnderCon
+	    left join 
+	    ( select hotelimage_wasfilename, fk_hotel_idx from tbl_here_hotelImage ) I
+	    on tblUnderCon.hotel_idx = i.fk_hotel_idx 
+	    left join
+	        (
+	            select  hotel_idx as fk_hotel_idx
+	            , round( avg(totalGradePerCount), 1 ) as gradePerHotel
+	            from 
+	            (
+	                select  a.hotel_idx, d.totalGradePerCount
+	                from 
+	                ( select hotel_idx from tbl_here_hotelInfo where hotel_status = 1 ) A
+	                left join
+	                ( select res_number, fk_hotel_idx from tbl_here_reservation ) B
+	                on a.hotel_idx = b.fk_hotel_idx
+	                left join 
+	                ( select fk_res_number, seq from tbl_here_finish ) C
+	                on b.res_Number = c.fk_res_number
+	                left join
+	                ( select fk_seq , (grade0+grade1+grade2+grade3+grade4)/5 as totalGradePerCount from tbl_here_review ) D
+	                on c.seq = d.fk_seq
+	            )
+	            group by hotel_idx
+	        ) H
+	    on tblUnderCon.hotel_idx = h.fk_hotel_idx
+	    left join 
+	    ( select hotel_idx, hotel_name, hotel_category, hotel_addr1, hotel_geo_x, hotel_geo_y from tbl_here_hotelInfo ) J
+	    on j.hotel_idx = tblUnderCon.hotel_idx
+	    
+	   <!--  정렬 (1 평점,2 거리,3 낮은가격,4 높은가격)  -->
+	   <choose>
+	   		<when test='orderBy == "1"'>
+	   			order by gradePerHotel desc
+	   		</when>
+	   		<when test='orderBy == "2"'>
+	   			order by sqrt(power(abs(#{latitude}-hotel_geo_x),2) + power(abs(#{longitude}-hotel_geo_y),2)) asc
+	   		</when>
+	   		<when test='orderBy == "3"'>
+	   			order by roomprice asc
+	   		</when>
+	   		<when test='orderBy == "4"'>
+	   			order by roomprice desc
+	   		</when>
+	   </choose>
+	
+	 </select> 
+	
+	
+	<select id="getAutoCompleteList" parameterType="String" resultType="String">
+		
+		select searchlist
+		from
+		(
+		select hotel_name as searchlist 
+		from
+		(select hotel_name from tbl_here_hotelInfo)
+		union 
+		( select hotel_addr1 from tbl_here_hotelInfo)
+		union
+		( select room_name from tbl_here_roomInfo)
+		 
+		union
+		( select hotel_addr1 ||' '|| hotel_addr2 from tbl_here_hotelInfo )
+		)
+		where searchlist like'%'||#{searchWord}||'%'
+		order by searchlist asc
+		
+		
+	</select>	
+	
+	
+	
+	<!-- 검색 끝 -->
 	
 </mapper>
 

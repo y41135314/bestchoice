@@ -1,16 +1,16 @@
 package com.project.dws;
 
-import java.util.HashMap;
+import java.util.Calendar;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.project.smh.SmhMemberVO;
 
@@ -23,23 +23,48 @@ public class DwsController {
 	// 결제 페이지 뷰단 
 	@RequestMapping(value="/pay/reserve.bc")
 	public String reserve(HttpServletRequest request, Model model) {
+		
+		HttpSession session = request.getSession();
+		SmhMemberVO memberVo = (SmhMemberVO) session.getAttribute("loginuser"); 
+		String hotel_idx = request.getParameter("hotel_idx"); //상세페이지에서 파라미터 넘 겨주셔야되여 
+		String room_idx = request.getParameter("room_idx");
+		String resstatus_in_day = request.getParameter("resstatus_in_day"); // get으로 넘겨 줄때 yyyymmdd 형식으로
+		String resstatus_out_day = request.getParameter("resstatus_out_day");// get으로 넘겨 줄때 yyyymmdd 형식으로
+		String res_totalprice = request.getParameter("res_totalprice");
+		
+		//room_idx="123";
+		//res_totalprice = "10000";
+		
+		DwoReservationVO reservationVO = new DwoReservationVO();
+		Calendar cal = Calendar.getInstance();
+		int date = cal.get ( cal.DATE ) ;
+		if(memberVo != null) {
+			memberVo = service.selectMember(String.valueOf(memberVo.getMember_idx())); // 고객정보 
+		}
+ 		//방정보 조회 
+ 		
+		//DwoReservationVO reservationVO = service.selectReservation(res_number);//예약정보 조회 
+		//현재 로그인이 아닌상태일시 loginuser 가존재 하지 않아 member_idx가 존재하지않음 
+ 		//해서 TBL_HERE_RESERVATION 테이블 inset 시 member_idx 제거후 insert 작업수행
+ 		//결제완료후 member_idx는 update 처리 
+		
+		String res_number = service.selectResNumber();
+		reservationVO.setRes_number(res_number);
+		reservationVO.setResstatus_in_day(resstatus_in_day);
+		reservationVO.setResstatus_out_day(resstatus_out_day);
+		reservationVO.setRoom_idx(room_idx);
+		reservationVO.setRes_totalprice(res_totalprice);
+		reservationVO.setRes_paymentstatus("1");// 결제상태
+		reservationVO.setHotel_idx(hotel_idx);
+		reservationVO.setRes_point("0"); //혹시 몰라서 일단 박아둠 현재 상태에서 적립금사용액 없음 
+		reservationVO.setRes_receipt(String.valueOf(date)+hotel_idx); //영수증 번호 생성 ( 날자+hotel_idx)
+		service.insertReservation(reservationVO);
 
-		String member_idx = request.getParameter("member_idx") == null ? "" : request.getParameter("member_idx") ;//세션으로 변경 
-		String res_number = request.getParameter("res_number "); //상세페이지에서 파라미터 넘 겨주셔야되여 
-		//res_number = "2";
-		
- 		SmhMemberVO memberVo = service.selectMember(member_idx); // 고객정보 
-		//방정보 조회 
-		DwoReservationVO reservationVO = service.selectReservation(res_number);//예약정보 조회 
-		
-		String in_day = reservationVO.getResstatus_in_day();
-		String out_day = reservationVO.getResstatus_in_day();
-		
-		reservationVO.setResstatus_in_day(in_day.substring(0, 4)+"년"+in_day.substring(4, 6)+"월"+in_day.substring(6, 8)+"일");
-		reservationVO.setResstatus_out_day(out_day.substring(0, 4)+"년"+out_day.substring(4, 6)+"월"+out_day.substring(6, 8)+"일");
-//
-//		reservationVO.setRes_paymentstatus("1");// 결제상태
-//		service.updatePayStatus(reservationVO);
+		reservationVO = service.selectReservation(res_number);
+		reservationVO.setMpointCash("0"); //디폴트값 세팅
+		//insert 문 추가 
+		reservationVO.setResstatus_in_day(resstatus_in_day.substring(0, 4)+"년"+resstatus_in_day.substring(4, 6)+"월"+resstatus_in_day.substring(6, 8)+"일");
+		reservationVO.setResstatus_out_day(resstatus_out_day.substring(0, 4)+"년"+resstatus_out_day.substring(4, 6)+"월"+resstatus_out_day.substring(6, 8)+"일");
 		model.addAttribute("member", memberVo);
 		model.addAttribute("reservation", reservationVO );
 		
@@ -48,6 +73,8 @@ public class DwsController {
 	
 	@RequestMapping(value="/pay/reserveSuccess.bc")
 	public String reserveSuccess(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		SmhMemberVO loginuser = (SmhMemberVO) session.getAttribute("loginuser"); 
 		
 		DwoReservationVO dwoReservation = new DwoReservationVO();
 		
@@ -62,6 +89,8 @@ public class DwsController {
 		int point = Integer.valueOf(amount)/10;
 		
 		//적립금 차감 update 
+		dwoReservation.setMember_idx(String.valueOf(loginuser.getMember_idx()));
+		dwoReservation.setFk_member_idx(String.valueOf(loginuser.getMember_idx()));
 		dwoReservation.setMpointCash(mpointCash); //사용된 적립금 
 		dwoReservation.setRes_number(res_number);		 
 		dwoReservation.setRes_paymentstatus(res_paymentstatus);
@@ -89,54 +118,4 @@ public class DwsController {
 		
 		return jsonObj.toString(); 
 	}
-	
-	
-/*	  이건 잠시 주석 파일 올라가고 풀자
-	 문자보내기 
-	@ResponseBody
-    @RequestMapping(value = "/sendSms.bc", method= {RequestMethod.POST})
-	public String sendSms(String receiver, HttpSession session) throws Exception {
-		int rand = (int) (Math.random() * 899999) + 100000;
-    	session.setAttribute("rand", rand);
-    	
-    	// 생성한 랜덤한 번호 받아오기 
-  	    int len = 6;
-  	    int dupCd = 1;
-  	    String numStr = SmhRandom.numberGen(len, dupCd);
-
-    	//String api_key = "test"; //api key
-        //String api_secret = "test";  //api secret
-        String api_key = "NCSL0KA7LMSAAN6A"; //api key
-        String api_secret ="BPH3ZWN9HQZR5CTOTSKUQ0X8JMQRUWZC";  //api secret
-        com.project.dws.sms.Coolsms coolsms = new com.project.dws.sms.Coolsms(api_key, api_secret);
-         //com.project.dws.sms에서 정보를 받아오겟다
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("to", receiver); // 받는번호
-
-        params.put("from", "01045606752"); //보내는번호
-        params.put("text", "여기는어때 입니다. 인증번호 [" + numStr  + "] 를 화면에 입력해주세요."); 
-        params.put("type", "sms");
-        params.put("mode", "test");
-        //문자메세지 확인용
-        //System.out.println(params);
-
-        org.json.simple.JSONObject result = coolsms.send(params); 
-        
-        org.json.simple.JSONObject result = coolsms.send(params); 
-        
-        if ((boolean)result.get("status") == true) {
-            return ""+numStr;
-          } else {
-
-            System.out.println(result.get("code")); // REST API 에러코드
-            //return "fail";
-            return ""+numStr;
-          }
-      }
-*/
-
-	
-	
-	
-	
 }

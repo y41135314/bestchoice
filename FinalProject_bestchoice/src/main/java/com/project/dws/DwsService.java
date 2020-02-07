@@ -37,7 +37,16 @@ public class DwsService {
 	}
 
 	public void updateDeductionMpointCash(DwoReservationVO dwoReservation) {
-		dao.updatePayStatus(dwoReservation);
+		dao.updateDeductionMpointCash(dwoReservation);
+	}
+
+	public void insertReservation(DwoReservationVO reservationVO){
+		// TODO Auto-generated method stub
+		dao.insertReservation(reservationVO);
+	}
+
+	public String selectResNumber() {
+		return dao.selectResNumber();
 	}
 
 	

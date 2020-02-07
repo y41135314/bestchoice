@@ -28,6 +28,7 @@
 <!-- 뷰단   -->
 <body>
     <div id="content">
+    	
         <div class="reserve">
         	결제 성공 
         </div>

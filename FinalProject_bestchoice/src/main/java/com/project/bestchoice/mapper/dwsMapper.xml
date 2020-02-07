@@ -44,7 +44,8 @@
 	<update id="updateReservation" parameterType="com.project.dws.DwoReservationVO">
 		UPDATE TBL_HERE_RESERVATION 
 		SET RES_PAYMENT = #{res_payment} , 
-		RES_POINT = #{mpointCash}
+		RES_POINT = #{mpointCash},
+		FK_MEMBER_IDX = #{member_idx}
 		WHERE RES_NUMBER = #{res_number}
 	</update>
 	
@@ -70,12 +71,39 @@
 		SET MPOINTCASH = ( 
 						   SELECT MPOINTCASH - nvl(#{mpointCash},0)
 						   FROM TBL_HERE_MPOINT 
-						   WHERE FK_MEMBER_IDX = #{res_number}
+						   WHERE FK_MEMBER_IDX = #{member_idx}
 						   )
-		WHERE FK_MEMBER_IDX = #{res_number}
- 
-		
+		WHERE FK_MEMBER_IDX = #{fk_member_idx}
 	</update>
+	
+	<insert id="insertReservation" parameterType="com.project.dws.DwoReservationVO">
+		INSERT INTO TBL_HERE_RESERVATION (
+            RES_NUMBER,
+            RES_RECEIPT,
+            FK_ROOM_IDX,
+            RESSTATUS_IN_DAY,
+            RESSTATUS_OUT_DAY,
+            RES_TOTALPRICE,
+            RES_POINT,
+            RES_PAYMENTSTATUS,
+            HOTEL_IDX
+            ) values (
+	            #{res_number},
+	            #{res_receipt},
+	            #{room_idx},
+	            #{resstatus_in_day} , 
+	            #{resstatus_out_day}, 
+	            #{res_totalprice}, 
+	            #{res_point}, 
+	            #{res_paymentstatus}, 
+	            #{hotel_idx}
+            )
+	</insert>
+		
+	<select id="selectResNumber" resultType="String">
+	
+		SELECT seq_tbl_here_hotelInfo.NEXTVAL FROM DUAL
+	</select>
 	
 </mapper>
 
