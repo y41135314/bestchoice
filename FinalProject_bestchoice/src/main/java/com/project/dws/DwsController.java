@@ -118,4 +118,52 @@ public class DwsController {
 		
 		return jsonObj.toString(); 
 	}
+	
+	
+
+	/* 문자보내기 
+		@ResponseBody
+	    @RequestMapping(value = "/sendSms.bc", method= {RequestMethod.POST})
+		public String sendSms(String receiver, HttpSession session) throws Exception {
+			int rand = (int) (Math.random() * 899999) + 100000;
+	    	session.setAttribute("rand", rand);
+	    	
+	    	// 생성한 랜덤한 번호 받아오기 
+	  	    int len = 6;
+	  	    int dupCd = 1;
+	  	    String numStr = SmhRandom.numberGen(len, dupCd);
+
+	    	//String api_key = "test"; //api key
+	        //String api_secret = "test";  //api secret
+	        String api_key = "NCSL0KA7LMSAAN6A"; //api key
+	        String api_secret ="BPH3ZWN9HQZR5CTOTSKUQ0X8JMQRUWZC";  //api secret
+	        com.project.dws.sms.Coolsms coolsms = new com.project.dws.sms.Coolsms(api_key, api_secret);
+	         //com.project.dws.sms에서 정보를 받아오겟다
+	        HashMap<String, String> params = new HashMap<String, String>();
+	        params.put("to", receiver); // 받는번호
+
+	        params.put("from", "01045606752"); //보내는번호
+	        params.put("text", "여기는어때 입니다. 인증번호 [" + numStr  + "] 를 화면에 입력해주세요."); 
+	        params.put("type", "sms");
+	        params.put("mode", "test");
+	        //문자메세지 확인용
+	        //System.out.println(params);
+
+	        org.json.simple.JSONObject result = coolsms.send(params); 
+	        
+	        org.json.simple.JSONObject result = coolsms.send(params); 
+	        
+	        if ((boolean)result.get("status") == true) {
+	            return ""+numStr;
+	          } else {
+
+	            System.out.println(result.get("code")); // REST API 에러코드
+	            //return "fail";
+	            return ""+numStr;
+	          }
+	      }
+
+	*/
+	
+	
 }

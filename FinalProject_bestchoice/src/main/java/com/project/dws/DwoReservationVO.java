@@ -1,5 +1,9 @@
 package com.project.dws;
 
+/**
+ * @author ghlee
+ *
+ */
 public class DwoReservationVO {
 	
 	String res_number;//예약번호
@@ -17,30 +21,24 @@ public class DwoReservationVO {
 	String finish_addpoint;//추가적립금
 	String res_paymentDay; //결제일
 	String mpointCash; //사용적립금
-	
+	String hotel_idx;  //호텔이름 
 	String hotel_name;  //호텔이름 
 	String room_name; // 룸타임
 	String room_checkintime; // 체크인시간
 	String room_checkouttime; // 체크아웃 시간
+	String room_idx;
+	String member_idx;
+	String name;
+	String seller_name;
 	
-/// 추가 할것
-String name  ;
-String seller_name;
-
+	@Override
+	public String toString() {
+		return "DwoReservationVO [res_receipt=" + res_receipt + ", fk_room_idx=" + fk_room_idx + ", fk_coupon_code="
+				+ fk_coupon_code + ", resstatus_in_day=" + resstatus_in_day + ", resstatus_out_day=" + resstatus_out_day
+				+ ", res_totalprice=" + res_totalprice + ", res_point=" + res_point + ", res_paymentstatus="
+				+ res_paymentstatus + ", hotel_idx=" + hotel_idx + ", member_idx=" + member_idx + "]";
+	}
 	
-	
-	public String getName() {
-	return name;
-}
-public void setName(String name) {
-	this.name = name;
-}
-public String getSeller_name() {
-	return seller_name;
-}
-public void setSeller_name(String seller_name) {
-	this.seller_name = seller_name;
-}
 	public String getRes_number() {
 		return res_number;
 	}
@@ -131,6 +129,12 @@ public void setSeller_name(String seller_name) {
 	public void setMpointCash(String mpointCash) {
 		this.mpointCash = mpointCash;
 	}
+	public String getHotel_idx() {
+		return hotel_idx;
+	}
+	public void setHotel_idx(String hotel_idx) {
+		this.hotel_idx = hotel_idx;
+	}
 	public String getHotel_name() {
 		return hotel_name;
 	}
@@ -155,6 +159,29 @@ public void setSeller_name(String seller_name) {
 	public void setRoom_checkouttime(String room_checkouttime) {
 		this.room_checkouttime = room_checkouttime;
 	}
+	public String getRoom_idx() {
+		return room_idx;
+	}
+	public void setRoom_idx(String room_idx) {
+		this.room_idx = room_idx;
+	}
+	public String getMember_idx() {
+		return member_idx;
+	}
+	public void setMember_idx(String member_idx) {
+		this.member_idx = member_idx;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSeller_name() {
+		return seller_name;
+	}
+	public void setSeller_name(String seller_name) {
+		this.seller_name = seller_name;
+	}
 	
-
 }
