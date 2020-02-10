@@ -2,6 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+
 <%
 	String ctxPath = request.getContextPath();
 %>
@@ -24,14 +26,22 @@
 		
 	</script>
 	
+	
 </head>
 <!-- 뷰단   -->
+
+<
+
 <body>
     <div id="content">
-    	
         <div class="reserve">
-        	결제 성공 
+        <span id="reserve">결제가 성공적으로 완료 되었습니다.</span><br/><br/>
+       <span style="font-size: 18pt;">이용해 주셔서 감사합니다.</span><br/><br/><br/>
         </div>
+        
+        
+           <div>
+      <span class="spanBtn homeBtn"><a href="<%= ctxPath%>/main.bc"; style="color: white;">홈으로 돌아가기</a></span>&nbsp;&nbsp;&nbsp;
 
     </div>
 

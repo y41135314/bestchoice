@@ -82,12 +82,21 @@ public class DwsController {
 	
 	
 	
-	@RequestMapping(value="/pay/reserveSuccess.bc")
-	public String reserveSuccess(HttpServletRequest request, Model model  ) {
+	@RequestMapping(value="/pay/reserveSuccess.bc",method={RequestMethod.POST})
+	public String reserveSuccess(HttpServletRequest request, Model model , DwoReservationVO rvo  ) {
 		HttpSession session = request.getSession();
 		SmhMemberVO loginuser = (SmhMemberVO) session.getAttribute("loginuser"); 
 		
 		DwoReservationVO dwoReservation = new DwoReservationVO();
+		
+		//post 처리방식 ?
+		//reserve.bc  ---->
+		 
+	//	String
+		///결제 완료시
+		
+        
+		
 		
 		String res_paymentstatus = request.getParameter("res_payment1Status"); //예약상태
 		String res_payment = request.getParameter("res_payment");//(0카드/신용 1카카오페이 2네이버)
@@ -134,9 +143,6 @@ public class DwsController {
 //		reservationVO.setResstatus_out_day(endday.substring(0, 4)+"년"+endday.substring(4, 6)+"월"+endday.substring(6, 8)+"일");
 //		
 //		model.addAttribute("reservation", reservationVO );
-		
-		
-		
 		
 		
 		
@@ -192,6 +198,8 @@ public class DwsController {
 	  	    int len = 6;
 	  	    int dupCd = 1;
 	  	    String numStr = SmhRandom.numberGen(len, dupCd);
+	  	    
+	  	    session.setAttribute("numStr", numStr);
 
 	    	//String api_key = "test"; //api key
 	        //String api_secret = "test";  //api secret
