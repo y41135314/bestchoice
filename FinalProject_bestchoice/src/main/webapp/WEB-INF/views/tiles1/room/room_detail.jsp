@@ -34,7 +34,7 @@
 <style type="text/css">
 	
 	#content { border: solid 0px red;
-			   padding-top: 100px;
+			   padding-top: 130px;
 			   width: 1024px;
 			   height: 100%;
 			   clear: both;
@@ -269,6 +269,7 @@
 	.room .pic_info {
 		display: inline-block; 
 		width: 540px;
+		padding-top: 15px;
 	}
 	
 	.room .pic_info .title {
@@ -345,7 +346,7 @@
 	  display: none; /* Hidden by default */
 	  position: fixed; /* Stay in place */
 	  z-index: 10; /* Sit on top */
-	  padding-top: 100px; /* Location of the box */
+	  padding-top: 170px; /* Location of the box */
 	  left: 0;
 	  top: 0;
 	  width: 100%; /* Full width */
@@ -531,24 +532,27 @@
         <!-- Left -->
   		<div class="left">
 			<div class="container" style="width : 500px; margin: 0; padding: 0; display: inline;">
+				
 				<div class="slider slider-for" id="slider-for">
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/1.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/2.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/3.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/4.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/5.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/6.jpg" style="width:100%"></div>
+					<c:forEach var="HotelTotalImageMap" items="${hotelTotalImageList}" begin="0" end="0" step="1">
+					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/${HotelTotalImageMap.hotelimage_filename}" style="width:100%"></div>
+					</c:forEach>
+					<c:forEach var="HotelTotalImageMap" items="${hotelTotalImageList}">
+					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/${HotelTotalImageMap.roomimage_filename}" style="width:100%"></div>
+					</c:forEach>
 				</div>
 			    
 			  	<br/>
 				   
 			    <div class="slider slider-nav" id="slider-nav" style="width:90%; margin: 0 auto;">
-					<div id="slick-current"><img src="<%= ctxPath%>/resources/images/1.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/2.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/3.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/4.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/5.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/6.jpg" style="width:100%"></div>
+					<div id="slick-current">
+						<c:forEach var="HotelTotalImageMap" items="${hotelTotalImageList}" begin="0" end="0" step="1">
+						<img src="<%= ctxPath%>/resources/images/${HotelTotalImageMap.hotelimage_filename}" style="width:100%">
+						</c:forEach>
+					</div>
+					<c:forEach var="HotelTotalImageMap" items="${hotelTotalImageList}">
+					<div><img src="<%= ctxPath%>/resources/images/${HotelTotalImageMap.roomimage_filename}" style="width:100%"></div>
+					</c:forEach>
 				</div>
 				 
 		
@@ -610,7 +614,13 @@
 			<c:if test="${roomInfoList != null}">
 			<c:forEach var="roomInfoMap" items="${roomInfoList}">
 			<div class="room">
-				<div class="pic_view"><img class="pic_view_img" style="width: 380px; height: auto;" src="<%= ctxPath%>/resources/images/1.jpg"/></div>
+				<div class="pic_view">
+					<c:forEach var="roomImageVO" items="${roomImageList}" begin="0" end="2" step="1">
+               			<c:if test="${roomImageVO.fk_room_idx == roomInfoMap.room_idx}">
+                		<img class="pic_view_img" style="width: 380px; height: auto;" src='<%= ctxPath%>/resources/images/${roomImageVO.roomImage_FileName}'>
+                		</c:if>
+	                </c:forEach>
+				</div>
                 <!-- pic_info -->
                 <div class="pic_info">       
                 	<strong class="title">${roomInfoMap.room_name}</strong>
@@ -936,13 +946,21 @@
 		    $(".modal").css("display","none"); 
 		});
 	////////////////////////////////////// book //////////////////////////////////////////////////	
-		
-		/* var cnt = $("ul.dot_txt"). children(".dot_content").length;
-		console.log(cnt);
-		if(cnt=0) {
-			$("ul.dot_txt").css('display', 'hidden');
-		} */
-		
+	/* 	
+		var spatype = $("ul.spatype"). children(".dot_content").length;
+		var servicetype = $("ul.servicetype"). children(".dot_content").length;
+		var themetype = $("ul.themetype"). children(".dot_content").length;
+		console.log(spatype+" "+servicetype+" "+themetype);
+		if(spatype=0) {
+			$("ul.spatype").css('display', 'hidden');
+		}
+		else if(servicetype=0) {
+			$("ul.servicetype").css('display', 'hidden');
+		} 
+		else if(spatype=0) {
+			$("ul.themetype").css('display', 'hidden');
+		} 
+		 */
 	}); // end of $(document).ready()--------------------------------------
 	
 	

@@ -18,6 +18,8 @@ public class KmtDAO {
 	// 아이디 찾아오기
 	public int checkSellerId(String seller_Id) {
 
+		System.out.println("~~~~~ DAO : " + seller_Id); 
+		
 		int n = sqlsession.selectOne("kmtMapper.checkSellerId", seller_Id);
 		return n;
 	}
@@ -120,6 +122,13 @@ public class KmtDAO {
 	public int updateRoomPrice(HashMap<String, String> paraMap) {
 		int n = sqlsession.update("kmtMapper.updateRoomPrice", paraMap);
 		return n;
+	}
+	
+	
+	// Home 에 정보 뿌려주기
+	public List<HashMap<String, String>> getmodifyHome() {
+		
+		return null;
 	}
 
 	

@@ -160,7 +160,12 @@ public class YjuDAO {
 			List<HashMap<String, String>> roomQuantityList = sqlsession.selectList("yjuMapper.getroomQuantity", paraMap);
 			return roomQuantityList;
 		}
-				
+		
+		// 전체(호텔, 방) 이미지 알아오기
+		public List<HashMap<String, String>> getHotelTotalImage(String hotel_idx) {
+			List<HashMap<String, String>> HotelTotalImageList = sqlsession.selectList("yjuMapper.getHotelTotalImage",hotel_idx);
+			return HotelTotalImageList;
+		}
 				
 		// 방이미지 알아오기
 		public List<KmtRoomImageVO> getRoomImage(String hotel_idx) {

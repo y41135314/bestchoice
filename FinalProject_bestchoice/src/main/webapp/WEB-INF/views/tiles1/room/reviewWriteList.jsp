@@ -218,22 +218,6 @@
 				                	</tr>
 				                </table>
 				                <br/>
-				     			<%-- <c:if test="${seqList != null }">
-					     			<c:forEach var="seq" items="${seqList}" varStatus="status">
-					     				<c:if test="${seq} ==">
-				                		<div class="review_update">
-				                			<button type="button" class="gra_left_right_red miniBtn" onClick="javascript:location.href='<%= ctxPath%>/roomReview.bc'">리뷰목록</button>
-											<button type="button" class="gra_left_right_red miniBtn" onClick="javascript:location.href='<%= ctxPath%>/reviewEdit.bc?review_no=${reviewMap.review_no}'">수정</button>
-											<button type="button" class="gra_left_right_red miniBtn" onClick="javascript:location.href='<%= ctxPath%>/reviewDel.bc?review_no=${reviewMap.review_no}'">삭제</button>
-				                		</div>
-				                		</c:if>
-				                		<c:if test="${seq != 0}">
-				                			<div>
-					                			 <button type="button" class="gra_left_right_red" onClick="javascript:location.href='<%= ctxPath%>/reviewWrite.bc?member_idx=${sessionScope.loginuser.member_idx}&seq=${useMyRoomMap.seq}'">리뷰 쓰기</button>
-					                		</div>
-				                		</c:if>
-			                		</c:forEach>
-		          				</c:if> --%>
 		          				
 		          				<c:if test="${seqList != null }">
 		          					<div class="btn${status.index}"></div>
@@ -261,25 +245,19 @@
        		</c:if>
        		
        		<c:if test="${useMyRoomList.isEmpty()}"> <%-- List null 체크하는 방법은 .isEmpty()이다 --%>
-       			<div style="margin: 0 auto; "> 
+       			<div style="margin: 0 auto; padding: 150px 0;"> 
        			<br/><br/>
-       			<span style= "font-size: 50px; font-weight: bold; margin-left: 30px; line-height: 300%;">여기는 어때를 이용해주세요</span>
-       			<img style= "width:28%; float: right;" src="<%= ctxPath%>/resources/images/관리자헤더.png"/>
+       			<span style= "font-size: 40px; font-weight: bold; margin-left: 100px; line-height: 300%;">여기는 어때를 이용해주세요</span>
+       			<img style= "width:20%; float: right; margin-right: 100px;" src="<%= ctxPath%>/resources/images/관리자헤더.png"/>
        			<br/><br/>
        			</div>
        		</c:if>
-       		<input id="reviewCnt" type="text" value=""/>
+       		<input id="reviewCnt" type="hidden" value=""/>
        		
     </div>
     <!-- tab_content-->
     
     <br/><br/>
-    <%-- 페이지바 보여주기 === 
-	<div class="pagination" align="center" style="padding: 40px;">
-		${pagebar}
-	</div> 
-	<br/><br/>
-	--%>
 </div>
 <!-- Content  -->
 

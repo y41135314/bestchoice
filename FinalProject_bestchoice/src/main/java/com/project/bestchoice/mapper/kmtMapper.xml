@@ -9,11 +9,13 @@
 	
 	<!-- 아이디 중복 검사 -->
 	<select id="checkSellerId" parameterType="String" resultType="int">
-		select count(*) from tbl_here_sellerMember where seller_id = #{seller_Id}
+		select count(*) 
+		from tbl_here_sellerMember 
+		where seller_id = #{seller_Id} 
 	</select>
 	
-	<!-- 판매자 회원가입 -->
-	<insert id="registerSeller" parameterType="com.project.kmt.KmtSellerMemberVO">
+		<!-- 판매자 회원가입 -->
+	<insert id="registerSeller" parameterType="com.project.kmt.KmtSellerMemberVO"> 
 		
 		insert into tbl_here_sellerMember 
 		( seller_idx, seller_id, seller_pwd, seller_name, seller_no, seller_regday, seller_phone, seller_mobile, seller_addr 
@@ -21,10 +23,10 @@
 		values ( seq_tbl_here_sellerMember.nextval, #{seller_Id}, #{seller_Pwd}, #{seller_Name}, #{seller_No}
 		, to_date(#{seller_Regday}, 'yyyy-mm-dd' ), #{seller_Phone}, #{seller_Mobile}, #{seller_Addr}
 		, #{seller_Post}, #{seller_RepName}, #{seller_homepage} , sysdate, 1  )
-	</insert>
+	</insert> 
 
 	<!-- 호텔 등록하기 -->
-	<insert id="registerHotel" parameterType="com.project.kmt.KmtHotelInfoVO" >
+	 <insert id="registerHotel" parameterType="com.project.kmt.KmtHotelInfoVO" >
 		
 		insert into tbl_here_hotelInfo 
 		( hotel_idx, hotel_name, hotel_category
@@ -40,7 +42,7 @@
 		#{fk_seller_Id}, sysdate ,#{hotel_Phone},#{hotel_Fax},#{hotel_Email}
 		,#{hotel_GEO_X},#{hotel_GEO_Y} )
 		
-	</insert>
+	</insert> 
 
 	<!-- 입력한 호텔 idx 가져오기  -->
 	<select id="getHotelIdx" parameterType="com.project.kmt.KmtHotelInfoVO" resultType="String">
@@ -75,7 +77,7 @@
 		order by hotel_idx asc
 	</select>
 	
-	<resultMap type="HashMap" id="roomPriceMap">
+		<resultMap type="HashMap" id="roomPriceMap">
 		<result property="room_idx" 	column="room_idx" 	javaType="String" />
 		<result property="room_name" 	column="room_name" 	javaType="String" />
 		<result property="fk_hotel_idx" 	column="fk_hotel_idx" 	javaType="String" />
@@ -102,7 +104,7 @@
 
 
 	<!--  -->
-	<resultMap type="HashMap" id="hotelListMap">
+ 	<resultMap type="HashMap" id="hotelListMap">
 		<result property="hotel_idx" 	column="hotel_idx" 	javaType="String" />
 		<result property="hotel_name" 	column="hotel_name" 	javaType="String" />
 	</resultMap>
@@ -113,7 +115,7 @@
 	
 	
 	
-	<insert id="roomRegister" parameterType="HashMap">
+ 	<insert id="roomRegister" parameterType="HashMap">
 		insert into tbl_here_roomInfo ( room_idx, room_name, room_checkintime, room_checkouttime, room_person, room_addperson, room_addpercharge, fk_hotel_idx )
 		values( seq_tbl_here_roomInfo.nextval, #{room_name}, #{ROOM_CHECKINTIME}, #{ROOM_CHECKOUTTIME}, #{ROOM_PERSON}, #{ROOM_ADDPERSON}
 		, #{ROOM_ADDPERCHARGE} , #{fk_hotel_idx} )
@@ -190,10 +192,11 @@
 	</insert>
 	
 	<!-- 방 가격 update 하기 -->
-	<update id="updateRoomPrice" parameterType="HashMap">
+ 	<update id="updateRoomPrice" parameterType="HashMap">
 		update tbl_here_roomPrice set roomprice = #{roomprice} , roomprice_quantity = #{roomprice_quantity}
 		where roomprice_date = to_date(#{logdate},'yyyy-mm-dd') and roomprice_seqno = #{ roomprice_seqno }
-	</update>
+	</update> 
+
 	
 </mapper>
 

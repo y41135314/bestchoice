@@ -17,7 +17,9 @@ public class KmtService {
 
 	// 아이디 가져오기
 	public int checkSellerId(String seller_Id) {
-
+		
+		System.out.println("~~~~~ Service : " + seller_Id); 
+		
 		int n = dao.checkSellerId(seller_Id);
 		return n;
 	}
@@ -130,7 +132,12 @@ public class KmtService {
 		return n;
 	}
 
-	
+	public String modifyHome(HashMap<String, String> paraMap) {
+		
+		return null;
+	}
+
+	// Home 에 정보 뿌려주기
 	
 	
 	

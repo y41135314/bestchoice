@@ -1583,17 +1583,20 @@ public class PsbController {
 		List<HashMap<String,Object>> paraMapList = service.sales_gender();
 	    for ( HashMap<String, Object> map : paraMapList ) { 
 			
-	    	if ( map.get("gender").equals("1")) {
-	    		mav.addObject("M_RCount",map.get("RCount"));
-	    		mav.addObject("M_totalPrice",map.get("totalPrice"));
-	    		mav.addObject("M_AVG",map.get("AVG"));
+	    	if( !map.get("gender").equals("0") ) {
+	    		if ( map.get("gender").equals("1")) {
+		    		mav.addObject("M_RCount",map.get("RCount"));
+		    		mav.addObject("M_totalPrice",map.get("totalPrice"));
+		    		mav.addObject("M_AVG",map.get("AVG"));
+		    	}
+		    	
+		    	if ( map.get("gender").equals("2")) {
+		    		mav.addObject("F_RCount",map.get("RCount"));
+		    		mav.addObject("F_totalPrice",map.get("totalPrice"));
+		    		mav.addObject("F_AVG",map.get("AVG"));
+		    	}
 	    	}
 	    	
-	    	if ( map.get("gender").equals("2")) {
-	    		mav.addObject("F_RCount",map.get("RCount"));
-	    		mav.addObject("F_totalPrice",map.get("totalPrice"));
-	    		mav.addObject("F_AVG",map.get("AVG"));
-	    	}
 		}
 		
 	    // 회원 매출액 - 연령대
@@ -1603,49 +1606,51 @@ public class PsbController {
 		int Avg70 = 0;
 		
 	    for ( HashMap<String, Object> map : paraMapList2 ) { 
-			
-	    	if ( map.get("age").equals("10")) {
-	    		mav.addObject("RCount_10",map.get("RCount"));
-	    		mav.addObject("totalPrice_10",map.get("totalPrice"));
-	    		mav.addObject("AVG_10",map.get("AVG"));
-	    		
+	    	if(!map.get("age").equals("0")) {
+	    		if ( map.get("age").equals("10")) {
+		    		mav.addObject("RCount_10",map.get("RCount"));
+		    		mav.addObject("totalPrice_10",map.get("totalPrice"));
+		    		mav.addObject("AVG_10",map.get("AVG"));
+		    		
+		    	}
+		    	
+		    	if ( map.get("age").equals("20")) {
+		    		mav.addObject("RCount_20",map.get("RCount"));
+		    		mav.addObject("totalPrice_20",map.get("totalPrice"));
+		    		mav.addObject("AVG_20",map.get("AVG"));
+		    	}
+		    	
+		    	if ( map.get("age").equals("30")) {
+		    		mav.addObject("RCount_30",map.get("RCount"));
+		    		mav.addObject("totalPrice_30",map.get("totalPrice"));
+		    		mav.addObject("AVG_30",map.get("AVG"));
+		    	}
+		    	
+		    	if ( map.get("age").equals("40")) {
+		    		mav.addObject("RCount_40",map.get("RCount"));
+		    		mav.addObject("totalPrice_40",map.get("totalPrice"));
+		    		mav.addObject("AVG_40",map.get("AVG"));
+		    	}
+		    	
+		    	if ( map.get("age").equals("50")) {
+		    		mav.addObject("RCount_50",map.get("RCount"));
+		    		mav.addObject("totalPrice_50",map.get("totalPrice"));
+		    		mav.addObject("AVG_50",map.get("AVG"));
+		    	}
+		    	
+		    	if ( map.get("age").equals("60")) {
+		    		mav.addObject("RCount_60",map.get("RCount"));
+		    		mav.addObject("totalPrice_60",map.get("totalPrice"));
+		    		mav.addObject("AVG_60",map.get("AVG"));
+		    	}
+		    	
+		    	if ( Integer.parseInt((String) map.get("age")) >= 70  ) {
+		    		Count70 += (int)map.get("RCount"); 
+		    		Price70 += (int)map.get("totalPrice");
+		    		Avg70 += (int)map.get("AVG");
+		    	}
 	    	}
 	    	
-	    	if ( map.get("age").equals("20")) {
-	    		mav.addObject("RCount_20",map.get("RCount"));
-	    		mav.addObject("totalPrice_20",map.get("totalPrice"));
-	    		mav.addObject("AVG_20",map.get("AVG"));
-	    	}
-	    	
-	    	if ( map.get("age").equals("30")) {
-	    		mav.addObject("RCount_30",map.get("RCount"));
-	    		mav.addObject("totalPrice_30",map.get("totalPrice"));
-	    		mav.addObject("AVG_30",map.get("AVG"));
-	    	}
-	    	
-	    	if ( map.get("age").equals("40")) {
-	    		mav.addObject("RCount_40",map.get("RCount"));
-	    		mav.addObject("totalPrice_40",map.get("totalPrice"));
-	    		mav.addObject("AVG_40",map.get("AVG"));
-	    	}
-	    	
-	    	if ( map.get("age").equals("50")) {
-	    		mav.addObject("RCount_50",map.get("RCount"));
-	    		mav.addObject("totalPrice_50",map.get("totalPrice"));
-	    		mav.addObject("AVG_50",map.get("AVG"));
-	    	}
-	    	
-	    	if ( map.get("age").equals("60")) {
-	    		mav.addObject("RCount_60",map.get("RCount"));
-	    		mav.addObject("totalPrice_60",map.get("totalPrice"));
-	    		mav.addObject("AVG_60",map.get("AVG"));
-	    	}
-	    	
-	    	if ( Integer.parseInt((String) map.get("age")) >= 70  ) {
-	    		Count70 += (int)map.get("RCount"); 
-	    		Price70 += (int)map.get("totalPrice");
-	    		Avg70 += (int)map.get("AVG");
-	    	}
 		}
 	    mav.addObject("RCount_70",Count70);
 		mav.addObject("totalPrice_70",Price70);
