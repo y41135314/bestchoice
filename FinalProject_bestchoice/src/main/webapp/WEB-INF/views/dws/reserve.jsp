@@ -199,7 +199,7 @@
 
 				sendSms(phone);
 
-			}
+			}///end of sendAuthCode;
 			
 	       //확인 (인증)
 			function sendCode(){

@@ -64,5 +64,5 @@ public class DwsService {
 		return dao.getCouponList(member_idx);
 	}
 
-	
+	//커밋
 }
