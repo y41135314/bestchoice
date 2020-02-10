@@ -35,9 +35,11 @@
 				  IMP.request_pay(
 					  $("form[name=payForm]").serializeObject(), function (rsp) { // callback
 					  if (rsp.success) {
-					  $("input[name=buyer_name]").val($("input[name=booker]").val());	
+						  
+						  $("input[name=buyer_name]").val($("input[name=booker]").val());	
 						  var resPoint = '0'// 적립금 사용내역 일단 0 으로 처리해 두었습니다. 
-						  var resPayment = $("input[name=pay_method]").val();
+						  var resPayment = $("input[name=resPayment]").val();
+						///원본  var resPayment = $("input[name=pay_method]").val();
 						  var resPaymentStatus = '1'; // 결제 상태 (0:예약전 1: 결제 o 3:취소)
 						  var resNumber = $("input[name=merchant_uid]").val();
 						  var amount = $("input[name=amount]").val();
@@ -49,7 +51,13 @@
 						  }else if( payMethod =='naverco'){
 							  resPayment = '2'
 						  }
-						  location.href="/pay/reserveSuccess.bc?res_paymentStatus="+resPaymentStatus+"&res_payment="+resPayment+"&res_point="+resPoint+"&res_number="+resNumber+"&amount="+amount+"&mpointCash="+mpointCash;
+						  
+						  $("input[name=res_payment]").val(resPayment);
+						  
+						  var frm = document.payForm;
+						  frm.method="POST";
+						  frm.action="<%= request.getContextPath()%>/pay/reserveSuccess.bc";
+						  frm.submit();
 						  
 				    } else {
 				       alert(rsp.error_msg)
@@ -133,6 +141,9 @@
  				$("#mpointCash").val($("input[name=mpointCash]").val().replace(/,/g,""))
 			});
 			
+			
+			
+			
 		}); // end of document ready ----------------------------------------------------------------
 		
 		
@@ -188,14 +199,23 @@
 
 				sendSms(phone);
 
-			}
+			}///end of sendAuthCode;
 			
 	       //확인 (인증)
 			function sendCode(){
 				var  certification = $("#certification").val();
-			     alert("휴대폰인증이 완료되었습니다.");
 			     
-			     return numberGen;
+				var numStr = "${ sessionScope.numStr}";
+				
+
+				if(numStr == certification ) {   //세션값이랑  인증번호값 확인
+					alert("인증에 성공하였습니다.");
+					
+				} else {
+					alert("인증에 실패하였습니다.");
+				}
+				
+				
 			}
 			 
 			
@@ -265,7 +285,7 @@
 	        <input type="hidden" name="buyer_name" value="${member.name}"> <!-- 구매자 -->
 	        <input type="hidden" name="buyer_tel" value="${member.hp1}-${member.hp2}-${member.hp3}"> <!--구매자 폰번호-->
 	        <input type="hidden" name="amount" value="${reservation.res_totalprice}"><!--결제금액-->
-		</form>
+		
 			<input type="hidden" name="mpointCash" value="${reservation.mpointCash}">
 			<input type="hidden" name="member_idx" value="${ sessionScope.loginuser.member_idx }">
             <div class="reserve-payment">
@@ -306,18 +326,24 @@
                     <label for="phone">적립금 조회</label>
                     <div class="input-element add-btn">
                         <input type="text" id="point" readonly="readonly"/>
-                        <button id="userPoint">조회</button>
+                        <button id="userPoint" type="button">조회</button>
                     </div>
                 </div>
                 <div class="input-wrap" style="float: right; width: 500px;">
                     <label for="phone">적립금 사용</label>
                     <div class="input-element add-btn">
 	     				<input type="text" id="mpointCash" onKeyup="this.value=this.value.replace(/[^0-9]/g,'');" />
-						<button id="mpointCashBtn">적립금사용</button>
+						<button id="mpointCashBtn" type="button">적립금사용</button>
                     </div> 
                 </div>
                 <!-- 적립금   -->
                 
+                
+                <!--  이벤트 조회 그냥 만들기만 할것 -->
+               <!--  <p>
+                    <button id="couponBtn">사용 가능 쿠폰 0장</button>
+                    <span class="val" id="couponVal"></span>
+                </p>                  -->
                 <!--이벤트  조회-->
                 
                 <!-- s:개발, 비회원시 보여지는 영역 -->
@@ -356,7 +382,7 @@
                     </table>
                 </div> -->
                 <!-- //e:개발, 로그인시 보여지는 영역 -->
-                <p class="tit tit-small">결제수단 선택</br></br></p>
+                <p class="tit tit-small">결제수단 선택</p>
                 <select name="methodchoice" id="payMethod">
                 	<option value="" selected="selected">결제수단 선택</option>
                     <option value="card">카드 결제</option>
@@ -392,10 +418,12 @@
                         <li>결제완료 후 <span>예약자 이름</span>으로 바로 <span>체크인</span> 하시면 됩니다.</li>
                     </ul>
                 </div>
-                <button id="payBtn">결제하기</button>
+                <button id="payBtn" type="button">결제하기</button>
             </div>
+            
+            </form>
         </div>
-
+	
     </div>
 
 </body>

@@ -62,4 +62,5 @@ public class DwsDAO {
 		return sqlsession.selectList("dwsMapper.getCouponList", member_idx);
 	}
 	
+	//커밋
 }

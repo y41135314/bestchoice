@@ -3,6 +3,7 @@
 <!-- ====  mapper 기본설정 ==== -->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!--  커밋때문에 주석문한거라 신경안써도 됩니다., -->
 <!-- 루트 엘리먼트 & 네임 스페이스 설정 ( 프로젝트 전체 내에서 유일해야 한다.) -->
 <!-- namespace 는 보통 파일명 ( 프로젝트 내에서 고유해야 한다. ) -->
 <mapper namespace="dwsMapper" >

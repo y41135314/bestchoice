@@ -21,7 +21,7 @@ public class DwoReservationVO {
 	String res_totalprice;//최종결제금액  
 	String res_point;//적립금 사용 또는 적립내역    
 	String res_paymentstatus; //예약상태
-	String finish_paymentstatus;//결제 상태 (0:예약전 1: 결제 o )
+	String finish_paymentstatus;//결제 상태 (0:예약전  1: 결제 o )
 	String finish_addpoint;//추가적립금
 	String res_paymentDay; //결제일
 	String mpointCash; //사용적립금
@@ -204,7 +204,7 @@ public class DwoReservationVO {
 		this.endday = endday;
 	}
 	
-	
+	//커밋 테스
 	
 	
 }
