@@ -204,18 +204,18 @@
 		from
 		(
 		select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
-		        trunc(age,-1) AS age,
+		        trunc(age,-1) AS age, birthday,
 		        mstatus, registerday, lastlogindate, lastpwdchangedate
 		from 
 		    (
-		    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+		    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, birthday,
 		            extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
 		            mstatus,to_char(registerday,'yyyymmdd') AS registerday, lastlogindate, lastpwdchangedate
 		    from tbl_here_member
 		    )
 		  
 	 	<if test="ageArr == null">
-			where trunc(age,-1) in (10,20,30,40,50,60,70,80,90)
+			where trunc(age,-1) in (10,20,30,40,50,60,70,80,90) or birthday is null 
 		</if>
 		<if test="ageArr != null">
 			where trunc(age,-1) in (
@@ -249,32 +249,32 @@
     
       <select id="memberListWithPaging"  parameterType="HashMap" resultType="com.project.smh.SmhMemberVO">
    		select rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
-                    age, 
+                    age, birthday,
                     mstatus, registerday, lastlogindate, lastpwdchangedate, totalPrice, totalCount
         from 
         (
            select  rownum AS rno, member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
-                    age, 
+                    age, birthday,
                     mstatus, registerday, lastlogindate, lastpwdchangedate, totalPrice, totalCount
             from 
             (
                 select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
-                        age, 
+                        age, birthday,
                         mstatus, to_char(registerday,'yyyy-mm-dd') AS registerday, lastlogindate, lastpwdchangedate, nvl(totalPrice,0) AS totalPrice, nvl(totalCount,0) AS totalCount
                 from
                 (
                 select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
-                       age, 
+                       age, birthday,
                         mstatus, registerday, lastlogindate, lastpwdchangedate
                 from 
                     (
-                    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, 
+                    select member_idx, email, pwd, name, nickname, hp1,hp2, hp3, gender, birthday,
                             extract(year from sysdate) - to_number(substr(birthday,1,4)) AS age,
                             mstatus,registerday, lastlogindate, lastpwdchangedate
                     from tbl_here_member
                     )
 	 	<if test="ageArr == null">
-					where trunc(age,-1) in (10,20,30,40,50,60,70,80,90)
+					where trunc(age,-1) in (10,20,30,40,50,60,70,80,90) or birthday is null 
 		</if>
 		<if test="ageArr != null">
 					where trunc(age,-1) in (
@@ -340,6 +340,7 @@
 		( 
 		   select  trunc(extract(year from sysdate) - to_number(substr(birthday,1,4)),-1) AS age, gender
 		   from tbl_here_member
+		   where birthday is not null 
 		) V
 		group by cube(age, gender)
 		order by age, gender
@@ -359,6 +360,7 @@
 		( 
 		   select  trunc(extract(year from sysdate) - to_number(substr(birthday,1,4)),-1) AS age, gender, to_char(registerday,'yyyy-mm') AS registerday
 		   from tbl_here_member
+		   where birthday is not null 
 		) V
 		group by cube(registerday, gender, age)
 		order by age, registerday, gender
@@ -438,7 +440,7 @@
 	</resultMap>
 	
 	<select id="sales_gender" resultMap="sales_genderMap">
-		select V.gender, totalPrice, RCount,  totalPrice/RCount AS AVG
+		select nvl(V.gender,0) AS gender, nvl(totalPrice,0) AS totalPrice, nvl(RCount, 0) AS RCount,  nvl(totalPrice/RCount , 0) AS AVG
 		from 
 		    (
 		    select gender,  
@@ -468,7 +470,7 @@
 	</resultMap>
 	
 	<select id="sales_age" resultMap="sales_agerMap">
-		select V.age, nvl(totalPrice,0) AS totalPrice, nvl(RCount,0) AS RCount,  nvl(totalPrice/RCount, 0) AS AVG
+		select nvl(V.age,0) AS age , nvl(totalPrice,0) AS totalPrice, nvl(RCount,0) AS RCount,  nvl(totalPrice/RCount, 0) AS AVG
 		from 
 		    (
 		    select trunc(extract(year from sysdate) - to_number(substr(birthday,1,4)),-1) AS age,
