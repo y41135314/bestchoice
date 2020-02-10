@@ -11,7 +11,7 @@
 	<resultMap type="HashMap" id="getUseMyRoomMap">
 		<result property="hotel_Name" 			column="hotel_Name" 			javaType="String" />
 		<result property="hotelImage_FileName" 	column="hotelImage_FileName" 	javaType="String" />
- 		<result property="hotel_category" 			column="hotel_category" 			javaType="int" />
+ 		<result property="hotel_category" 		column="hotel_category" 			javaType="String" />
  		<result property="hotel_Addr" 			column="hotel_Addr" 			javaType="String" />
  		<result property="room_name" 			column="room_name" 				javaType="String" />
  		<result property="finish_date" 			column="finish_date" 			javaType="String" />
@@ -22,7 +22,10 @@
  		<result property="fk_member_idx" 		column="fk_member_idx" 			javaType="int" />
 	</resultMap>
 	<select id="getUseMyRoom" resultMap="getUseMyRoomMap" parameterType="String">
-		select H.hotel_Name AS hotel_Name, G.hotelImage_FileName AS hotelImage_FileName, H.hotel_category AS hotel_category
+		select H.hotel_Name AS hotel_Name, G.hotelImage_FileName AS hotelImage_FileName
+		,decode(H.hotel_category, 1 , '특1급'
+              , 2 , '특급'
+              , 3 , '일반') AS hotel_category
 		     , H.hotel_Addr1||' '||H.hotel_Addr2||' '||H.hotel_Addr3 AS hotel_Addr
 		     , O.room_name, to_char(F.finish_date-1,'yyyy/mm/dd') AS finish_date
              , R.res_totalPrice AS res_totalPrice

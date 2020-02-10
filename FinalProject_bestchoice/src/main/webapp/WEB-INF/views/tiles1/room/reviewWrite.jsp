@@ -142,9 +142,9 @@
          	</tr>
 		</table>
 		
-		<input id="seq" name="seq" type="text" value="${ReviewWriteMap.seq}"/>
+		<input id="seq" name="seq" type="hidden" value="${ReviewWriteMap.seq}"/>
 		<button type="button" id="btnWrite" class="gra_left_right_red">리뷰등록</button> 
-	
+		
 	</form>
 </div>
 <br/><br/><br/>

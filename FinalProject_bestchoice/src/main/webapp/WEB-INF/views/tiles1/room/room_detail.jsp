@@ -586,6 +586,11 @@
 						 3층 전 층을 활용한 피트니스클럽이 인상적이며, 4층 전면에 위치한 정원이 매우 아름다운 호텔입니다</div>
                 </div>
 				<!-- comment -->
+				
+				<!-- chatting -->
+	            <div style="width: 60%; margin: 0 auto; padding: 30px;">
+	            <button type="button" class="btn btn-info active" style="width: 100%; height: 40px;" onclick="openChatting()"><i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;1대 1 문의 </button>
+	            </div>
 			</div>
         </div>
         <!-- Right -->
@@ -963,7 +968,15 @@
 		 */
 	}); // end of $(document).ready()--------------------------------------
 	
-	
+	// 1대1 문의 클릭
+   function openChatting(){
+      //console.log("member_idx:"+member_idx);
+      var url = "<%= ctxPath%>/chatWithseller.bc";
+      
+      // 팝업창 띄우기
+      window.open(url, "Chatting",
+                "width=300px, height=380px, top=400px, left=1200px");
+   }// end of function openChatting()-------------
 	
 	
 	

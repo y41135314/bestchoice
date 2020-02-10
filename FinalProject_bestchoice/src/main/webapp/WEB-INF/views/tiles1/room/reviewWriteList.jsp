@@ -24,7 +24,7 @@
 <style type="text/css">
 	
 	#content { border: solid 0px red;
-			   padding-top: 100px;
+			   padding-top: 130px;
 			   width: 1024px;
 			   height: 100%;
 			   clear: both;
@@ -200,7 +200,7 @@
 						<div class="container" style="width : 500px; margin: 0; padding: 0; display: inline;">
 							<!-- Info -->
 			            	<div class="info">
-				                <span class="build_badge" style="color: rgba(255,255,255,1); background-color: rgba(103,101,201,1);">${useMyRoomMap.hotel_Grade}성급</span>
+				                <span class="build_badge" style="color: rgba(255,255,255,1); background-color: rgba(103,101,201,1);">${useMyRoomMap.hotel_category}</span>
 				                <h2 id="hotelName">${useMyRoomMap.hotel_Name}</h2>
 				                <p class="address">${useMyRoomMap.hotel_Addr}</p>
 				                <table>
@@ -239,20 +239,28 @@
 				<!-- pic_info -->
            
             </div>
-
-            <input class="count count${status.index} ${status.index}" type="text" value="${useMyRoomMap.seq}"/>
+			
+			<form name="gobackURLFrm">
+            <input class="count count${status.index} ${status.index}" type="hidden" value="${useMyRoomMap.seq}"/>
+            </form> 
             </c:forEach>
        		</c:if>
        		
        		<c:if test="${useMyRoomList.isEmpty()}"> <%-- List null 체크하는 방법은 .isEmpty()이다 --%>
-       			<div style="margin: 0 auto; padding: 150px 0;"> 
-       			<br/><br/>
-       			<span style= "font-size: 40px; font-weight: bold; margin-left: 100px; line-height: 300%;">여기는 어때를 이용해주세요</span>
-       			<img style= "width:20%; float: right; margin-right: 100px;" src="<%= ctxPath%>/resources/images/관리자헤더.png"/>
-       			<br/><br/>
+       			<div style="margin: 0 auto; padding: 80px 0;"> 
+	       			<br/><br/>
+	       			<span style= "font-size: 40px; font-weight: bold; line-height: 800%;">여기는 어때를 이용해주세요</span>
+	       			<img style= "width:50%; float: right;" src="<%= ctxPath%>/resources/images/리뷰목록.png"/>
+	       			<br/><br/>
+	       			<div class='info' style="display: inline-block; width: 30%;">
+	       			<button type='button' class='gra_left_right_red miniBtn reviewList' onClick='goReviewList()'>리뷰목록</button>
+	       			</div>
        			</div>
        		</c:if>
        		<input id="reviewCnt" type="hidden" value=""/>
+       		
+       		
+       		
        		
     </div>
     <!-- tab_content-->
@@ -310,7 +318,7 @@
 					
 				}
 				else if(flag2){
-					html = "<div style='margin: 13px;'><button type='button' class='gra_left_right_red reviewWrite' onClick='javascript:location.href='<%= ctxPath%>/reviewWrite.bc?member_idx=${sessionScope.loginuser.member_idx}&seq=${useMyRoomMap.seq}''>리뷰 쓰기</button></div>";
+					html = "<div style='margin: 13px;'><button type='button' class='gra_left_right_red reviewWrite'>리뷰 쓰기</button></div>";
 					$(".btn${status1.index}").html(html);
 					
 				}
@@ -327,7 +335,6 @@
 			var seqClass = "."+lastChar+"";
 			
 			var seq = $(seqClass).val();
-			alert(seq);
 			window.location.href="<%= ctxPath%>/reviewEdit.bc?seq="+seq+"";
 		});	
 		
@@ -341,7 +348,6 @@
 			var seqClass = "."+lastChar+"";
 			
 			var seq = $(seqClass).val();
-			alert(seq);
 			window.location.href="<%= ctxPath%>/reviewDel.bc?seq="+seq+"";
 		});	
 		
@@ -354,7 +360,6 @@
 			var seqClass = "."+lastChar+"";
 			
 			var seq = $(seqClass).val();
-			alert(seq);
 			window.location.href="<%= ctxPath%>/reviewWrite.bc?member_idx=${sessionScope.loginuser.member_idx}&seq="+seq+"";
 		});	
 		
@@ -362,7 +367,7 @@
 	
 	// 리뷰목록 가기
 	function goReviewList(){
-		window.location.href="<%= ctxPath%>/roomReview.bc";
+		window.location.href="${sessionScope.gobackReviewURL}";
 	}
 	
 	

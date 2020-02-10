@@ -7,7 +7,9 @@
 // test_bestchoice
 	if(${n==1}) {
 		alert("글수정 성공!!!");
-		location.href="<%= ctxPath%>/roomReview.bc";
+		<%-- location.href="<%= ctxPath%>/roomReview.bc"; --%>
+		location.href="${sessionScope.gobackReviewURL}";
+		
 	}
 	else {
 		alert("글수정 실패ㅠㅠ");
