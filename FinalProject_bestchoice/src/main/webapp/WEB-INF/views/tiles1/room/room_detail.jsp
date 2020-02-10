@@ -714,7 +714,7 @@
 							    	<section>
 								    	<strong>선택날짜</strong>
 								    	<ul class="dot_txt">
-								    		<li><fmt:formatDate value="${startday}" pattern="yyyy.MM.dd"/> ~ <fmt:formatDate value="${endday}" pattern="yyyy.MM.dd"/></li>
+								    		<li>${startday} ~ ${endday}</li>
 								    	</ul>
 							    	</section>
 							    	<br/><br/>
