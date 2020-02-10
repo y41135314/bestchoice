@@ -5,8 +5,505 @@
 
 <!-- 루트 엘리먼트 & 네임 스페이스 설정 ( 프로젝트 전체 내에서 유일해야 한다.) -->
 <!-- namespace 는 보통 파일명 ( 프로젝트 내에서 고유해야 한다. ) -->
-<mapper namespace="yjuMapper" >
-
-
+<mapper namespace="yjuMapper" > 
+	
+	<!-- 결제완료 한사람만 리뷰 작성하기 oo -->
+	<resultMap type="HashMap" id="getUseMyRoomMap">
+		<result property="hotel_Name" 			column="hotel_Name" 			javaType="String" />
+		<result property="hotelImage_FileName" 	column="hotelImage_FileName" 	javaType="String" />
+ 		<result property="hotel_Grade" 			column="hotel_Grade" 			javaType="int" />
+ 		<result property="hotel_Addr" 			column="hotel_Addr" 			javaType="String" />
+ 		<result property="room_name" 			column="room_name" 				javaType="String" />
+ 		<result property="finish_date" 			column="finish_date" 			javaType="String" />
+ 		<result property="res_totalPrice" 		column="res_totalPrice" 		javaType="int" />
+ 		<result property="seq" 					column="seq" 					javaType="int" />
+ 		<result property="fk_res_number" 		column="fk_res_number" 			javaType="int" />
+ 		<result property="fk_room_idx" 			column="fk_room_idx" 			javaType="int" />
+ 		<result property="fk_member_idx" 		column="fk_member_idx" 			javaType="int" />
+	</resultMap>
+	<select id="getUseMyRoom" resultMap="getUseMyRoomMap" parameterType="String">
+		select H.hotel_Name AS hotel_Name, G.hotelImage_FileName AS hotelImage_FileName, H.hotel_Grade AS hotel_Grade
+		     , H.hotel_Addr1||' '||H.hotel_Addr2||' '||H.hotel_Addr3 AS hotel_Addr
+		     , O.room_name, to_char(F.finish_date-1,'yyyy/mm/dd') AS finish_date
+             , R.res_totalPrice AS res_totalPrice
+		     , F.seq AS seq, F.fk_res_number AS fk_res_number, R.fk_room_idx AS fk_room_idx, R.fk_member_idx AS fk_member_idx
+		from TBL_HERE_FINISH F JOIN tbl_here_reservation R
+		ON F.fk_res_Number = R.res_Number
+		JOIN tbl_here_roomInfo O
+		ON R.fk_room_idx = O.room_idx
+		JOIN tbl_here_hotelInfo H
+		ON O.fk_hotel_idx = H.hotel_idx
+		JOIN tbl_here_hotelImage G
+		ON G.fk_hotel_idx = H.hotel_idx
+		where R.fk_member_idx = #{member_idx} and (TRUNC(sysdate - F.finish_date) between 0 and 12)
+		and F.finish_paymentStatus = 1
+		order by F.finish_date desc
+	</select>
+	
+	<!-- 작성할 리뷰 번호 알아오기 oo-->
+	<select id="getReviewseq" resultType="int">
+		select seq_here_review_no.nextval
+		from dual
+	</select>
+	
+	<!-- 리뷰테이블에 insert oo-->
+	<insert id="addReview" parameterType="HashMap">
+		insert into tbl_here_review(review_no, fk_seq, title, content, grade0, grade1, grade2, grade3, grade4, registerday, status) 
+		values(#{review_no}, #{seq}, #{title}, #{content}, #{grade0}, #{grade1}, #{grade2}, #{grade3}, #{grade4}, default, default)  
+	</insert>
+	
+	<!-- 리뷰이미지테이블에 insert oo-->
+    <insert id="addReviewimage" parameterType="HashMap">
+    	insert into tbl_here_review_img(review_img_no , fk_review_no, wasImgname, orgImgname) 
+		values(seq_here_review_img_no.nextval, #{fk_review_no}, #{wasImgname}, #{orgImgname})  
+    </insert>
+	
+	<!-- 리뷰테이블 select oo-->
+	<resultMap type="HashMap" id="getreviewMap">
+		<result property="review_no" 	column="review_no" 		javaType="int" />
+ 		<result property="title" 		column="title" 			javaType="String" />
+ 		<result property="content" 		column="content" 		javaType="String" />
+ 		<result property="registerday" 	column="registerday" 	javaType="String" />
+ 		<result property="grade0" 		column="grade0" 		javaType="int" />
+ 		<result property="grade1" 		column="grade1" 		javaType="int" />
+ 		<result property="grade2" 		column="grade2" 		javaType="int" />
+ 		<result property="grade3" 		column="grade3" 		javaType="int" />
+ 		<result property="grade4" 		column="grade4" 		javaType="int" />
+ 		<result property="allGrade" 	column="allGrade" 		javaType="double" />
+ 		<result property="name" 	column="name" 		javaType="String" />
+ 		<result property="room_name" 	column="room_name" 		javaType="String" />
+	</resultMap>
+	<select id="getreview" resultMap="getreviewMap" parameterType="HashMap">
+		select review_no, fk_seq, title, content, registerday, grade0, grade1, grade2, grade3, grade4, allGrade, fk_room_idx, name, room_name
+		from(
+            select rownum AS rno, review_no, fk_seq, title, content, registerday, grade0, grade1, grade2, grade3, grade4, allGrade, fk_room_idx, name, room_name
+            from(
+                select review_no, fk_seq, title, content, to_char(V.registerday,'yyyy/mm/dd') AS registerday
+                     , grade0, grade1, grade2, grade3, grade4
+                     , round((grade0+grade1+grade2+grade3+grade4)/5,1) AS allGrade
+                     , R.fk_room_idx AS fk_room_idx, name, I.room_name AS room_name
+                from tbl_here_review V JOIN tbl_here_finish F
+                ON fk_seq = seq
+                JOIN tbl_here_reservation R
+                ON fk_res_Number = res_Number
+                JOIN tbl_here_roomInfo I
+                ON fk_room_idx = room_idx
+                JOIN tbl_here_member M
+                ON R.fk_member_idx = M.member_idx
+                where mstatus = 1 and V.status = 1 and R.fk_hotel_idx = #{hotel_idx}
+                order by review_no desc
+            )V
+		)T
+		where rno between #{startRno} and #{endRno}
+	</select>
+	
+	<!-- 리뷰이미지테이블 select oo-->
+	<resultMap type="HashMap" id="getreviewImageMap">
+		<result property="review_no" 		column="review_no" 		javaType="int" />
+ 		<result property="title" 			column="title" 			javaType="String" />
+ 		<result property="content" 			column="content" 		javaType="String" />
+ 		<result property="registerday" 		column="registerday" 	javaType="String" />
+		<result property="review_img_no"	column="review_img_no" 	javaType="int" />
+ 		<result property="fk_review_no"		column="fk_review_no" 	javaType="int" />
+		<result property="orgImgname" 		column="orgImgname" 	javaType="String" />
+ 		<result property="wasImgname" 		column="wasImgname" 	javaType="String" />
+	</resultMap>
+	<select id="getreviewImage" resultMap="getreviewImageMap">
+		select review_no, title, content
+		     , to_char(registerday, 'yyyy/mm/dd') AS registerday
+		     , I.review_img_no AS review_img_no
+		     , I.fk_review_no AS fk_review_no
+		     , I.orgImgname AS orgImgname
+		     , I.wasImgname AS wasImgname
+		from tbl_here_review R JOIN tbl_here_review_img I  
+		ON R.review_no = I.fk_review_no
+		where R.status = 1
+		order by review_no desc, review_img_no desc
+	</select>
+	
+	<!-- 리뷰평점테이블 select  -->
+	<resultMap type="HashMap" id="getreviewGradeMap">
+		<result property="grade0" 		column="grade0" 		javaType="int" />
+ 		<result property="grade1" 		column="grade1" 		javaType="int" />
+ 		<result property="grade2" 		column="grade2" 		javaType="int" />
+ 		<result property="grade3" 		column="grade3" 		javaType="int"  />
+		<result property="grade4" 		column="grade4" 		javaType="int" />
+ 		<result property="allGrade" 	column="allGrade" 		javaType="double" />
+		<result property="allReviewNum" column="allReviewNum" 	javaType="int" />
+	</resultMap>
+	<select id="getreviewGrade" resultMap="getreviewGradeMap" parameterType="String">
+		select nvl(round(avg(grade0),1),0) AS grade0
+		      ,nvl(round(avg(grade1),1),0) AS grade1
+		      ,nvl(round(avg(grade2),1),0) AS grade2
+		      ,nvl(round(avg(grade3),1),0) AS grade3
+		      ,nvl(round(avg(grade4),1),0) AS grade4
+		      ,nvl(round((avg(grade0)+avg(grade1)+avg(grade2)+avg(grade3)+avg(grade4))/5,1),0) AS allGrade
+		      ,count(*) AS allReviewNum
+		from tbl_here_review V JOIN tbl_here_finish F
+		ON fk_seq = seq
+		JOIN tbl_here_reservation R
+		ON fk_res_Number = res_Number
+		where V.status = 1 and R.fk_hotel_idx = #{hotel_idx}
+		order by review_no desc
+	</select>
+	
+	<!-- 호텔 정보 알아오기 -->
+	<select id="getHotelInfo" resultType="com.project.kmt.KmtHotelInfoVO" parameterType="String">
+		select *
+		from tbl_here_hotelInfo
+		where hotel_Status = 1 and hotel_idx = #{hotel_idx}
+	</select>
+	<!-- 호텔에 따른 총 리뷰 건수 알아오기 oo -->
+	<select id="getReviewCnt" parameterType="String" resultType="int">
+		select count(*)
+		from tbl_here_review V JOIN tbl_here_finish F
+		ON fk_seq = seq
+		JOIN tbl_here_reservation R
+		ON fk_res_Number = res_Number
+		where status = 1 and fk_hotel_idx = #{hotel_idx}
+	</select>
+	
+	<!-- 리뷰테이블 select oo-->
+	<resultMap type="HashMap" id="reviewEditMap">
+		<result property="review_no" 	column="review_no" 		javaType="int" />
+		<result property="fk_seq" 	column="fk_seq" 		javaType="int" />
+ 		<result property="title" 		column="title" 			javaType="String" />
+ 		<result property="content" 		column="content" 		javaType="String" />
+ 		<result property="registerday" 	column="registerday" 	javaType="String" />
+ 		<result property="grade0" 		column="grade0" 		javaType="int" />
+ 		<result property="grade1" 		column="grade1" 		javaType="int" />
+ 		<result property="grade2" 		column="grade2" 		javaType="int" />
+ 		<result property="grade3" 		column="grade3" 		javaType="int" />
+ 		<result property="grade4" 		column="grade4" 		javaType="int" />
+ 		<result property="allGrade" 	column="allGrade" 		javaType="double" />
+	</resultMap>
+	<select id="reviewEdit" resultMap="reviewEditMap" parameterType="HashMap">
+		select review_no, fk_seq, title, content, to_char(registerday,'yyyy/mm/dd') AS registerday
+		     , grade0, grade1, grade2, grade3, grade4
+		     , round((grade0+grade1+grade2+grade3+grade4)/5,1) AS allGrade
+		from tbl_here_review 
+		where status = 1 and fk_seq = #{seq}
+		order by review_no desc
+	</select>
+	
+	<!-- 리뷰이미지테이블 select oo-->
+	<resultMap type="HashMap" id="reviewImageEditMap">
+		<result property="review_no" 		column="review_no" 		javaType="int" />
+		<result property="fk_seq" 	column="fk_seq" 		javaType="int" />
+ 		<result property="title" 			column="title" 			javaType="String" />
+ 		<result property="content" 			column="content" 		javaType="String" />
+ 		<result property="registerday" 		column="registerday" 	javaType="String" />
+		<result property="review_img_no"	column="review_img_no" 	javaType="int" />
+ 		<result property="fk_review_no"		column="fk_review_no" 	javaType="int" />
+		<result property="orgImgname" 		column="orgImgname" 	javaType="String" />
+ 		<result property="wasImgname" 		column="wasImgname" 	javaType="String" />
+	</resultMap>
+	<select id="reviewImageEdit" resultMap="reviewImageEditMap" parameterType="HashMap">
+		select review_no, fk_seq, title, content
+		     , to_char(registerday, 'yyyy/mm/dd') AS registerday
+		     , I.review_img_no AS review_img_no
+		     , I.fk_review_no AS fk_review_no
+		     , I.orgImgname AS orgImgname
+		     , I.wasImgname AS wasImgname
+		from tbl_here_review R JOIN tbl_here_review_img I  
+		ON R.review_no = I.fk_review_no
+		where R.status = 1 and fk_seq = #{seq}
+		order by review_no desc, review_img_no desc
+	</select>
+	
+	<!-- seq로  리뷰 no알아오기 -->
+	<select id="getReviewNO" parameterType="String" resultType="String">
+		select review_no
+		from tbl_here_review
+		where status = 1 and fk_seq = #{seq}
+	</select>
+	<!-- 리뷰이미지테이블 원래이미지 갯수읽어오기 oo-->
+	<select id="orgReviewImage" parameterType="String" resultType="String">
+		select count(*) AS count
+		from tbl_here_review_img
+		where fk_review_no = #{review_no}
+		group by fk_review_no
+		order by fk_review_no desc
+	</select>
+	
+	<!-- 리뷰이미지테이블 delete oo-->
+	<delete id="delReviewImage" parameterType="HashMap" >
+		delete from tbl_here_review_img
+		where fk_review_no = #{review_no} 
+		<if test="orgAttachArr != null">
+			and not orgImgname in 
+			<foreach collection="orgAttachArr" index="i" open="(" separator="," close=")">
+				('${orgAttachArr[i]}')
+			</foreach>
+		</if>
+	</delete>
+	
+	<!-- 리뷰테이블 update 상태 0으로 oo-->
+	<update id="updateReview" parameterType="HashMap">
+		
+		<if test="title != null">
+		update tbl_here_review set title = #{title}
+                             , content = #{content}
+                             , grade0 = #{grade0}
+                             , grade1 = #{grade1}
+                             , grade2 = #{grade2}
+                             , grade3 = #{grade3}
+                             , grade4 = #{grade4}
+        </if>
+        
+        <if test="title == null">
+		update tbl_here_review set status = 0
+        </if>                     
+		where review_no = #{review_no}
+		
+	</update>
+	
+	<!-- 리뷰를 쓴 seq 가져오기 -->
+	<select id="getReviewAllSeq" parameterType="String" resultType="Integer">
+		select seq
+		from tbl_here_review V JOIN tbl_here_finish F
+		ON V.fk_seq = F.seq
+		JOIN tbl_here_reservation R
+		ON F.fk_res_number = R.res_number
+		JOIN tbl_here_member M
+		ON R.fk_member_idx = M.member_idx
+		where V.status =1 and member_idx = #{member_idx}
+	</select>
+	
+	<!-- 호텔 기본정보 불러오기 
+	<select id="getRoomInfo" parameterType="String" resultType="com.project.kmt.KmtRoomInfoVO">
+		select *
+        from TBL_HERE_ROOMINFO
+        where fk_hotel_idx = #{hotel_idx}
+	</select>
+	-->
+	
+	<!-- 호텔 서비스 불러오기 -->
+	<resultMap type="HashMap" id="getRoomServiceMap">
+		<result property="service" 			column="service" 		javaType="String" />
+		<result property="status" 			column="status" 		javaType="String" />
+	</resultMap>
+	<select id="getRoomService" parameterType="String" resultMap="getRoomServiceMap">
+		SELECT *
+		FROM (select sum(service_spa) AS spa
+		     , sum(service_minibar) AS minibar
+		     , sum(service_wifi) AS wifi
+		     , sum(service_towel) AS towel
+		     , sum(service_tv) AS tv
+		     , sum(service_airconditioner) AS airconditioner
+		     , sum(service_fridge) AS fridge
+		     , sum(service_showerroom) AS showerroom
+		     , sum(service_bathtub) AS bathtub
+		     , sum(service_hairdryer) AS hairdryer
+		     , sum(service_iron) AS iron
+		     , sum(service_kitchen) AS kitchen
+		from TBL_HERE_HOTELINFO H JOIN TBL_HERE_ROOMINFO R
+		ON fk_hotel_idx = hotel_idx
+		JOIN TBL_HERE_SERVICE S 
+		ON fk_room_idx = room_idx
+		where hotel_idx = #{hotel_idx})
+		UNPIVOT 
+		( 
+		status
+		FOR service IN 
+		(spa,minibar,wifi,towel,tv,airconditioner,fridge
+		,showerroom,bathtub,hairdryer,iron,kitchen))
+	</select>
+	
+	<resultMap type="HashMap" id="getRoomInfoMap">
+		<result property="room_idx" 			column="room_idx" 		javaType="String" />
+		<result property="room_name" 			column="room_name" 		javaType="String" />
+		<result property="roomprice" 			column="roomprice" 		javaType="String" />
+		<result property="cnt" 					column="cnt" 			javaType="String" />
+	</resultMap>
+	<!--  날짜에 따른  방정보 가져오기 -->
+	<select id="getRoomInfo" parameterType="HashMap" resultMap="getRoomInfoMap">
+		select P.fk_room_idx AS room_idx, R.room_name AS room_name, sum(P.roomprice) AS roomprice, cnt 
+        from tbl_here_roominfo R JOIN tbl_here_hotelinfo H
+        ON fk_hotel_idx = hotel_idx
+        JOIN tbl_here_roomprice P
+        ON P.fk_room_idx = R.room_idx
+        join 
+        ( select fk_room_idx , count(*) as cnt from tbl_here_roomPrice
+         where roomprice_date &gt;= to_date(#{startday},'yyyy-mm-dd') and roomprice_date &lt; to_date(#{endday},'yyyy-mm-dd')
+         group by fk_room_idx
+         )Z
+        on P.fk_room_idx = Z.fk_room_idx
+        where H.hotel_idx = #{hotel_idx} and cnt = ( to_date(#{endday},'yyyy-mm-dd') - to_date(#{startday},'yyyy-mm-dd')) 
+        and roomprice_date &gt;= to_date(#{startday},'yyyy-mm-dd') and roomprice_date &lt; to_date(#{endday},'yyyy-mm-dd')
+        group by P.fk_room_idx, R.room_name, cnt
+        order by P.fk_room_idx
+	</select>
+	
+	<resultMap type="HashMap" id="getroomQuantityMap">
+		<result property="room_idx" 			column="room_idx" 		javaType="String" />
+		<result property="roomprice_quantity" 	column="room_name" 		javaType="String" />
+	</resultMap>
+	<!-- 방수량 알아오기 -->
+	<select id="getroomQuantity" parameterType="HashMap" resultMap="getroomQuantityMap">
+		select fk_room_idx AS room_idx, roomprice_quantity
+        from tbl_here_roominfo R JOIN tbl_here_hotelinfo H
+        ON fk_hotel_idx = hotel_idx
+        JOIN tbl_here_roomprice P
+        ON P.fk_room_idx = R.room_idx
+        where fk_hotel_idx = #{hotel_idx} and roomprice_date = to_date(#{startday},'yyyy-mm-dd')
+	</select>
+	
+	<!-- 방이미지 알아오기 -->
+	<select id="getRoomImage" parameterType="String" resultType="com.project.kmt.KmtRoomImageVO">
+		select distinct I.fk_room_idx AS fk_room_idx, R.room_name AS room_name, I.roomimage_filename AS roomimage_filename
+        from tbl_here_roominfo R JOIN TBL_HERE_HOTELINFO H
+        ON fk_hotel_idx = hotel_idx
+        JOIN tbl_here_roomprice P
+        ON P.fk_room_idx = room_idx
+        JOIN Tbl_Here_Roomimage I
+        ON I.fk_room_idx = room_idx
+        where hotel_idx = #{hotel_idx}
+        order by I.fk_room_idx
+	</select>
+	
+	<!-- 침대유형 알아오기 -->
+	<resultMap type="HashMap" id="getBedtypeMap">
+		<result property="room_idx" 			column="room_idx" 		javaType="String" />
+		<result property="bedtype" 			column="bedtype" 		javaType="String" />
+		<result property="room_person" 			column="room_person" 		javaType="String" />
+		<result property="room_addperson" 			column="room_addperson" 		javaType="String" />
+		
+	</resultMap>
+	<select id="getBedtype" parameterType="String" resultMap="getBedtypeMap">
+		select fk_room_idx AS room_idx
+		,decode(bedtype, 'BED_SINGLE' , '싱글침대'
+		               , 'BED_DOUBLE' , '더블침대'
+		               , 'BED_TWIN'   , '트윈침대'
+		                              , '온돌방') AS bedtype
+		, room_person, room_addperson
+		from tbl_here_roominfo R JOIN tbl_here_hotelinfo H
+		ON fk_hotel_idx = hotel_idx
+		JOIN 
+		((SELECT fk_room_idx, BED_SINGLE,BED_DOUBLE,BED_TWIN,BED_ONDOL
+		from tbl_here_hotelinfo H JOIN tbl_here_roominfo R
+		ON fk_hotel_idx = hotel_idx
+		JOIN tbl_here_bed B 
+		ON fk_room_idx = room_idx
+		where hotel_idx = #{hotel_idx})
+		UNPIVOT 
+		( 
+		status
+		FOR bedtype IN 
+		(BED_SINGLE,BED_DOUBLE,BED_TWIN,BED_ONDOL)
+		))X 
+		ON X.fk_room_idx = R.room_idx 
+		where status != 0
+		order by fk_room_idx
+	</select>
+	
+	<!-- 스파유형 알아오기 -->
+	<resultMap type="HashMap" id="getSpatypeMap">
+		<result property="room_idx" 			column="room_idx" 		javaType="String" />
+		<result property="spatype" 			column="spatype" 		javaType="String" />
+	</resultMap>
+	<select id="getSpatype" parameterType="String" resultMap="getSpatypeMap">
+		select fk_room_idx AS room_idx
+		,decode(spatype, 'SPA_WPOOL' , '월풀'
+		              , 'SPA_SAUNA' , '사우나'
+		              , 'SPA_MASSAGE' , '마사지베드'
+		              , 'SPA_HINOKKI' , '하노끼탕'
+		              , 'SPA_OPENBATH' , '노천탕'
+		              , 'SPA_HALFPOOL' , '반신욕'
+		                             , '욕실내 TV') AS spatype
+		from tbl_here_roominfo R JOIN tbl_here_hotelinfo H
+		ON fk_hotel_idx = hotel_idx
+		JOIN 
+		((SELECT fk_room_idx, SPA_WPOOL,SPA_SAUNA,SPA_MASSAGE,SPA_HINOKKI,SPA_OPENBATH,SPA_HALFPOOL,SPA_TV
+		from tbl_here_hotelinfo H JOIN tbl_here_roominfo R
+		ON fk_hotel_idx = hotel_idx
+		JOIN tbl_here_spa S 
+		ON fk_room_idx = room_idx
+		where hotel_idx = #{hotel_idx})
+		UNPIVOT 
+		( 
+		status
+		FOR spatype IN 
+		(SPA_WPOOL,SPA_SAUNA,SPA_MASSAGE,SPA_HINOKKI,SPA_OPENBATH,SPA_HALFPOOL,SPA_TV)
+		))X 
+		ON X.fk_room_idx = R.room_idx 
+		where status != 0
+		order by fk_room_idx
+	</select>
+	
+	<!-- 테마유형 알아오기 -->
+	<resultMap type="HashMap" id="getThemetypeMap">
+		<result property="room_idx" 			column="room_idx" 		javaType="String" />
+		<result property="themetype" 			column="themetype" 		javaType="String" />
+	</resultMap>
+	<select id="getThemetype" parameterType="String" resultMap="getThemetypeMap">
+		select fk_room_idx AS room_idx
+		,decode(spatype, 'THEME_MOOIN' , '무인텔'
+		              , 'THEME_PARTY' , '파티룸'
+		              , 'THEME_MIRROR' , '미러룸'
+		              , 'THEME_DOUBLEFLOOR' , '복층룸'
+		              , 'THEME_PRINCESS' , '공주룸'
+		              , 'THEME_TERRAS' , '야외테라스'
+		              , 'THEME_OCEAN' , '오션뷰'
+		              , 'THEME_LAKE' , '호수뷰'
+		                              , '스카이뷰') AS themetype
+		from tbl_here_roominfo R JOIN tbl_here_hotelinfo H
+		ON fk_hotel_idx = hotel_idx
+		JOIN 
+		((SELECT fk_room_idx, THEME_MOOIN,THEME_PARTY,THEME_MIRROR,THEME_DOUBLEFLOOR,THEME_PRINCESS,THEME_TERRAS,THEME_OCEAN,THEME_LAKE,THEME_SKY
+		from tbl_here_hotelinfo H JOIN tbl_here_roominfo R
+		ON fk_hotel_idx = hotel_idx
+		JOIN TBL_HERE_THEME T 
+		ON fk_room_idx = room_idx
+		where hotel_idx = #{hotel_idx})
+		UNPIVOT 
+		( 
+		status
+		FOR spatype IN 
+		(THEME_MOOIN,THEME_PARTY,THEME_MIRROR,THEME_DOUBLEFLOOR,THEME_PRINCESS,THEME_TERRAS,THEME_OCEAN,THEME_LAKE,THEME_SKY)
+		))X 
+		ON X.fk_room_idx = R.room_idx 
+		where status != 0
+		order by fk_room_idx
+	</select>
+	
+	<!-- 내부객시설유형 알아오기 -->
+	<resultMap type="HashMap" id="getServicetypeMap">
+		<result property="room_idx" 			column="room_idx" 		javaType="String" />
+		<result property="servicetype" 			column="servicetype" 		javaType="String" />
+	</resultMap>
+	<select id="getServicetype" parameterType="String" resultMap="getServicetypeMap">
+		select fk_room_idx AS room_idx
+		,decode(servicetype, 'SERVICE_SPA' , '스파'
+		              , 'SERVICE_MINIBAR' , '미니바'
+		              , 'SERVICE_WIFI' , '와이파이'
+		              , 'SERVICE_TOWEL' , '욕실용품'
+		              , 'SERVICE_TV' , 'TV'
+		              , 'SERVICE_AIRCONDITIONER' , '에어컨'
+		              , 'SERVICE_FRIDGE' , '냉장고'
+		              , 'SERVICE_SHOWERROOM' , '객실샤워실'
+		              , 'SERVICE_BATHTUB' , '욕조'
+		              , 'SERVICE_HAIRDRYER' , '드라이기'
+		              ,'SERVICE_IRON' , '다리미'
+		                              , '전기밥솥') AS servicetype
+		from tbl_here_roominfo R JOIN tbl_here_hotelinfo H
+		ON fk_hotel_idx = hotel_idx
+		JOIN 
+		((SELECT fk_room_idx, SERVICE_SPA,SERVICE_MINIBAR,SERVICE_WIFI,SERVICE_TOWEL,SERVICE_TV,SERVICE_AIRCONDITIONER,SERVICE_FRIDGE,SERVICE_SHOWERROOM,SERVICE_BATHTUB,SERVICE_HAIRDRYER,SERVICE_IRON,SERVICE_KITCHEN
+		from tbl_here_hotelinfo H JOIN tbl_here_roominfo R
+		ON fk_hotel_idx = hotel_idx
+		JOIN TBL_HERE_SERVICE S 
+		ON fk_room_idx = room_idx
+		where hotel_idx = #{hotel_idx})
+		UNPIVOT 
+		( 
+		status
+		FOR servicetype IN 
+		(SERVICE_SPA,SERVICE_MINIBAR,SERVICE_WIFI,SERVICE_TOWEL,SERVICE_TV,SERVICE_AIRCONDITIONER,SERVICE_FRIDGE,SERVICE_SHOWERROOM,SERVICE_BATHTUB,SERVICE_HAIRDRYER,SERVICE_IRON,SERVICE_KITCHEN)
+		))X 
+		ON X.fk_room_idx = R.room_idx 
+		where status != 0
+		order by fk_room_idx
+	</select>
 </mapper>
 
