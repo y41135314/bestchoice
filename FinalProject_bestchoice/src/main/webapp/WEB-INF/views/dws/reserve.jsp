@@ -17,7 +17,7 @@
     <link href="<%= ctxPath %>/resources/css/reserve.css" rel="stylesheet">
   
       <!-- jQuery -->
-	  <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	  <!-- iamport.payment.js -->
 	  <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
 	  
@@ -74,7 +74,7 @@
 			});
 			
 			$("#userPoint").on("click",function(){
-				var meber_idx = $("input[name=member_idx]").val()
+				var meber_idx = $("input[name=member_idx]").val();
 				if(meber_idx != null && meber_idx != '' && meber_idx != undefined){
 					$.ajax({  
 						url: "<%= request.getContextPath() %>/pay/mpointCash.bc" ,
@@ -95,8 +95,13 @@
 			$("#mpointCashBtn").on("click",function(){
  				var mpointCash = parseInt($("#mpointCash").val().replace(/,/g,""));
  				var point = parseInt($("#point").val().replace(/,/g,""));
- 				var amount = parseInt($("input[name=amount]").val().replace(/,/g,""));
+ 				var amount = parseInt($("#payAmt").text().replace(/,/g,""));
 				
+ 				console.log(mpointCash);
+ 				console.log(point);
+ 				console.log(amount);
+ 				
+ 				
  				if($("#point").val() == '' || $("#point").val() == null ){
  					alert("조회후 이용해주세요.");
  					return;
@@ -118,12 +123,18 @@
  					alert("사용가능한 포인트 보다 사용액이 더큽니다.");
  					return;
  				};
+ 				
+ 				
+ 				
+ 				
+ 				
  				$("input[name=mpointCash]").val(mpointCash)
 				$("#payAmt").text(numberWithCommas(String(amount - mpointCash))) 				
  				$("#mpointCash").val($("input[name=mpointCash]").val().replace(/,/g,""))
 			});
 			
-		})
+		}); // end of document ready ----------------------------------------------------------------
+		
 		
 		function payInit(){
 			 var IMP = window.IMP; // 생략해도 괜찮습니다.
@@ -153,25 +164,38 @@
 			 if($("#phone").val() == '' || $("#phone").val() == null  ){
 				alert("휴대폰번호 확인해주세요.");
 				return false;	
-			}else if(인증체크 값 ){
+			}else if("인증체크 값" ){
 				alert("휴대폰인증을 진행해주세요");
 			} 
 			
+			
+			 if($("input[name=member_idx]").val() =='' || $("input[name=member_idx]").val() == null){
+					if(confirm("로그인후 결제 가능합니다 로그인 페이지로 이동하시겠습니까?")){
+						location.href="/userLogin.bc"					
+					}else{
+						return false;	
+					}
+				}			
+				
+				return true;
+			 
+		}
+			 
 			//핸드폰인증
 			function sendAuthCode(){
 
 				var phone = $("#phone").val();
 
-				
-
 				sendSms(phone);
 
 			}
-	       //확인
+			
+	       //확인 (인증)
 			function sendCode(){
 				var  certification = $("#certification").val();
+			     alert("휴대폰인증이 완료되었습니다.");
 			     
-				alter("휴대폰인증이 완료되었습니다.");
+			     return numberGen;
 			}
 			 
 			
@@ -194,20 +218,14 @@
 				});
 			} ///////////핸드폰 인증
 
+			/* if($("#certification") == {numberStr}){
+				alert("성공");
+			}
+			else{
+				$(this).val()."";
+				return  "";
+			} */
 			
-			
-			
-			if($("input[name=member_idx]").val() =='' || $("input[name=member_idx]").val() == null){
-				if(confirm("로그인후 결제 가능합니다 로그인 페이지로 이동하시겠습니까?")){
-					location.href="/userLogin.bc"					
-				}else{
-					return false;	
-				}
-			}			
-			
-			return true;
-		} // // end of login
-		
 		function numberWithCommas(str) {
 		    return str.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		}
@@ -243,13 +261,13 @@
 			<input type="hidden" name="pay_method">
 			<input type="hidden" name="buyer_email" value="${member.email}">
 	        <input type="hidden" name="merchant_uid" value="${reservation.res_number}"><!-- 예약번호 --> 
-	        <input type="hidden" name="name" value="호텔 산다잉"> <!--상품명-->
+	        <input type="hidden" name="name" value="여기는 어때"> <!--상품명-->
 	        <input type="hidden" name="buyer_name" value="${member.name}"> <!-- 구매자 -->
 	        <input type="hidden" name="buyer_tel" value="${member.hp1}-${member.hp2}-${member.hp3}"> <!--구매자 폰번호-->
 	        <input type="hidden" name="amount" value="${reservation.res_totalprice}"><!--결제금액-->
 		</form>
 			<input type="hidden" name="mpointCash" value="${reservation.mpointCash}">
-			<input type="hidden" name="member_idx" value="${member.member_idx}">
+			<input type="hidden" name="member_idx" value="${ sessionScope.loginuser.member_idx }">
             <div class="reserve-payment">
                 <p class="tit">예약자 정보</p>
                 <div class="input-wrap">
@@ -338,7 +356,7 @@
                     </table>
                 </div> -->
                 <!-- //e:개발, 로그인시 보여지는 영역 -->
-                <p class="tit tit-small">결제수단 선택</p>
+                <p class="tit tit-small">결제수단 선택</br></br></p>
                 <select name="methodchoice" id="payMethod">
                 	<option value="" selected="selected">결제수단 선택</option>
                     <option value="card">카드 결제</option>
@@ -357,17 +375,17 @@
             <div class="reserve-product">
                 <div class="product-selection">
                     <p class="tit">숙소 이름</p>
-                    <p class="txt">${reservation.hotel_name}</p>
+                    <p class="txt">${roomMap.hotel_name}</p>
                     <p class="tit">객실타입</p>
-                    <p class="txt">${reservation.room_name}</p>
+                    <p class="txt">${roomMap.room_name}</p>
                     <p class="tit">체크인</p>
-                    <p class="txt">${reservation.resstatus_in_day}&nbsp ${reservation.room_checkintime}:00</p>
+                    <p class="txt">${startday}&nbsp ${roomMap.room_checkintime}:00</p>
                     <p class="tit">체크아웃</p>
-                    <p class="txt">${reservation.resstatus_out_day}&nbsp ${reservation.room_checkouttime}:00</p>
+                    <p class="txt">${endday}&nbsp ${roomMap.room_checkouttime}:00</p>
                 </div>
                 <div class="total-payment">
                     <h3>총 결제 금액<span>(VAT 포함)</span></h3>
-                    <p class="price" id="payAmt"><fmt:formatNumber value="${reservation.res_totalprice}" pattern="#,###"/></p>
+                    <p class="price" id="payAmt"><fmt:formatNumber value="${roomMap.roomprice}" pattern="#,###"/></p>
                     	
                     <ul>
                         <li>해당 객실가는 세금, 봉사료가 포함된 가격입니다.</li>

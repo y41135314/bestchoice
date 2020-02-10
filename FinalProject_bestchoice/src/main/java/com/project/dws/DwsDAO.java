@@ -1,6 +1,9 @@
 package com.project.dws;
 
 
+import java.util.HashMap;
+import java.util.List;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -47,6 +50,16 @@ public class DwsDAO {
 
 	public void updateDeductionMpointCash(DwoReservationVO dwoReservation) {
 		sqlsession.update("dwsMapper.updateDeductionMpointCash",dwoReservation);
+	}
+
+	public HashMap<String, String> getRoomInfo(HashMap<String, String> paraMap) {
+
+		return sqlsession.selectOne("dwsMapper.getRoomInfo", paraMap);
+	}
+
+	public List<HashMap<String, String>> getCouponList(String member_idx) {
+		// TODO Auto-generated method stub
+		return sqlsession.selectList("dwsMapper.getCouponList", member_idx);
 	}
 	
 }

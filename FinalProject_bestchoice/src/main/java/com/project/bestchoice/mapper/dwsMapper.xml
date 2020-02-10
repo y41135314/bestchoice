@@ -63,7 +63,7 @@
 	<select id="selectMpointCash" parameterType="String" resultType="String"> 
 		SELECT MPOINTCASH 
 		FROM TBL_HERE_MPOINT 
-		WHERE fk_member_idx = #{res_number}
+		WHERE fk_member_idx = #{meber_idx}
 	</select>
 	
 	<update id="updateDeductionMpointCash" parameterType="com.project.dws.DwoReservationVO">
@@ -91,8 +91,8 @@
 	            #{res_number},
 	            #{res_receipt},
 	            #{room_idx},
-	            #{startday} , 
-	            #{endday}, 
+	            #{resstatus_in_day} , 
+	            #{resstatus_out_day}, 
 	            #{res_totalprice}, 
 	            #{res_point}, 
 	            #{res_paymentstatus}, 
@@ -103,6 +103,66 @@
 	<select id="selectResNumber" resultType="String">
 	
 		SELECT seq_tbl_here_hotelInfo.NEXTVAL FROM DUAL
+	</select>
+	
+	
+	<resultMap type="HashMap" id="roomMap">
+		<result property="hotel_idx"  column="hotel_idx"  javaType="String"/>
+		<result property="hotel_name"  column="hotel_name"  javaType="String"/>
+		<result property="room_idx"  column="room_idx"  javaType="String"/>
+		<result property="room_name"  column="room_name"  javaType="String"/>
+		<result property="room_checkintime"  column="room_checkintime"  javaType="String"/>
+		<result property="room_checkouttime"  column="room_checkouttime"  javaType="String"/>
+		<result property="roomprice_seqno"  column="roomprice_seqno"  javaType="String"/>
+		<result property="roomprice"  column="roomprice"  javaType="String"/>
+	</resultMap>
+	
+	<select id="getRoomInfo" parameterType="HashMap" resultMap="roomMap">
+		select hotel_idx, hotel_name
+		         , room_idx, room_name
+		         , room_checkintime
+		         , room_checkouttime
+		         , roomprice_seqno
+		         , roomprice
+		from tbl_here_hotelInfo A
+		join 
+		tbl_here_roomInfo B
+		on a.hotel_idx = b.fk_hotel_idx
+		join 
+		( select fk_room_idx, sum(roomprice) as roomprice from tbl_here_roomPrice 
+		    where roomprice_date &gt;= to_date(#{startday},'yyyy-mm-dd') and roomprice_date &lt; to_date(#{endday},'yyyy-mm-dd')
+		    group by fk_room_idx
+		) c
+		on b.room_idx = c.fk_room_idx
+		join 
+		( select fk_room_idx, roomprice_seqno from tbl_here_roomPrice
+		    where roomprice_date &gt;= to_date(#{startday},'yyyy-mm-dd') and roomprice_date &lt; to_date(#{endday},'yyyy-mm-dd') ) d
+		on c.fk_room_idx = d.fk_room_idx
+		where room_idx = #{room_idx}
+	
+	</select>
+	
+	
+	<resultMap type="HashMap" id="couponMap">
+		<result property="coupon_code"  column="coupon_code"  javaType="String"/>
+		<result property="coupon_name"  column="coupon_name"  javaType="String"/>
+		<result property="coupon_discountmon"  column="coupon_discountmon"  javaType="String"/>
+		<result property="coupon_discountpct"  column="coupon_discountpct"  javaType="String"/>
+	</resultMap>
+	
+	<select id="getCouponList" parameterType="String" resultMap="couponMap">
+		select  coupon_code
+		        , coupon_name
+		        , coupon_discountmon
+		        , coupon_discountpct
+		from 
+		tbl_here_member_coupon a
+		join 
+		tbl_here_admin_coupon b
+		on a.fk_coupon_code = b.coupon_code
+		where fk_idx= #{member_idx} and coupon_status = 1
+		and sysdate between coupon_startday and coupon_endday
+		
 	</select>
 	
 </mapper>

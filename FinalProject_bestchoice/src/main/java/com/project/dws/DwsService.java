@@ -1,5 +1,8 @@
 package com.project.dws;
 
+import java.util.HashMap;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -49,6 +52,16 @@ public class DwsService {
 
 	public String selectResNumber() {
 		return dao.selectResNumber();
+	}
+
+	public HashMap<String, String> getRoomInfo(HashMap<String, String> paraMap) {
+
+		return dao.getRoomInfo(paraMap);
+	}
+
+	public List<HashMap<String, String>> getCouponList(String member_idx) {
+		// TODO Auto-generated method stub
+		return dao.getCouponList(member_idx);
 	}
 
 	

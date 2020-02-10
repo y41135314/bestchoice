@@ -2,6 +2,7 @@ package com.project.dws;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -53,10 +54,26 @@ public class DwsController {
 		//room_idx="123";
 		//res_totalprice = "10000";
 		
+		// 방 정보 받아오기
+		HashMap<String,String> paraMap = new HashMap<String,String>();
+		paraMap.put("room_idx",  room_idx );
+		paraMap.put("startday", startday  );
+		paraMap.put("endday",  endday );
+		
+		
+		HashMap<String,String> roomMap = service.getRoomInfo(paraMap);
+		request.setAttribute("roomMap", roomMap);
+		request.setAttribute("hotel_idx", hotel_idx);
+		request.setAttribute("room_idx", room_idx);
+		request.setAttribute("startday", startday);
+		request.setAttribute("endday", endday);
+		
+		// HashMap<String,String> roomMap = service.getRoomInfo(room_idx);
 		
 		// 쿠폰 리스트 받아오기
-		
-		
+		String member_idx = String.valueOf(loginuser.getMember_idx());
+		List<HashMap<String,String>> couponList = service.getCouponList(member_idx); 
+		request.setAttribute("couponList", couponList);
 		
 		
 		return "dws/reserve.tiles_dws";
@@ -66,7 +83,7 @@ public class DwsController {
 	
 	
 	@RequestMapping(value="/pay/reserveSuccess.bc")
-	public String reserveSuccess(HttpServletRequest request, Model model) {
+	public String reserveSuccess(HttpServletRequest request, Model model  ) {
 		HttpSession session = request.getSession();
 		SmhMemberVO loginuser = (SmhMemberVO) session.getAttribute("loginuser"); 
 		
