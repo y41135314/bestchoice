@@ -27,7 +27,7 @@
 <style type="text/css">
 	
 	#content { border: solid 0px red;
-			   padding-top: 100px;
+			   padding-top: 130px;
 			   width: 1024px;
 			   height: 100%;
 			   clear: both;
@@ -351,24 +351,27 @@
         <!-- Left -->
   		<div class="left">
 			<div class="container" style="width : 500px; margin: 0; padding: 0; display: inline;">
+				
 				<div class="slider slider-for" id="slider-for">
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/1.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/2.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/3.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/4.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/5.jpg" style="width:100%"></div>
-					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/6.jpg" style="width:100%"></div>
+					<c:forEach var="HotelTotalImageMap" items="${hotelTotalImageList}" begin="0" end="0" step="1">
+					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/${HotelTotalImageMap.hotelimage_filename}" style="width:100%"></div>
+					</c:forEach>
+					<c:forEach var="HotelTotalImageMap" items="${hotelTotalImageList}">
+					<div class="mainImg"><img src="<%= ctxPath%>/resources/images/${HotelTotalImageMap.roomimage_filename}" style="width:100%"></div>
+					</c:forEach>
 				</div>
 			    
 			  	<br/>
 				   
 			    <div class="slider slider-nav" id="slider-nav" style="width:90%; margin: 0 auto;">
-					<div id="slick-current"><img src="<%= ctxPath%>/resources/images/1.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/2.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/3.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/4.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/5.jpg" style="width:100%"></div>
-					<div><img src="<%= ctxPath%>/resources/images/6.jpg" style="width:100%"></div>
+					<div id="slick-current">
+						<c:forEach var="HotelTotalImageMap" items="${hotelTotalImageList}" begin="0" end="0" step="1">
+						<img src="<%= ctxPath%>/resources/images/${HotelTotalImageMap.hotelimage_filename}" style="width:100%">
+						</c:forEach>
+					</div>
+					<c:forEach var="HotelTotalImageMap" items="${hotelTotalImageList}">
+					<div><img src="<%= ctxPath%>/resources/images/${HotelTotalImageMap.roomimage_filename}" style="width:100%"></div>
+					</c:forEach>
 				</div>
 				 
 		

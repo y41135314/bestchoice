@@ -101,6 +101,9 @@ public class YjuController {
 		// 방수량 알아오기
 		List<HashMap<String, String>> roomQuantityList = service.getroomQuantity(paraMap);
 		
+		// 전체(호텔, 방) 이미지 알아오기
+		List<HashMap<String, String>> hotelTotalImageList = service.getHotelTotalImage(hotel_idx);
+		
 		// 방이미지 알아오기
 		List<KmtRoomImageVO> roomImageList = service.getRoomImage(hotel_idx);
 		
@@ -127,6 +130,7 @@ public class YjuController {
 		request.setAttribute("spatypeList", spatypeList);
 		request.setAttribute("themetypeList", themetypeList);
 		request.setAttribute("servicetypeList", servicetypeList);
+		request.setAttribute("hotelTotalImageList", hotelTotalImageList);
 		
 		request.setAttribute("startday", startday);
 		request.setAttribute("endday", endday);
@@ -172,7 +176,10 @@ public class YjuController {
 		request.setAttribute("hotel_Category", str_hotel_Category);
 		request.setAttribute("startday", startday);
 		request.setAttribute("endday", endday);
-	  
+		// 전체(호텔, 방) 이미지 알아오기
+		List<HashMap<String, String>> hotelTotalImageList = service.getHotelTotalImage(hotel_idx);
+		request.setAttribute("hotelTotalImageList", hotelTotalImageList);
+		
 		return "room/room_service.tiles1";
 	}
 	
@@ -307,6 +314,10 @@ public class YjuController {
 	    request.setAttribute("startday", startday);
 		request.setAttribute("endday", endday);
 		
+		// 전체(호텔, 방) 이미지 알아오기
+		List<HashMap<String, String>> hotelTotalImageList = service.getHotelTotalImage(hotel_idx);
+		request.setAttribute("hotelTotalImageList", hotelTotalImageList);
+
 	   return "room/room_review.tiles1";
 	
 	}

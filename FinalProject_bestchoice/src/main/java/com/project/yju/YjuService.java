@@ -54,7 +54,7 @@ public class YjuService {
 	public HashMap<String, Object> getreviewGrade(String hotel_idx) {
 		HashMap<String,Object> gradeMap = dao.getreviewGrade(hotel_idx);
 		
-		if(gradeMap != null) {
+		if(gradeMap != null && (int)gradeMap.get("allReviewNum") != 0) {
 			double double_allGrade = (double)gradeMap.get("allGrade");
 			int allGrade = (int)double_allGrade;
 			
@@ -243,7 +243,13 @@ public class YjuService {
 		List<HashMap<String, String>> roomQuantityList = dao.getroomQuantity(paraMap);
 		return roomQuantityList;
 	}
-		
+	
+	// 전체(호텔, 방) 이미지 알아오기
+	public List<HashMap<String, String>> getHotelTotalImage(String hotel_idx) {
+		List<HashMap<String, String>> HotelTotalImageList = dao.getHotelTotalImage(hotel_idx);
+		return HotelTotalImageList;
+	}
+	
 	// 방이미지 알아오기
 	public List<KmtRoomImageVO> getRoomImage(String hotel_idx) {
 		List<KmtRoomImageVO> roomImageList = dao.getRoomImage(hotel_idx);
