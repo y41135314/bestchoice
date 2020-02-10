@@ -36,37 +36,9 @@ public class KmtController {
 		return "kmt/sellerJoin";
 	}
 	
-	// 
+	// 판매자관리 페이지
 	@RequestMapping(value="/sellerModify.bc")
 	public String modifySeller(HttpServletRequest request) {
-		
-		HttpSession session = request.getSession();
-		KmtSellerMemberVO loginseller = (KmtSellerMemberVO)session.getAttribute("loginseller");
-		
-		// 판매자 소유의 호텔 리스트 받아오기
-		List<HashMap<String,String>> sellerHotelList = service.getHotelListOfUser(loginseller.getSeller_Id());
-		request.setAttribute("sellerHotelList", sellerHotelList);
-		
-		
-		// 판매자 소유의 호텔 중 제일 처음 등록한 것 가져오기
-		String fk_hotel_idx = service.getFk_hotel_idx(loginseller.getSeller_Id());
-		System.out.println(fk_hotel_idx);
-		request.setAttribute("fk_hotel_idx",fk_hotel_idx);
-		
-		
-		// 방, 특정 날짜의 가격 불러오기 
-		HashMap<String,String> paraMap = new HashMap<String,String>();
-		paraMap.put("fk_hotel_idx", fk_hotel_idx);
-		
-		List<HashMap<String,String>> roomPriceList = service.getRoomPriceList(paraMap);
-		request.setAttribute("roomPriceList", roomPriceList);
-		
-		
-		
-		
-		
-		
-		
 		
 		return "kmt/sellerModify";
 	}
@@ -83,6 +55,8 @@ public class KmtController {
 		System.out.println(seller_Id);
 		
 		int n = service.checkSellerId(seller_Id);
+		
+		System.out.println("n : "+ n); 
 		
 		JSONObject jsonObj = new JSONObject();
 		
@@ -109,7 +83,7 @@ public class KmtController {
 		List<HashMap<String,String>> imageMapList = new ArrayList<HashMap<String,String>>();	// 이미지만 담을 해쉬맵 리스트
 		
 		// 이미지 삽입하기
-		List<MultipartFile> attachList = mprequest.getFiles("attach"); 	// view 에서 받아온 이미지 파일들 ( 지금은 1개 )
+		List<MultipartFile> attachList = mprequest.getFiles("hotelImage_FileName"); 	// view 에서 받아온 이미지 파일들 ( 지금은 1개 )
 
 		String root = session.getServletContext().getRealPath("/"); 
 		String path = root + "resources"+File.separator+"images"+File.separator+"kmt"+File.separator+"hotelImage";
@@ -131,8 +105,8 @@ public class KmtController {
 					 
 					 HashMap<String, String> imageMap = new HashMap<String, String>();
 					 
-					 imageMap.put("hotelimage_wasfilename", wasFilename);
-					 imageMap.put("hotelimage_filename", attachList.get(i).getOriginalFilename());
+					 imageMap.put("hotelImage_wasFileName", wasFilename);
+					 imageMap.put("hotelImage_FileName", attachList.get(i).getOriginalFilename());
 					 
 					 System.out.println(wasFilename);
 					 System.out.println(attachList.get(i).getOriginalFilename());
@@ -318,8 +292,61 @@ public class KmtController {
 		
 		return "msg";
 	}
-	
-	
+/////////////////////////////////////////////////////////////////////////////	
+	// Home 에 뿌려주기
+	@ResponseBody
+	@RequestMapping(value="/seller/modifyHome.bc", method= {RequestMethod.GET})
+	public String modifyHome(HttpServletRequest request) {
+		
+		String seller_id = request.getParameter("seller_id");
+		String seller_pwd = request.getParameter("seller_pwd");
+		HashMap<String,String> paraMap = new HashMap<String,String>();
+		paraMap.put("seller_id", seller_id );
+		paraMap.put("seller_pwd", seller_pwd );
+		
+		KmtSellerMemberVO loginseller = service.sellerLogin(paraMap);
+		
+		String jsonStr = "";
+		String msg ="";
+		String loc ="";
+		
+		if(loginseller != null) {
+			String result = null;
+			msg = "";
+			loc = "";
+						
+			jsonStr  = "";
+			String emptyroom = request.getParameter("emptyroom");
+			String checkin = request.getParameter("checkin");
+			String checkout = request.getParameter("checkout");
+			String usingroom = request.getParameter("usingroom");
+			String inreserv = request.getParameter("inreserv");
+			String outreserv = request.getParameter("outreserv");
+			String today = request.getParameter("today");
+
+			
+			paraMap.put("emptyroom", emptyroom );
+			paraMap.put("checkin", checkin );
+			paraMap.put("checkout", checkout );
+			paraMap.put("usingroom", usingroom );
+			paraMap.put("inreserv", inreserv );
+			paraMap.put("outreserv", outreserv );
+			paraMap.put("today", today );
+			
+			result = service.modifyHome(paraMap);
+			return jsonStr;
+		}
+		else {
+			msg = "로그인을 하셔야 합니다 .";
+			loc = request.getContextPath()+"/seller/login.bc";
+			request.setAttribute("msg", msg);
+			request.setAttribute("loc", loc);
+			return "msg";
+		}
+
+
+	}
+//////////////////////////////////////////////////////////////////////////////	
 	// 요금 조정
 	@ResponseBody
 	@RequestMapping(value="/seller/adjustPrice.bc", method= {RequestMethod.POST})
