@@ -49,8 +49,6 @@ public class YjuController {
 		// 호텔목록에서 가져올 경우~
 		String startday = request.getParameter("startday");
 		String endday = request.getParameter("endday");
-		System.out.println("startday: "+ startday);
-		System.out.println("endday: "+ endday);
 		
 		/*if((startday == null || "".equals(startday)) &&  (endday == null || "".equals(endday))) {
 			startday = "";
