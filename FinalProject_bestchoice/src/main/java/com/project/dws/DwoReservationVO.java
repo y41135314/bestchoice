@@ -12,6 +12,10 @@ public class DwoReservationVO {
 	String fk_room_idx; //방코드
 	String fk_coupon_code;//쿠폰코드
     String res_payment;//(0카드/신용 1카카오페이 2네이버)
+    
+    String startday;
+    String endday;
+    
     String resstatus_in_day; //입실일
 	String resstatus_out_day; //퇴실일
 	String res_totalprice;//최종결제금액  
@@ -183,5 +187,24 @@ public class DwoReservationVO {
 	public void setSeller_name(String seller_name) {
 		this.seller_name = seller_name;
 	}
+
+	public String getStartday() {
+		return startday;
+	}
+
+	public void setStartday(String startday) {
+		this.startday = startday;
+	}
+
+	public String getEndday() {
+		return endday;
+	}
+
+	public void setEndday(String endday) {
+		this.endday = endday;
+	}
+	
+	
+	
 	
 }
