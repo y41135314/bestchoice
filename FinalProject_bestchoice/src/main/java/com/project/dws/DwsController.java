@@ -1,6 +1,7 @@
 package com.project.dws;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -9,10 +10,12 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonObject;
 import com.project.smh.SmhMemberVO;
+import com.project.smh.SmhRandom;
 
 @Controller
 public class DwsController {
@@ -119,9 +122,9 @@ public class DwsController {
 		return jsonObj.toString(); 
 	}
 	
-	
 
-	/* 문자보내기 
+
+      //문자보내기 
 		@ResponseBody
 	    @RequestMapping(value = "/sendSms.bc", method= {RequestMethod.POST})
 		public String sendSms(String receiver, HttpSession session) throws Exception {
@@ -151,8 +154,7 @@ public class DwsController {
 
 	        org.json.simple.JSONObject result = coolsms.send(params); 
 	        
-	        org.json.simple.JSONObject result = coolsms.send(params); 
-	        
+
 	        if ((boolean)result.get("status") == true) {
 	            return ""+numStr;
 	          } else {
@@ -163,7 +165,6 @@ public class DwsController {
 	          }
 	      }
 
-	*/
 	
 	
 }

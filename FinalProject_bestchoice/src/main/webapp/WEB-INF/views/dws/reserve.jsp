@@ -153,7 +153,7 @@
 			 if($("#phone").val() == '' || $("#phone").val() == null  ){
 				alert("휴대폰번호 확인해주세요.");
 				return false;	
-			}if else(인증체크 값 ){
+			}else if(인증체크 값 ){
 				alert("휴대폰인증을 진행해주세요");
 			} 
 			
@@ -170,7 +170,8 @@
 	       //확인
 			function sendCode(){
 				var  certification = $("#certification").val();
-			
+			     
+				alter("휴대폰인증이 완료되었습니다.");
 			}
 			 
 			

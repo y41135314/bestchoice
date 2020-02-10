@@ -1,4 +1,4 @@
-/*package com.project.dws.sms;
+package com.project.dws.sms;
 
 import java.io.*;
 import java.net.URL;
@@ -13,17 +13,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
  
- -------------- 민하씨 깃하면 풀기
+/*
  * Https.class
  * Https request, response를 관리하는 class 입니다.
- 
+ */
 public class Https
 {
-    
+    /*
      * postRequest (POST)
      * @param StringBuffer : data 
      * @param String : image
-     
+     */
     public JSONObject postRequest(String url_string, HashMap<String, String> params) {
         JSONObject obj = new JSONObject();
         try {
@@ -138,9 +138,9 @@ public class Https
         return obj;
     }
  
-    
+    /*
      * https request (GET)
-     
+     */
     public JSONObject request(String url_string, HashMap<String, String> params) {
         JSONObject obj = new JSONObject();
         try {
@@ -215,20 +215,20 @@ public class Https
         return obj;
     }
  
-    
+    /*
      * 업로드할 파일에 대한 메타 데이터를 설정한다.
      * @param key : 서버에서 사용할 파일 변수명
      * @param fileName : 서버에서 저장될 파일명
-     
+     */
     public String setFile(String key, String fileName) {
         return "Content-Disposition: form-data; name=\"" + key
                 + "\";filename=\"" + fileName
                 + "\"\r\nContent-type: image/jpeg;\r\n";
     }
  
-    
+    /*
      * String을 POST 형식에 맞게 Input 
-     
+     */
     public StringBuffer setPostData(StringBuffer builder, String key, String value, String delimiter) {
         try {
             builder.append(setValue(key, value));
@@ -240,9 +240,9 @@ public class Https
         return builder;
     }
  
-    
+    /*
      * String을 GET 방식으로 변경
-     
+     */
     public String setGetData(String data, String key, String value, String charSet) {
         try {
             data += "&"
@@ -256,9 +256,9 @@ public class Https
         return data;
     }
  
-    
+    /*
      * Get salt
-     
+     */
     public String salt() {
         String uniqId = "";
         Random randomGenerator = new Random();
@@ -272,9 +272,9 @@ public class Https
         return uniqId;
     }
  
-    
+    /*
      * Get signature
-     
+     */
     public String getSignature(String api_secret, String salt, String timestamp) {
         String signature = "";
         
@@ -301,21 +301,21 @@ public class Https
         return signature;
     }
  
-    
+    /*
      * Get timestamp
-     
+     */
     public String getTimestamp() {
         long timestamp_long = System.currentTimeMillis() / 1000;
         String timestamp = Long.toString(timestamp_long);
         return timestamp;
     }
  
-    
+    /*
      * Map 형식으로 Key와 Value를 셋팅한다.
      * @param key : 서버에서 사용할 변수명
      * @param value : 변수명에 해당하는 실제 값
-     
+     */
     public String setValue(String key, String value) {
         return "Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n"+ value;
     }
-}*/
+}

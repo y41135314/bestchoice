@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.project.smh.SmhMemberVO;
 
+
+///수정
 @Service
 public class DwsService {
 
