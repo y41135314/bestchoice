@@ -943,7 +943,7 @@
     
     
     <%-- 페이지바 보여주기 === --%>
-	<div class="pagination" align="center" style="padding: 40px; position:relative;">
+	<div class="pagination" align="center" style="padding: 40px; margin-left:600px; position:relative;">
 		${pagebar}
 	</div> 
 </div>

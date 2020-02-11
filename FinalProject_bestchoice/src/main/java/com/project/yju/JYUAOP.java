@@ -84,7 +84,7 @@ import com.project.common.MyUtil;
 				
 				try {
 					String msg = "비정상적인 경로입니다.";
-					String loc = request.getContextPath()+"/roomReview.bc";
+					String loc = "javascript:history.back()";
 					
 					request.setAttribute("msg", msg);
 					request.setAttribute("loc", loc);

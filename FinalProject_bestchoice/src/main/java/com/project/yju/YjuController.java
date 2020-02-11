@@ -76,7 +76,7 @@ public class YjuController {
 		
 		// 호텔 정보 알아오기
 		KmtHotelInfoVO hotelInfoVO = service.getHotelInfo(hotel_idx);
-		String hotel_Addr = hotelInfoVO.getHotel_Addr1()+" "+hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
+		String hotel_Addr = hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
 		int hotel_Category = hotelInfoVO.getHotel_Category(); 
 		String str_hotel_Category = "";
 		
@@ -151,7 +151,7 @@ public class YjuController {
 		// 호텔 정보 알아오기
 		KmtHotelInfoVO hotelInfoVO = service.getHotelInfo(hotel_idx);
 		
-		String hotel_Addr = hotelInfoVO.getHotel_Addr1()+" "+hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
+		String hotel_Addr = hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
 		int hotel_Category = hotelInfoVO.getHotel_Category(); 
 		String str_hotel_Category = "";
 		
@@ -194,7 +194,7 @@ public class YjuController {
 		
 		String str_currentShowPageNo = request.getParameter("currentShowPageNo"); // 페이지바 
         int tatalCount = 0; 		// 총게시물 건수
-        int sizePerPage = 5; 		// 한페이지당 보여줄 게시물 수
+        int sizePerPage = 3; 		// 한페이지당 보여줄 게시물 수
         int currentShowPageNo = 0;  // 현재 보여주는 페이지번호로서, 초기치료는 1페이지로 설정함
         int totalPage = 0;			// 총페이지수(웹브라우저상에 보여줄 총 페이지 갯수, 페이지바)
         
@@ -243,45 +243,41 @@ public class YjuController {
 				
 		int pageNo = ((currentShowPageNo - 1)/blockSize) * blockSize + 1;
 			
-		String url = "roomReview.bc";	
-			String lastStr = url.substring(url.length()-1);
-			if(!"?".equals(lastStr)) 
-				url += "?"; 
-			
+		String url = "roomReview.bc?hotel_idx="+hotel_idx+"&startday="+startday+"&endday="+endday+"";	
+		/*String lastStr = url.substring(url.length()-1);
+		if(!"?".equals(lastStr)) 
+			url += "?"; */
+	
 			// *** [이전] 만들기 *** // 
 			if(pageNo != 1) {
-				pagebar += "&nbsp;<a class='page-link' aria-label='Previous' href='roomReview.bc?currentShowPageNo="+(pageNo-1)+"'>"
-			             + "<span aria-hidden='true'>&laquo;</span>"
-						 + "<span class='sr-only'>Previous</span>"
-			             + "</a>&nbsp;";
+				pagebar += "&nbsp;<a href='"+url+"&currentShowPageNo="+(pageNo-1)+"&sizePerPage="+sizePerPage+"'>[이전]</a>&nbsp;";
 			}
 			
 			while(!(loop > blockSize || pageNo > totalPage)) {
-			
+				
 				if(pageNo == currentShowPageNo) {
 					pagebar += "&nbsp;<span style='font-weight: bold; background-color:#efefef'>"+pageNo+"</span>&nbsp;";
 				}
 				else {
-					pagebar += "&nbsp;<a class='page-link' href='roomReview.bc?currentShowPageNo="+pageNo+"'>"+pageNo+"</a>&nbsp;";	
+					pagebar += "&nbsp;<a class='page-link' href='roomReview.bc?hotel_idx="+hotel_idx+"&startday="+startday+"&endday="+endday+"&currentShowPageNo="+pageNo+"'>"+pageNo+"</a>&nbsp;";	
 				}
 				pageNo++;	
 				loop++;		
 			} // end of while-----------------------------------
-
+			
 			// *** [다음] 만들기 *** // 
-			if(!(pageNo > totalPage))
-				pagebar += "&nbsp;<a class='page-link' aria-label='Next' href='roomReview.bc?currentShowPageNo="+pageNo+"'>"
-				         + "<span aria-hidden='true'>&raquo;</span>"
-				         + "<span class='sr-only'>Next</span>"
-				         + "</a>&nbsp;";
-	    
+			if( !(pageNo>totalPage) ) {
+				pagebar += "&nbsp;<a href='"+url+"&currentShowPageNo="+pageNo+"&sizePerPage="+sizePerPage+"'>[다음]</a>&nbsp;";
+			}
 	    pagebar += "</ul>";
+	    
+    
 	    
 	    // 평점 알아오기
 		HashMap<String,Object> gradeMap = service.getreviewGrade(hotel_idx);
 		// 호텔 정보 알아오기
 		KmtHotelInfoVO hotelInfoVO = service.getHotelInfo(hotel_idx);
-		String hotel_Addr = hotelInfoVO.getHotel_Addr1()+" "+hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
+		String hotel_Addr = hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
 		int hotel_Category = hotelInfoVO.getHotel_Category(); 
 		String str_hotel_Category = "";
 		
@@ -502,7 +498,6 @@ public class YjuController {
     	
     	// 수정해야할 글번호 가져오기
     	String seq = request.getParameter("seq");
-    	System.out.println("seq: "+seq);
     	
     	// 수정해야할 글 1개 내용 가져오기 (조회수 증가없이 글만 가져오기)
     	HashMap<String, Object> reviewEditMap = service.reviewEdit(seq);
@@ -578,7 +573,6 @@ public class YjuController {
 					 reviewImageMap.put("wasImgname", newFileName);
 					 reviewImageMap.put("orgImgname", attachList.get(i).getOriginalFilename());
 					 //reviewImageMap.put("IMAGEFILESIZE", String.valueOf(fileSize));
-					 System.out.println("reviewImageMap: "+ reviewImageMap);
 					 reviewImageMapList.add(reviewImageMap);
 					 
 				} catch (Exception e) {	}
@@ -677,7 +671,7 @@ public class YjuController {
     		// 호텔 정보 알아오기
     		KmtHotelInfoVO hotelInfoVO = service.getHotelInfo(hotel_idx);
     		
-    		String hotel_Addr = hotelInfoVO.getHotel_Addr1()+" "+hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
+    		String hotel_Addr = hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
 			
 			JSONArray jsonArr = new JSONArray();
 			

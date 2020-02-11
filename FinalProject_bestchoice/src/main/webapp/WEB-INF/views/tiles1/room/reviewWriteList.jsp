@@ -220,14 +220,14 @@
 				                <br/>
 		          				
 		          				<c:if test="${seqList != null }">
+		          					<c:forEach var="seq" items="${seqList}">
+		          					<c:if test="${seq == useMyRoomMap.seq}">
+		          					<input class="seq seq${status.index} ${status.index}" type="text" value="${seq}"/>
+		          					</c:if>
+		          					</c:forEach>
 		          					<div class="btn${status.index}"></div>
 		          				</c:if>
 		          				
-		          				<c:if test="${seqList.isEmpty()}">
-		                		<div>
-		                			 <button type="button" class="gra_left_right_red" onClick="javascript:location.href='<%= ctxPath%>/reviewWrite.bc?member_idx=${sessionScope.loginuser.member_idx}&seq=${useMyRoomMap.seq}'">리뷰 쓰기</button>
-		                		</div>
-				     			</c:if>
 				            </div>
 							<!-- Info -->
 							
@@ -241,7 +241,7 @@
             </div>
 			
 			<form name="gobackURLFrm">
-            <input class="count count${status.index} ${status.index}" type="hidden" value="${useMyRoomMap.seq}"/>
+            <input class="count count${status.index} ${status.index}" type="text" value="${useMyRoomMap.seq}"/>
             </form> 
             </c:forEach>
        		</c:if>
@@ -285,45 +285,32 @@
 		
 		$("#reviewCnt").val(cnt);
 		
-		
-		// seq가 같다면 
-		
-			var flag1 = false; 
-			var flag2 = false; 
-			var html = ""; 
-			var cnt = 0;
-			<c:forEach var="useMyRoomMap" items="${useMyRoomList}" varStatus="status1">
-				var count = $(".count${status1.index}").val();    
+		 <c:forEach var="useMyRoomMap" items="${useMyRoomList}" varStatus="status">
+			
+		  	var html = "";
+		 	var count = $(".count${status.index}").val();  
+			
+			var seqLen = $(".seq${status.index}").length;
+			var seq = $(".seq${status.index}").val();
+			 
+			if(seqLen>0 &&(seq == count)) {
+				html += "<div class='review_update'>";
+	    		html += "<button type='button' class='gra_left_right_red miniBtn reviewList' onClick='goReviewList()'>리뷰목록</button>";
+	    		html += "<button type='button' class='gra_left_right_red miniBtn reviewUpdate'>수정</button>";
+	    		html += "<button type='button' class='gra_left_right_red miniBtn reviewDelete'>삭제</button></div>";
+				$(".btn${status.index}").html(html);
+			}
+			
+			if(seqLen==0){
+				html = "<div class='review_write' style='margin: 13px;'><button type='button' class='gra_left_right_red reviewWrite'>리뷰 쓰기</button></div>";
+				$(".btn${status.index}").html(html);
 				
-				<c:forEach var="seq" items="${seqList}" varStatus="status2">
-			    	
-					if(${seq} == count) {
-						flag1 = true; // 같을 경우
-						flag2 = false;
-					}
-					else {
-						flag1 = false;
-						flag2 = true; // 다를 경우
-						
-					}
-					
-				</c:forEach>
-				
-				if(flag1) {
-					html += "<div class='review_update'>";
-		    		html += "<button type='button' class='gra_left_right_red miniBtn reviewList' onClick='goReviewList()'>리뷰목록</button>";
-		    		html += "<button type='button' class='gra_left_right_red miniBtn reviewUpdate'>수정</button>";
-		    		html += "<button type='button' class='gra_left_right_red miniBtn reviewDelete'>삭제</button></div>";
-					$(".btn${status1.index}").html(html);
-					
-				}
-				else if(flag2){
-					html = "<div style='margin: 13px;'><button type='button' class='gra_left_right_red reviewWrite'>리뷰 쓰기</button></div>";
-					$(".btn${status1.index}").html(html);
-					
-				}
-				
-			</c:forEach>
+			}
+			
+		</c:forEach> 
+			
+			 
+				 
 				
 		$(".reviewUpdate").click( function(event){
 			
