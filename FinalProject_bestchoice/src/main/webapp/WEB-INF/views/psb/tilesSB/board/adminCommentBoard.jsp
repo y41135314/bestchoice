@@ -229,6 +229,7 @@
 						   	   				<c:forEach begin="1" end="${boardvo.depthno}" >
 								   	    	RE: <%-- └RE${boardvo.depthno} --%>
 								   	    	</c:forEach>
+								   	    </span>	
 								   	    <span class="title" onclick="goView('${boardvo.adminBoard_idx}','${boardvo.rno}');">
 						   	   				&nbsp;&nbsp;${boardvo.title}&nbsp;
 						   	   			</span>
