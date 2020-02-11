@@ -137,19 +137,16 @@
 	<result property="hotel_Addr3" 	column="hotel_Addr3" 		javaType="String" />
 	<result property="hotel_Post" 	column="hotel_Post" 		javaType="String" />
 	<result property="hotel_Phone" 	column="hotel_Phone" 		javaType="String" />
-	<result property="hotelImage_FileName" 	column="hotelImage_FileName" 		javaType="String" />
+	<result property="hotelImage_wasFileName" 	column="hotelImage_wasFileName" 		javaType="String" />
 	</resultMap>
 	<select id="reservationList" parameterType="HashMap" resultMap="reservationMap">
-	select  a.hotel_Name, a.hotel_Addr1, a.hotel_Addr2,a.hotel_Addr3,a.hotel_Post, a.hotel_Phone, b.hotelImage_FileName
+	select  a.hotel_Name, a.hotel_Addr1, a.hotel_Addr2,a.hotel_Addr3,a.hotel_Post, a.hotel_Phone, b.hotelImage_wasFileName
 	from tbl_here_hotelInfo a join TBL_HERE_RESERVATION c 
 	on a.hotel_idx     =  c.fk_hotel_idx join tbl_here_hotelImage b
 	on c.fk_hotel_idx  =  b.fk_hotel_idx join tbl_here_member 
 	on c.fk_member_idx = member_idx
 	where member_idx = #{member_idx}
 	</select>
-		
-		
-		
-		
+			
 </mapper>
 

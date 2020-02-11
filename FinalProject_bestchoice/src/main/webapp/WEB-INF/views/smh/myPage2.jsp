@@ -14,6 +14,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet">
 <style>
 
 
@@ -224,7 +225,6 @@ button {
 
 .fix_title strong {
     font-size: 24px;
-    font-weight: bold;
     margin-bottom: 15px;
    
 }
@@ -252,9 +252,9 @@ margin-top: 16px;
     vertical-align: top;
     background: #ff0055;
     width: 296px;
-height: 56px;
-margin: 0 auto;
-position: relative;
+	height: 56px;
+	margin: 0 auto;
+	position: relative;
 }
 
 .text_input1 {
@@ -468,7 +468,7 @@ $(document).ready(function(){
 
 <div class="main align_rt">
         <div class="mypage">			 						
-                    <strong class="myInfoTitle">내 정보 수정</strong>
+                    <strong class="myInfoTitle" style="font-size: 20pt; font-family: 'Do Hyeon', sans-serif; font-weight: normal; ">내 정보 수정</strong>
                     
 			<form name="memberDelete">
                    <div class="login_info">

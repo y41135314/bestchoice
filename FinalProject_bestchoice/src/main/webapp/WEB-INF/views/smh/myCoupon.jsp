@@ -9,11 +9,9 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
+<link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet">
 <style type="text/css">
-body {
 
-font-family: "Apple SD Gothic Neo","맑은 고딕","Malgun Gothic",sans-serif;
-}
 .point_show {
     padding-bottom: 21px;
     border-bottom: 1px solid rgba(0,0,0,0.2);
@@ -46,13 +44,13 @@ ul{
    }
 	/* 보유쿠폰 글씨   */
    .mhtitle{
-   font-family: "Apple SD Gothic Neo","맑은 고딕","Malgun Gothic",sans-serif;
+   font-family: 'Do Hyeon', sans-serif;
     display: inline-block;
     margin-right: 16px;
     padding: 0;
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 25px;
    }
+   
    /* 쿠폰내역 제목들 */
    .cu_title{
    font-size: 16px;
@@ -94,7 +92,7 @@ width: 280px;
 	       		<c:if test="${(sessionScope.loginuser) != null}">
 	       			
 		            <div class="point_show gra_red">
-		                <span class="mhtitle" style="font-size: 16px; font-weight: bold;">보유쿠폰 </span>
+		                <span class="mhtitle" style="font-family: 'Do Hyeon', sans-serif; font-size: 25px;">보유쿠폰 </span>
 		                <strong id="point-page-show"></strong>
 		            </div>
 				</c:if>

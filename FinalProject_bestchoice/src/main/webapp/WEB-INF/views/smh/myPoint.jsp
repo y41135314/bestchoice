@@ -9,6 +9,7 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
+<link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet">
 <style type="text/css">
 .point_show {
     padding-bottom: 21px;
@@ -17,13 +18,7 @@
     color: rgba(0,0,0,0.87);
     text-align: left;
 }
-.point_show span {
-    display: inline-block;
-    margin-right: 16px;
-    padding: 0;
-    font-size: 16px;
-    font-weight: bold;
-}
+
 .point_show strong {
     display: inline;
     font-size: 18px;
@@ -43,9 +38,7 @@ ul{
 	  	display: inline-block;
 	    margin-right: 16px;
 	    padding: 0;
-	    font-size: 20px;
-	    font-weight: bold;
-   }
+	    }
    
 </style>
 <body>
@@ -54,7 +47,7 @@ ul{
 	        <div>
 	       		
 	            <div class="point_show gra_red">
-	                <span class="mhtitle ">사용 가능 포인트 </span>
+	                <span class="mhtitle" style="font-family: 'Do Hyeon', sans-serif; font-size: 20pt; ">사용 가능 포인트 </span>
 	                <span style="float:right; color:#F7323F; font-weight: bolder; font-size: 18pt;">
 	              	<%-- ${point} --%><fmt:formatNumber value="${point}" pattern="###,###"/>
 	                </span>

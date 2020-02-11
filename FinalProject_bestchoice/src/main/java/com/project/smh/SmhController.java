@@ -34,6 +34,8 @@ import org.codehaus.jackson.JsonNode;
 
 import com.project.common.SHA256;
 import com.project.mail.SmhGoogleMail;
+import com.project.yhj.search.YhjSearchResultVO;
+import com.project.yhj.search.YhjSearchVO;
 
 
 //=== #30. 컨트롤러 선언 ===
@@ -498,7 +500,7 @@ public class SmhController {
 				 String hotel_Addr3 = request.getParameter("hotel_Addr3");	// 호텔주소 3
 				 String hotel_Post = request.getParameter("hotel_Post");	// 호텔우편주소 
 				 String hotel_Phone = request.getParameter("hotel_phone");	// 호텔전화번호 
-				 String hotelImage_FileName = request.getParameter("hotelImage_FileName");	// 호텔이미지 
+				 String hotelImage_wasFileName = request.getParameter("hotelImage_wasFileName");	// 호텔이미지 
 				
 				 String member_idx = Integer.toString(loginuser.getMember_idx());
 				 
@@ -510,7 +512,7 @@ public class SmhController {
 					paraMap.put("hotel_Addr3", hotel_Addr3);
 					paraMap.put("hotel_Phone", hotel_Phone);
 					paraMap.put("member_idx", member_idx);
-					paraMap.put("hotelImage_FileName", hotelImage_FileName);
+					paraMap.put("hotelImage_wasFileName", hotelImage_wasFileName);
 				
 									
 					List<HashMap<String, String>> reservationList = service.reservationList(paraMap);
@@ -599,8 +601,7 @@ public class SmhController {
 //	                   email = (String)session.getAttribute(certificationCode);
 //	                   String pwd = (String)session.getAttribute(certificationCode);
 //	                   session.getAttribute(email);
-	                    
-	                    
+	                    	                    
 	                    HashMap<String, String> paraMap = new HashMap<String, String>(); 
 	             	 	paraMap.put("email", email);
 	             		paraMap.put("pwd", SHA256.encrypt(certificationCode)); 
@@ -681,6 +682,7 @@ public class SmhController {
 		 mav.setViewName("smh/DeleteEnd");	
 		 return mav;
 	}
+	
 	
 	
 	

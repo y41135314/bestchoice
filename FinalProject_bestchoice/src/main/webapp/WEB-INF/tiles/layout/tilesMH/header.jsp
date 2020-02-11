@@ -187,11 +187,11 @@ body {
 		<td width="6%"><a href="<%=ctxPath%>/search/main.bcs">내주변</a></td>
 		
 		<c:if test="${sessionScope.loginuser != null or (sessionScope.loginuser == null && sessionScope.loginseller == null && sessionScope.loginadmin == null) }">
-			<td width="6%"><a href="#">예약내역&nbsp;</a></td>
+			<td width="6%"><a href="<%=ctxPath%>/myReservation.bc">예약내역&nbsp;</a></td>
 		</c:if>
 		
 		<c:if test="${sessionScope.loginseller != null}">
-			<td width="6%"><a href="#">예약현황&nbsp;</a></td>
+			<td width="6%"><a href="<%=ctxPath%>/myReservation.bc">예약현황&nbsp;</a></td>
 		</c:if>
 		
 		<c:if test="${sessionScope.loginadmin != null}">

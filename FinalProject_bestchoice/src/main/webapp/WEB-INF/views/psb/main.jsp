@@ -24,7 +24,9 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <!--캘린더 -->
+<script type="text/javascript">
 
+</script>
 
 
 <body>
@@ -33,13 +35,14 @@
 
 <!-- Slide Show -->
 <section>
-
+<form id="smhSearchForm">
    <div class="main_envent_seach">
 	  <div class="main_envent_text_block" >	 <!-- 메인 검색창 상자  -->
 	     <div class="main_input_keword" style="display: inline-block;">	 
 		     <div class="keword">검색></div> 
 		     <img src="<%= ctxPath%>/resources/images/minha_images/input_keword.jpg"/>		      
-			 <input class="input_keword" type="text" placeholder="도시, 호텔, 공항명 입력" value="" autocomplete="off"/>
+			 <input type="hidden" name="smh_search" />
+			 <input class="input_keword" name="smh_search" id="smh_search" type="text" placeholder="호텔명 입력" value="" autocomplete="off"/>
 	      </div>
 	      
 	      <div class="schedule_calendar" >
@@ -122,10 +125,10 @@
 			</div> <!-- person_select  -->
 	  	 </div> <!-- setRoomPerson_box -->
 	</div> <!-- // Modal_set_room_person -->
-						 
-	      <button type="button" class="keword_search" id="keword_search_btn"><span>검색</span></button>   	 
+		 
+	      <button type="button" class="keword_search" id="smh_search_btn" ><span>검색</span></button>   	 
 </div> <!-- 메인 검색창  -->
-	    
+</form>	    
 	  <!-- 메인슬라이더 이미지  -->
 	  <a href="<%= ctxPath%>/event/main.bc">
 	  	<img class="mySlides" src="<%= ctxPath%>/resources/images/minha_images/main_event_４.jpg">

@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.common.AES256;
+import com.project.yhj.search.YhjSearchResultVO;
+import com.project.yhj.search.YhjSearchVO;
 
 
 
@@ -150,14 +152,7 @@ public class SmhService {
 			return reservationList;
 		}
 
-		
 
-
-
-
-	
-	
-	
 
 
 }
