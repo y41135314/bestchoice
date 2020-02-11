@@ -7,11 +7,11 @@
 <!-- namespace 는 보통 파일명 ( 프로젝트 내에서 고유해야 한다. ) -->
 <mapper namespace="yjuMapper" > 
 	
-	<!-- 결제완료 한사람만 리뷰 작성하기 oo -->
+	<!-- 결제완료 한사람만 리뷰 작성하기  -->
 	<resultMap type="HashMap" id="getUseMyRoomMap">
 		<result property="hotel_Name" 			column="hotel_Name" 			javaType="String" />
 		<result property="hotelImage_FileName" 	column="hotelImage_FileName" 	javaType="String" />
- 		<result property="hotel_Grade" 			column="hotel_Grade" 			javaType="int" />
+ 		<result property="hotel_category" 		column="hotel_category" 			javaType="String" />
  		<result property="hotel_Addr" 			column="hotel_Addr" 			javaType="String" />
  		<result property="room_name" 			column="room_name" 				javaType="String" />
  		<result property="finish_date" 			column="finish_date" 			javaType="String" />
@@ -22,7 +22,10 @@
  		<result property="fk_member_idx" 		column="fk_member_idx" 			javaType="int" />
 	</resultMap>
 	<select id="getUseMyRoom" resultMap="getUseMyRoomMap" parameterType="String">
-		select H.hotel_Name AS hotel_Name, G.hotelImage_FileName AS hotelImage_FileName, H.hotel_Grade AS hotel_Grade
+		select H.hotel_Name AS hotel_Name, G.hotelImage_FileName AS hotelImage_FileName
+		,decode(H.hotel_category, 1 , '특1급'
+              , 2 , '특급'
+              , 3 , '일반') AS hotel_category
 		     , H.hotel_Addr1||' '||H.hotel_Addr2||' '||H.hotel_Addr3 AS hotel_Addr
 		     , O.room_name, to_char(F.finish_date-1,'yyyy/mm/dd') AS finish_date
              , R.res_totalPrice AS res_totalPrice
@@ -40,25 +43,25 @@
 		order by F.finish_date desc
 	</select>
 	
-	<!-- 작성할 리뷰 번호 알아오기 oo-->
+	<!-- 작성할 리뷰 번호 알아오기 -->
 	<select id="getReviewseq" resultType="int">
 		select seq_here_review_no.nextval
 		from dual
 	</select>
 	
-	<!-- 리뷰테이블에 insert oo-->
+	<!-- 리뷰테이블에 insert -->
 	<insert id="addReview" parameterType="HashMap">
 		insert into tbl_here_review(review_no, fk_seq, title, content, grade0, grade1, grade2, grade3, grade4, registerday, status) 
 		values(#{review_no}, #{seq}, #{title}, #{content}, #{grade0}, #{grade1}, #{grade2}, #{grade3}, #{grade4}, default, default)  
 	</insert>
 	
-	<!-- 리뷰이미지테이블에 insert oo-->
+	<!-- 리뷰이미지테이블에 insert -->
     <insert id="addReviewimage" parameterType="HashMap">
     	insert into tbl_here_review_img(review_img_no , fk_review_no, wasImgname, orgImgname) 
 		values(seq_here_review_img_no.nextval, #{fk_review_no}, #{wasImgname}, #{orgImgname})  
     </insert>
 	
-	<!-- 리뷰테이블 select oo-->
+	<!-- 리뷰테이블 select -->
 	<resultMap type="HashMap" id="getreviewMap">
 		<result property="review_no" 	column="review_no" 		javaType="int" />
  		<result property="title" 		column="title" 			javaType="String" />
@@ -97,7 +100,7 @@
 		where rno between #{startRno} and #{endRno}
 	</select>
 	
-	<!-- 리뷰이미지테이블 select oo-->
+	<!-- 리뷰이미지테이블 select -->
 	<resultMap type="HashMap" id="getreviewImageMap">
 		<result property="review_no" 		column="review_no" 		javaType="int" />
  		<result property="title" 			column="title" 			javaType="String" />
@@ -163,7 +166,7 @@
 		where status = 1 and fk_hotel_idx = #{hotel_idx}
 	</select>
 	
-	<!-- 리뷰테이블 select oo-->
+	<!-- 리뷰테이블 select -->
 	<resultMap type="HashMap" id="reviewEditMap">
 		<result property="review_no" 	column="review_no" 		javaType="int" />
 		<result property="fk_seq" 	column="fk_seq" 		javaType="int" />
@@ -186,7 +189,7 @@
 		order by review_no desc
 	</select>
 	
-	<!-- 리뷰이미지테이블 select oo-->
+	<!-- 리뷰이미지테이블 select -->
 	<resultMap type="HashMap" id="reviewImageEditMap">
 		<result property="review_no" 		column="review_no" 		javaType="int" />
 		<result property="fk_seq" 	column="fk_seq" 		javaType="int" />
@@ -217,7 +220,7 @@
 		from tbl_here_review
 		where status = 1 and fk_seq = #{seq}
 	</select>
-	<!-- 리뷰이미지테이블 원래이미지 갯수읽어오기 oo-->
+	<!-- 리뷰이미지테이블 원래이미지 갯수읽어오기 -->
 	<select id="orgReviewImage" parameterType="String" resultType="String">
 		select count(*) AS count
 		from tbl_here_review_img
@@ -226,7 +229,7 @@
 		order by fk_review_no desc
 	</select>
 	
-	<!-- 리뷰이미지테이블 delete oo-->
+	<!-- 리뷰이미지테이블 delete -->
 	<delete id="delReviewImage" parameterType="HashMap" >
 		delete from tbl_here_review_img
 		where fk_review_no = #{review_no} 
@@ -238,7 +241,7 @@
 		</if>
 	</delete>
 	
-	<!-- 리뷰테이블 update 상태 0으로 oo-->
+	<!-- 리뷰테이블 update 상태 0으로 -->
 	<update id="updateReview" parameterType="HashMap">
 		
 		<if test="title != null">
@@ -347,6 +350,22 @@
         JOIN tbl_here_roomprice P
         ON P.fk_room_idx = R.room_idx
         where fk_hotel_idx = #{hotel_idx} and roomprice_date = to_date(#{startday},'yyyy-mm-dd')
+	</select>
+	
+	<!-- 방전체 이미지 알아오기 -->
+	<resultMap type="HashMap" id="getHotelTotalImageMap">
+		<result property="hotelimage_filename" 	column="hotelimage_filename" 		javaType="String" />
+		<result property="roomimage_filename" 	column="roomimage_filename" 		javaType="String" />
+	</resultMap>
+	<select id="getHotelTotalImage" parameterType="String" resultMap="getHotelTotalImageMap">
+		select fk_room_idx, hotelimage_filename, roomimage_filename
+		from TBL_HERE_HOTELINFO JOIN TBL_HERE_HOTELIMAGE H
+		ON hotel_idx = H.fk_hotel_idx
+		JOIN TBL_HERE_ROOMINFO R
+		ON hotel_idx = R.fk_hotel_idx
+		JOIN TBL_HERE_ROOMIMAGE
+		ON room_idx = fk_room_idx
+		where hotel_idx = #{hotel_idx}
 	</select>
 	
 	<!-- 방이미지 알아오기 -->
@@ -484,8 +503,8 @@
 		              , 'SERVICE_SHOWERROOM' , '객실샤워실'
 		              , 'SERVICE_BATHTUB' , '욕조'
 		              , 'SERVICE_HAIRDRYER' , '드라이기'
-		              ,'SERVICE_IRON' , '다리미'
-		                              , '전기밥솥') AS servicetype
+		              , 'SERVICE_IRON' , '다리미'
+		                               , '전기밥솥') AS servicetype
 		from tbl_here_roominfo R JOIN tbl_here_hotelinfo H
 		ON fk_hotel_idx = hotel_idx
 		JOIN 

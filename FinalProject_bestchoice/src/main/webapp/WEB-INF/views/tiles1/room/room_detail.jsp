@@ -587,10 +587,11 @@
                 </div>
 				<!-- comment -->
 				
-				<!-- chatting -->
+				<!-- chatting 
 	            <div style="width: 60%; margin: 0 auto; padding: 30px;">
 	            <button type="button" class="btn btn-info active" style="width: 100%; height: 40px;" onclick="openChatting()"><i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;1대 1 문의 </button>
 	            </div>
+	            -->
 			</div>
         </div>
         <!-- Right -->
