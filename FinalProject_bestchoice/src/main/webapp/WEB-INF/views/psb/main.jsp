@@ -127,10 +127,10 @@
 </div> <!-- 메인 검색창  -->
 	    
 	  <!-- 메인슬라이더 이미지  -->
-	  <a href="#">
+	  <a href="<%= ctxPath%>/event/main.bc">
 	  	<img class="mySlides" src="<%= ctxPath%>/resources/images/minha_images/main_event_４.jpg">
 	  </a>
-	  <a href="#">
+	  <a href="<%= ctxPath%>/event/main.bc">
 	  	 <img class="mySlides" src="<%= ctxPath%>/resources/images/minha_images/main_event_6.jpg">
 	  </a>
   </div> <!-- 메인이미지슬라이더 -->
@@ -152,7 +152,9 @@
 		  <div class ="slides_box">
 		  <div class="mySlides_1 fade">
 			  <div class="numbertext">1 / 3</div>
-			  <img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event5.png">
+			  <a href="<%= ctxPath%>/event/main.bc">
+			  	<img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event5.png">
+			  </a>
 			  <div class="slider_event_title">
 				<strong>음악의 바이브가 필요한 여기는 어때 회원 누구나  </strong>
 				<span> VIBE 1개월 이용권 </span>
@@ -161,7 +163,9 @@
 						
 		 <div class="mySlides_1 fade">
 			  <div class="numbertext">2 / 3</div>
+			  <a href="<%= ctxPath%>/event/main.bc">
 			  <img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event6.png">
+			  </a>
 			  <div class="slider_event_title">
 				<strong>우리카드 포인트로 숙박부터 액티비티까지</strong>
 				<span>보유포인트 전액 사용</span>
@@ -170,7 +174,9 @@
 		
 		<div class="mySlides_1 fade">
 		  <div class="numbertext">3 / 3</div>
+		  <a href="<%= ctxPath%>/event/main.bc">
 		  <img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event7.png">
+		  </a>
 		  <div class="slider_event_title">
 				<strong>50% cupon 을 돌려주는 페이백 </strong>
 				<span> 예약후 쿠폰을 돌려받아 보세요 </span>
@@ -193,7 +199,9 @@
 		
 		 <div class="mySlides_2 fade">
 			  <div class="numbertext">1 / 3</div>
-			  <img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event3.jpg">
+			  <a href="<%= ctxPath%>/event/main.bc">
+			  	<img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event3.jpg">
+			  </a>
 			  <div class="slider_event_title">
 				<strong>제주에서 가장 HOT한 호텔  </strong>
 				<span> 인피니트 풀에서 즐기는 제주여행  </span>
@@ -203,7 +211,7 @@
 		
 		 <div class="mySlides_2 fade">
 			  <div class="numbertext">2 / 3</div>
-			  <a href="#">
+			  <a href="<%= ctxPath%>/event/main.bc">
 			  <img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event2.jpg">
 			  </a>
 			  <div class="slider_event_title">
@@ -214,7 +222,7 @@
 		
 		<div class="mySlides_2 fade">
 		  <div class="numbertext">3 / 3</div>
-		  <a href="#">
+		  <a href="<%= ctxPath%>/event/main.bc">
 		  	<img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event1.jpg">
 		  </a>	
 		  <div class="slider_event_title">
@@ -239,7 +247,7 @@
 
 		<div class="main_content">				
 		   <div class="city_image" style="display: block; width: 1080px; height: 220px; margin: 0 auto; margin-bottom: 20px;">			
-			 <a href="#" onclick="">
+			 <a href="<%=ctxPath%>/search/main.bc" onclick="">
 				<strong class="city_" style="text-align: center; padding-left: 300px;" >지역별 BEST</strong>
 				<img src="<%= ctxPath%>/resources/images/minha_images/main_local_best.jpg" alt="" />
 			 </a>
@@ -248,14 +256,14 @@
 			
 				<div class="" style="display: inline-block;" >
 				<div class="city_image " style=" width: 255px; height: 305px;">			
-				  <a href="#" onclick="">
+				  <a href="<%=ctxPath%>/search/main.bc" onclick="">
 					<strong class="city_" style="text-align: center;" >강원</strong>
 					<img src="<%= ctxPath%>/resources/images/minha_images/main_gangwon_do1.jpg" alt="" />
 				 </a>				
 				 </div>
 				 
 				<div class="city_image" style=" width: 255px; height: 305px;">			
-				  <a href="#" onclick="">
+				  <a href="<%=ctxPath%>/search/main.bc" onclick="">
 					<strong class="city_" style="text-align: center;" >경기</strong>
 					<img src="<%= ctxPath%>/resources/images/minha_images/main_gyeonggi_do1.jpg" alt="" />
 				 </a>
@@ -264,7 +272,7 @@
 				 
 			
 				 <div class="city_image" style=" width: 522px; height: 625px; display: inline-block;">			
-				  <a href="#" onclick="">
+				  <a href="<%=ctxPath%>/search/main.bc" onclick="">
 					<strong class="city_" style="text-align: center; padding-left: 130px;" >서울</strong>
 					<img src="<%= ctxPath%>/resources/images/minha_images/main_seoul_1.jpg" alt="" />
 				 </a>
@@ -272,14 +280,14 @@
 	 
 				<div class="" style="display: inline-block;">
 	 				<div class="city_image" style=" width: 255px; height: 305px;">
-						 <a href="#" onclick="">
+						 <a href="<%=ctxPath%>/search/main.bc" onclick="">
 							<strong class="city_" style="text-align: center;" >제주</strong>
 							<img src="<%= ctxPath%>/resources/images/minha_images/main_jeju1.jpg" alt="" />
 						 </a>
 					 </div>
 	
 					<div class="city_image" style=" width: 255px; height: 305px;  ">			
-						  <a href="#" onclick="">
+						  <a href="<%=ctxPath%>/search/main.bc" onclick="">
 							<strong class="city_" style="text-align: center;" >부산</strong>
 							<img src="<%= ctxPath%>/resources/images/minha_images/main_busan1.jpg" alt="" />
 						 </a>
@@ -313,7 +321,7 @@
 			$(".input_calendar").flatpickr({
 			    mode: "range",
 			    dateFormat: "y-m-d",
-			    defaultDate: ["20-01-13", "20-01-14"],
+			    defaultDate: [new Date(), new Date().fp_incr(1)],
 				locale: { rangeSeparator: ' ~ ' }
 			}); 
 		});

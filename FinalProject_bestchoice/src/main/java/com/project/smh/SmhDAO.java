@@ -1,6 +1,7 @@
 package com.project.smh;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -23,12 +24,29 @@ public class SmhDAO {
 		
 		return n;		
 	}
+	
+	// 카카오 회원가입 
+	public int memberInsertForKakao(SmhMemberVO smhvo) {
+		
+		int n = sqlsession.insert("smhMapper.memberInsertForKakao", smhvo);
+		
+		return n;		
+	}
+	
+	
+
+
 
 	// 로그인처리
 	public SmhMemberVO getLoginMember(HashMap<String, String> paraMap) {
 
 		SmhMemberVO loginuser = sqlsession.selectOne("smhMapper.getLoginMember", paraMap);
 		return loginuser;
+	}
+	
+	public SmhMemberVO getKakaoLoginMember(HashMap<String, String> paraMap) {
+		SmhMemberVO kakaologinuser = sqlsession.selectOne("smhMapper.getKakaoLoginMember", paraMap);
+		return kakaologinuser;
 	}
 	
 	// 마지막으로 로그인 한 날짜시간 변경(기록)하기
@@ -104,14 +122,31 @@ public class SmhDAO {
 	}
 
 	public String getUserPoint(HashMap<String, String> paraMap) {
-		String point =sqlsession.selectOne("smhMapper.getUserPoint",paraMap );
+		String point = sqlsession.selectOne("smhMapper.getUserPoint",paraMap );
 		 return point;
 		
 	}
 	
-	
+	// 유저의 쿠폰가져오기 
+	public  List<HashMap<String, String>> couponList(HashMap<String, String> paraMap) {
+		List<HashMap<String, String>> couponList = sqlsession.selectList("smhMapper.getUserCoupon",paraMap);
+		return couponList;
+	}
+
+	public List<HashMap<String, String>> reservationList(HashMap<String, String> paraMap) {
+		List<HashMap<String, String>> reservationList = sqlsession.selectList("smhMapper.reservationList",paraMap);
+		
+		return reservationList;
+	}
 
 	
+
+
+
+
+
+	
+
 
 	
 	

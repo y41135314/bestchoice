@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>      
+    
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>  
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,6 +39,14 @@
 ul{
    list-style:none;
    }
+ .mhtitle{
+	  	display: inline-block;
+	    margin-right: 16px;
+	    padding: 0;
+	    font-size: 20px;
+	    font-weight: bold;
+   }
+   
 </style>
 <body>
 	<div class="align_rt">
@@ -44,7 +54,10 @@ ul{
 	        <div>
 	       		
 	            <div class="point_show gra_red">
-	                <span >사용 가능 포인트 </span><span >${point}</span>
+	                <span class="mhtitle ">사용 가능 포인트 </span>
+	                <span style="float:right; color:#F7323F; font-weight: bolder; font-size: 18pt;">
+	              	<%-- ${point} --%><fmt:formatNumber value="${point}" pattern="###,###"/>
+	                </span>
 	                <strong id="point-page-show"></strong>
 	            </div>
 			

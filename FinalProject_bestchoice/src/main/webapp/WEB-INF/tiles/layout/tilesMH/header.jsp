@@ -184,7 +184,7 @@ body {
 		
 	  	<td width="70%"></td>
 	     
-		<td width="6%"><a href="#">내주변</a></td>
+		<td width="6%"><a href="<%=ctxPath%>/search/main.bcs">내주변</a></td>
 		
 		<c:if test="${sessionScope.loginuser != null or (sessionScope.loginuser == null && sessionScope.loginseller == null && sessionScope.loginadmin == null) }">
 			<td width="6%"><a href="#">예약내역&nbsp;</a></td>
@@ -204,18 +204,18 @@ body {
 	               <i class="fa fa-caret-down"></i>
 	            </button>  
 			    <div class="dropdown-content">
-			      <a href="#">공지사항</a>
-			      <a href="#">이벤트</a>
-			      <a href="#">자주 묻는 질문</a>
-			      <a href="#">1:1문의</a>
+			      <a href="<%=ctxPath%>/notice/main.bc">공지사항</a>
+			      <a href="<%=ctxPath%>/event/main.bc">이벤트</a>
+			      <a href="<%=ctxPath%>/question/main.bc">자주 묻는 질문</a>
+			      <a href="<%=ctxPath%>/faq/main.bc">1:1문의</a>
 			      <a href="#">약관 및 정책</a>
 			    </div>
 			</div>
 		</td>
 		
 		<c:if test="${sessionScope.loginuser == null && sessionScope.loginseller == null && sessionScope.loginadmin == null}">  
-			<td width="5%"><a href="#">로그인</a></td>
-			<td width="6%"><a href="#">회원가입</a></td>
+			<td width="5%"><a href="<%=ctxPath%>/userLogin.bc">로그인</a></td>
+			<td width="6%"><a href="<%=ctxPath%>/userRegisterForm.bc">회원가입</a></td>
 		</c:if>
 		
 		<c:if test="${sessionScope.loginuser != null }">  
@@ -225,11 +225,10 @@ body {
 	               <i class="fa fa-caret-down"></i>
 	            </button>  
 			    <div class="dropdown-content">
-			      <a href="#">내정보</a>
-			      <a href="#">포인트</a>
-			      <a href="#">쿠폰함</a>
-			      <a href="#">예약내역</a>
-			      <a href="#">최근 본 숙소</a>
+			      <a href="<%=ctxPath%>/myPage.bc">내정보</a>
+			      <a href="<%=ctxPath%>/myPoint.bc">포인트</a>
+			      <a href="<%=ctxPath%>/myCoupon.bc">쿠폰함</a>
+			      <a href="<%=ctxPath%>/myReservation.bc">예약내역</a>
 			    </div>
 			</div>
 			</td>

@@ -196,8 +196,8 @@
 			      <a>${(sessionScope.loginuser).name}님</a>
 			      <a href="<%=ctxPath%>/myPage.bc">내정보</a>
 			      <a href="<%=ctxPath%>/myPoint.bc">포인트</a>
-			      <a href="#">쿠폰함</a>
-			      <a href="#">예약내역</a>
+			      <a href="<%=ctxPath%>/myCoupon.bc">쿠폰함</a>
+			      <a href="<%=ctxPath%>/myReservation.bc">예약내역</a>
 			    </div>
 			</div>
 			</td>		

@@ -40,8 +40,8 @@ font-size: 14pt;
     border-radius: 4px;
     text-align: center;
     width: 336px;
-    height: 56px;
-    font-size: 16px;   
+    height: 73px;
+    font-size: 20px;   
 }
 
 .layer_fix .btn_naver {
@@ -247,7 +247,7 @@ function here_Login() {
                 <strong class="logo"><a href="main.bc"><img id="main_Logo_img" src="<%= ctxPath%>/resources/images/minha_images/main_Logo.png"></a></strong>
     </div>
             <button type="button" id="kakao_login_btn" class="btn_start btn_kakao" data-device-type="W">
-            	<span><i class="icon-ic_login_kakaotalk"><img  class="Logo_img" src="<%= ctxPath%>/resources/images/minha_images/kakao_ico.png"/></i>카카오톡으로 로그인</span>
+            	<a href="${kakao_url}" style="text-decoration: none;"><span><i class="icon-ic_login_kakaotalk"><img  class="Logo_img" src="<%= ctxPath%>/resources/images/minha_images/kakao_ico.png"/></i>카카오톡으로 로그인</span></a>
             </button>
             
             	<%@ page import="java.net.URLEncoder" %>

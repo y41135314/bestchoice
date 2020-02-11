@@ -3,6 +3,7 @@ package com.project.smh;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.mail.Session;
@@ -30,6 +31,32 @@ public class SmhService {
 		return n;		
 	}
 	
+	// 회원가입
+	public int memberInsertForKakao(SmhMemberVO smhmbrvo) {		
+		int n = dao.memberInsertForKakao(smhmbrvo);
+		return n;		
+	}
+	
+	
+	
+	// 카카오로그인유처리 
+		public SmhMemberVO getKakaoLoginMember(HashMap<String, String> paraMap) {
+			
+			SmhMemberVO kakaologinuser = dao.getKakaoLoginMember(paraMap);
+		if(kakaologinuser != null) {			
+			if(kakaologinuser.getPwdchangegap() > 6) {
+				// 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 6개월이 지났으면 true 로 변경한다.
+				kakaologinuser.setRequirePwdChange(true);					
+			}	
+				
+				// 마지막 로그인날짜 업데이트 
+				dao.setLastLoginDate(paraMap); 
+				kakaologinuser.setEmail(kakaologinuser.getEmail());
+			
+		  }	
+		 return kakaologinuser;
+		}
+	
 	// 로그인유처리 
 	public SmhMemberVO getLoginMember(HashMap<String, String> paraMap) {
 		
@@ -47,6 +74,9 @@ public class SmhService {
 	  }	
 	 return loginuser;
 	}
+	
+
+
 	
 	// 이메일(id)중복검사
 	public int userEmailCheck(String email) {
@@ -102,13 +132,26 @@ public class SmhService {
 		int m = dao.pwdUpdate(paraMap);
 		return m;
 	}
-
+	// 유저의 포인트 가져오기 
 	public String getUserPoint(HashMap<String, String> paraMap) {		
 		 String point =dao.getUserPoint(paraMap);
 		 return point;
 	}
-
 	
+	// 유저의 쿠폰가져오기 
+		public  List<HashMap<String, String>> couponList(HashMap<String, String> paraMap) {
+		   List<HashMap<String, String>> couponList = dao.couponList(paraMap);
+			return couponList;
+		}
+
+		// 유저 예약내역조회 
+		public List<HashMap<String, String>> reservationList(HashMap<String, String> paraMap) {
+			List<HashMap<String, String>> reservationList = dao.reservationList(paraMap);
+			return reservationList;
+		}
+
+		
+
 
 
 

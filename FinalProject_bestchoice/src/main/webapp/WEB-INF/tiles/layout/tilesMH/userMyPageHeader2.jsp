@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
+<link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet"> 
 <style>
 
 #loginUserMyPage {
@@ -21,7 +22,7 @@
 
 #adminInfo{
 	float: left;
-	font-size: 15px;
+	font-size: 18px;
 	color: white;  
 	display: inline-block;
 	position: relative;   
@@ -40,11 +41,11 @@
 </style>    
 
 <div id="loginUserMyPage">    
-	<p id="header2">  
+	<p id="header2"  style="font-family: 'Do Hyeon', sans-serif;">  
 			 내정보
 	</p> 
 		  
-	<p id="adminInfo">
+	<p id="adminInfo" style="font-family: 'Do Hyeon', sans-serif;" >
 	안녕하세요!  <span style="font-weight: bold;">${(sessionScope.loginuser).name}</span> 님 
 	</p>
 		    
