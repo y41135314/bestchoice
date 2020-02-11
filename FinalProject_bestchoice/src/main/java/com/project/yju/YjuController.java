@@ -24,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.project.common.FileManager;
 import com.project.kmt.KmtHotelInfoVO;
 import com.project.kmt.KmtRoomImageVO;
+import com.project.common.MyUtil;
 
 
 
@@ -298,6 +299,9 @@ public class YjuController {
 			break;
 		}
 		
+		// 전체(호텔, 방) 이미지 알아오기
+		List<HashMap<String, String>> hotelTotalImageList = service.getHotelTotalImage(hotel_idx);
+		
 	    List<HashMap<String, Object>> reviewImageMapList = service.getreviewImage(); 
 		request.setAttribute("reviewImageMapList", reviewImageMapList);
 		request.setAttribute("gradeMap", gradeMap);
@@ -312,9 +316,11 @@ public class YjuController {
 	    request.setAttribute("startday", startday);
 		request.setAttribute("endday", endday);
 		
-		// 전체(호텔, 방) 이미지 알아오기
-		List<HashMap<String, String>> hotelTotalImageList = service.getHotelTotalImage(hotel_idx);
 		request.setAttribute("hotelTotalImageList", hotelTotalImageList);
+		
+		HttpSession session = request.getSession();
+		String gobackURL = MyUtil.getCurrentURL(request);
+		session.setAttribute("gobackReviewURL", gobackURL);
 
 	   return "room/room_review.tiles1";
 	
@@ -325,7 +331,7 @@ public class YjuController {
 	public String jyuAOP_reviewWriteList(HttpServletRequest request, HttpServletResponse response) {
 		
 		String member_idx = request.getParameter("member_idx");
-		
+		String gobackURL = request.getParameter("gobackURL");
 		
 		List<HashMap<String, Object>> useMyRoomList = service.getUseMyRoom(member_idx);
 		
@@ -356,6 +362,7 @@ public class YjuController {
 		}*/
 		
 		request.setAttribute("seqList", seqList);
+		request.setAttribute("gobackURL", gobackURL);
 		
 		return "room/reviewWriteList.tiles1";
 	}
@@ -367,6 +374,7 @@ public class YjuController {
 	    
 	   String member_idx = request.getParameter("member_idx");
 	   String seq = request.getParameter("seq");
+	   String gobackURL = request.getParameter("gobackURL");
 	  
 	   HashMap<String, String> ReviewWriteMap = new HashMap<String, String>(); 
 	  
@@ -374,6 +382,7 @@ public class YjuController {
 	   ReviewWriteMap.put("seq", seq);
 	   
 	   request.setAttribute("ReviewWriteMap", ReviewWriteMap);
+	   request.setAttribute("gobackURL", gobackURL);
 		
 	   return "room/reviewWrite.tiles1"; // String 사용하는 view단: views/yju/reviewWrite.jsp 이다.
 	}
@@ -477,6 +486,7 @@ public class YjuController {
 		   }
 	   }
 	   
+	  
 	   request.setAttribute("n", n);
 	   
 	   return "room/reviewWriteEnd.tiles1"; 
@@ -497,27 +507,6 @@ public class YjuController {
     	// 수정해야할 글 1개 내용 가져오기 (조회수 증가없이 글만 가져오기)
     	HashMap<String, Object> reviewEditMap = service.reviewEdit(seq);
     	List<HashMap<String, Object>> reviewImageEditMapList = service.reviewImageEdit(seq);
-    	
-    	// 내글인지 남의 글인지 알아오기
-//	    	HttpSession session = request.getSession();
-//	    	MemberVO loginuser = (MemberVO)session.getAttribute("loginuser");
-    	
-    	// before advice 이므로 loginuser는 절대 null이 아니다!! 따라서 .equals가능!
-    	// 다른사람이 쓴 글이라면~
-//	    	if(!loginuser.getUserid().equals(boardvo.getFk_userid())) {
-//	    		String msg = "다른 사용자의 글은 수정이 불가합니다.";
-//	    		String loc = "javascript:history.back()";
-//	    		
-//	    		mav.addObject("msg", msg);
-//	    		mav.addObject("loc", loc);
-//	    		
-//	    		mav.setViewName("msg");
-//	    	}
-//	    	else {
-//	    		// 자신의 글을 수정한 경우
-//	    		mav.addObject("boardvo",boardvo);
-//		        mav.setViewName("board/edit.tiles1");
-//	    	}
     	
     	mav.addObject("reviewEditMap",reviewEditMap);
     	mav.addObject("reviewImageEditMapList",reviewImageEditMapList);
@@ -649,7 +638,13 @@ public class YjuController {
     	else {
     		mav.addObject("msg", "글삭제 성공!!");
     	}
-    	mav.addObject("loc", request.getContextPath()+"/roomReview.bc");
+    	
+    	HttpSession session = request.getSession();
+    	String gobackReviewURL = (String) session.getAttribute("gobackReviewURL");
+    	
+    	session.removeAttribute("gobackReviewURL");
+    	
+    	mav.addObject("loc", gobackReviewURL);
 		mav.setViewName("msg");
 
 		return mav;

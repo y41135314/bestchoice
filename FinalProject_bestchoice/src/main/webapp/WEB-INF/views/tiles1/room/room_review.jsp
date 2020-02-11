@@ -515,7 +515,8 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		
-		var allReviewNum = $("#allReviewNum").val();
+		var allReviewNum = $("#allReviewNum").text();
+		console.log(allReviewNum);
 		
 		if(allReviewNum != 0) {
 			gradeChart();
@@ -642,14 +643,15 @@
 		
 	}); // end of $(document).ready()--------------------------------------
 	
-	<%-- function goRoomDetail(hotel_idx){
-		var url = "<%= ctxPath%>/productReviewWrite.bc?hotel_idx="+hotel_idx+"";
-		
-		// 팝업창 띄우기
-		window.open(url, "reviewWrite",
-				    "width=500px, height=700px, top=50px, left=300px");
-	}// end of function openReviewWrite(loginuser)-------------
-	 --%>
+	// 리뷰 쓰기 버튼 누르고 목록가기
+	function goReviewList(member_idx) {
+		var frm = document.goReviewListFrm;
+		frm.member_idx.value = member_idx;
+		frm.method = "GET";
+		frm.action = "<%= ctxPath%>/reviewWriteList.bc";
+		frm.submit();
+	}
+	
 	// 랜덤이미지
 	function showImage(){
 		
@@ -856,11 +858,6 @@
     <div class="tab_content">
 		
 		<div id="tab_review" class="tabcontent" style="display: block;">
-		<%-- <c:if test="${sessionScope.loginuser != null}">
-		  	<div class="total_review_info">
-		  		<button type="button" class="gra_left_right_red" onClick="javascript:location.href='<%= ctxPath%>/reviewWriteList.bc?member_idx=${sessionScope.loginuser.member_idx}'"> 리뷰 작성하기 </button>
-		  	</div>
-	  	</c:if> --%>
 		
 		<!-- tab_review -->
 		  	<div id="total_review_info" class="total_review_info">
@@ -878,7 +875,12 @@
 		  	
 		  	<c:if test="${sessionScope.loginuser != null}">
 			  	<div class="total_review_info">
-			  		<button type="button" class="gra_left_right_red" onClick="javascript:location.href='<%= ctxPath%>/reviewWriteList.bc?member_idx=${sessionScope.loginuser.member_idx}'"> 리뷰 작성하기 </button>
+			  		<%-- <button type="button" class="gra_left_right_red" onClick="javascript:location.href='<%= ctxPath%>/reviewWriteList.bc?member_idx=${sessionScope.loginuser.member_idx}'"> 리뷰 작성하기 </button> --%>
+			  		<button type="button" class="gra_left_right_red" onClick="goReviewList('${sessionScope.loginuser.member_idx}')"> 리뷰 작성하기 </button>
+			  		
+			  		<form name="goReviewListFrm">
+				   		<input type="hidden" name="member_idx" />
+					</form>
 			  	</div>
 		  	</c:if>
 		  	
@@ -925,10 +927,10 @@
 		  	</c:if>       
 	
 		<c:if test="${gradeMap.allReviewNum == 0}">
-			<div style="margin: 0 auto; margin-left: 200px;"> 
+			<div style="margin: 0 auto; margin-left: 200px; display: inline-block;"> 
        			<br/><br/>
-       			<span style= "font-size: 40px; font-weight: bold; margin-left: 100px; line-height: 300%;">작성된 리뷰가 없습니다.</span>
-       			<img style= "width:20%; float: right;" src="<%= ctxPath%>/resources/images/관리자헤더.png"/>
+       			<span style= "font-size: 40px; font-weight: bold; padding-top: 100px; margin-left: 100px; line-height: 500%;">작성된 리뷰가 없습니다.</span>
+       			<img style= "width:30%; float: right;" src="<%= ctxPath%>/resources/images/리뷰.jpg"/>
        			<br/><br/>
      		</div>
 		</c:if>   
@@ -937,6 +939,8 @@
 		
     </div>
     <!-- tab_content-->
+    
+    
     
     <%-- 페이지바 보여주기 === --%>
 	<div class="pagination" align="center" style="padding: 40px; position:relative;">
