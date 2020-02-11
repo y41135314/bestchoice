@@ -25,43 +25,50 @@
 	$("#tile_yhj_head_div").hide();
 		$(document).ready(function(){
 	
+			$("input[name=room_idx]").val("${room_idx}");
+			
+			
+			
 			payInit(); //결제 관련 초기화 
 			
 			$("#payBtn").on("click",function(){
 				if(validation() == true){
 					$("input[name=pay_method]").val($("#payMethod").select().val());
 				  // IMP.request_pay(param, callback) 호출
-					$("input[name=amount]").val($("#payAmt").text().replace(/,/g,""));
-				  IMP.request_pay(
-					  $("form[name=payForm]").serializeObject(), function (rsp) { // callback
-					  if (rsp.success) {
-						  
-						  $("input[name=buyer_name]").val($("input[name=booker]").val());	
-						  var resPoint = '0'// 적립금 사용내역 일단 0 으로 처리해 두었습니다. 
-						  var resPayment = $("input[name=resPayment]").val();
-						///원본  var resPayment = $("input[name=pay_method]").val();
-						  var resPaymentStatus = '1'; // 결제 상태 (0:예약전 1: 결제 o 3:취소)
-						  var resNumber = $("input[name=merchant_uid]").val();
-						  var amount = $("input[name=amount]").val();
-						  var mpointCash = $("input[name=mpointCash]").val();
-						  if(resPayment =='card'){
-							  resPayment = '0'
-						  }else if(resPayment == 'kakaopay'){
-							  resPayment = '1'
-						  }else if( payMethod =='naverco'){
-							  resPayment = '2'
-						  }
-						  
-						  $("input[name=res_payment]").val(resPayment);
-						  
-						  var frm = document.payForm;
-						  frm.method="POST";
-						  frm.action="<%= request.getContextPath()%>/pay/reserveSuccess.bc";
-						  frm.submit();
-						  
-				    } else {
-				       alert(rsp.error_msg)
-				    }
+					$("input[name=res_totalprice]").val($("#payAmt").text().replace(/,/g,""));
+				  IMP.request_pay({
+					
+					pg: "inicis",
+					pay_method: $("#payMethod").select().val(),
+					merchant_uid: new Date().getTime(),
+					name : "여기는어때:결제테스트",
+					amount : $("#payAmt").text().replace(/,/g,""),
+
+				  }, function (rsp) { // callback
+						  if (rsp.success) {
+							  
+							  
+							  $("input[name=res_receipt]").val(rsp.merchant_uid);
+							  
+							  var resPayment = $("#payMethod").select().val(); 
+							  
+							  if(resPayment =='card'){
+								  $("input[name=res_payment]").val("0");
+							  }else if(resPayment == 'kakaopay'){
+								  $("input[name=res_payment]").val("1");
+							  }else if( payMethod =='naverco'){
+								  $("input[name=res_payment]").val("2");
+							  }
+							  
+							  
+							  var frm = document.payForm;
+							  frm.method="POST";
+							  frm.action="<%= request.getContextPath()%>/pay/reserveSuccess.bc";
+							  frm.submit();
+							  
+					    } else {
+					       alert(rsp.error_msg)
+					    }
 				  });
 				}
 			});
@@ -172,12 +179,12 @@
 				return false;	
 			}
 			
-			 if($("#phone").val() == '' || $("#phone").val() == null  ){
+			/*  if($("#phone").val() == '' || $("#phone").val() == null  ){
 				alert("휴대폰번호 확인해주세요.");
 				return false;	
 			}else if("인증체크 값" ){
 				alert("휴대폰인증을 진행해주세요");
-			} 
+			}  */
 			
 			
 			 if($("input[name=member_idx]").val() =='' || $("input[name=member_idx]").val() == null){
@@ -202,18 +209,29 @@
 			}///end of sendAuthCode;
 			
 	       //확인 (인증)
-			function sendCode(){
+			function sendCode(certification){
 				var  certification = $("#certification").val();
 			     
-				var numStr = "${ sessionScope.numStr}";
-				
+				// var numStr = "${ sessionScope.numStr}";
+				// var numStr = sessionStorage.getItem("numStr");				
 
-				if(numStr == certification ) {   //세션값이랑  인증번호값 확인
+			/* 	 if(numStr == certification ) {   //세션값이랑  인증번호값 확인
 					alert("인증에 성공하였습니다.");
 					
 				} else {
 					alert("인증에 실패하였습니다.");
-				}
+				} */ 
+				
+				$.ajax({ 
+					url: "<%=request.getContextPath()%>/checkSms.bc", 
+					data: { receiver: certification }, 
+					type: "post", 
+					success: function(result) {
+						
+						alert(result.msg);
+					
+					} 
+				});  ///end of ajax
 				
 				
 			}
@@ -277,6 +295,12 @@
     <div id="content">
         <div class="reserve">
         <form name="payForm">
+        	<input type="hidden" name="room_idx" >
+        	<input type="hidden" name="startday" value="${startday}" >
+        	<input type="hidden" name="endday" value="${endday}" >
+        	
+        	<input type="hidden" name="res_payment">
+        	
  			<input type="hidden" name="pg" value="inicis">
 			<input type="hidden" name="pay_method">
 			<input type="hidden" name="buyer_email" value="${member.email}">
@@ -284,9 +308,10 @@
 	        <input type="hidden" name="name" value="여기는 어때"> <!--상품명-->
 	        <input type="hidden" name="buyer_name" value="${member.name}"> <!-- 구매자 -->
 	        <input type="hidden" name="buyer_tel" value="${member.hp1}-${member.hp2}-${member.hp3}"> <!--구매자 폰번호-->
-	        <input type="hidden" name="amount" value="${reservation.res_totalprice}"><!--결제금액-->
-		
-			<input type="hidden" name="mpointCash" value="${reservation.mpointCash}">
+	        <input type="hidden" name="res_totalprice" ><!--결제금액-->
+			<input type="hidden" name="res_receipt">
+			
+			
 			<input type="hidden" name="member_idx" value="${ sessionScope.loginuser.member_idx }">
             <div class="reserve-payment">
                 <p class="tit">예약자 정보</p>
@@ -313,7 +338,7 @@
                 <div class="input-wrap">
                     <label for="certification"><b>인증번호</b></label>
                     <div class="input-element add-btn add-timer">
-                        <input type="text" id="certification" placeholder="체크인시 필요한 정보입니다.">
+                        <input type="text" id="certification" placeholder="인증번호를 입력해주세여">
                         <input style="width: 150px; padding: 0;" class="inputPwd" type="hidden" id="authCodehidden">
                         <!-- <span class="timer">3:00</span> -->
                        <button type="button" class="ui-button __square-small __black" id="authCodeSend" name="authCodeSend" onclick="sendCode()">
@@ -332,7 +357,7 @@
                 <div class="input-wrap" style="float: right; width: 500px;">
                     <label for="phone">적립금 사용</label>
                     <div class="input-element add-btn">
-	     				<input type="text" id="mpointCash" onKeyup="this.value=this.value.replace(/[^0-9]/g,'');" />
+	     				<input type="text" name="mpointCash" id="mpointCash" onKeyup="this.value=this.value.replace(/[^0-9]/g,'');" />
 						<button id="mpointCashBtn" type="button">적립금사용</button>
                     </div> 
                 </div>

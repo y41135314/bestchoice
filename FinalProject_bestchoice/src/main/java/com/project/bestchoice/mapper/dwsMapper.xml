@@ -50,10 +50,7 @@
 		WHERE RES_NUMBER = #{res_number}
 	</update>
 	
-	<insert id="insertFinish" parameterType="com.project.dws.DwoReservationVO">
-		INSERT INTO TBL_HERE_FINISH ( SEQ , FK_RES_NUMBER , FINISH_ADDPOINT , FINISH_PAYMENTSTATUS )
-		VALUES ( seq_here_finish.nextval , #{res_number} , #{finish_addpoint} , #{res_paymentstatus} )
-	</insert>
+	
 
 	<update id="updatePayStatus" parameterType="com.project.dws.DwoReservationVO">
 		UPDATE TBL_HERE_RESERVATION 
@@ -81,30 +78,53 @@
 		INSERT INTO TBL_HERE_RESERVATION (
             RES_NUMBER,
             RES_RECEIPT,
+            FK_MEMBER_IDX,
             FK_ROOM_IDX,
+            RES_PAYMENT,
             RESSTATUS_IN_DAY,
             RESSTATUS_OUT_DAY,
             RES_TOTALPRICE,
             RES_POINT,
             RES_PAYMENTSTATUS,
-            HOTEL_IDX
+            RES_PAYMENTDAY,
+            FK_HOTEL_IDX
             ) values (
 	            #{res_number},
 	            #{res_receipt},
+	            #{fk_member_idx},
 	            #{room_idx},
-	            #{resstatus_in_day} , 
-	            #{resstatus_out_day}, 
+	            #{res_payment},
+	            to_date(#{startday},'yyyy-mm-dd') , 
+	            to_date(#{endday},'yyyy-mm-dd'), 
 	            #{res_totalprice}, 
-	            #{res_point}, 
-	            #{res_paymentstatus}, 
-	            #{hotel_idx}
+	            #{mpointCash}, 
+	            1, 
+	            sysdate,
+	            (select hotel_idx from tbl_here_hotelInfo a join tbl_here_roomInfo b 
+	            on a.hotel_idx=b.fk_hotel_idx where room_idx = #{room_idx})
             )
 	</insert>
 		
+	<insert id="insertFinish" parameterType="com.project.dws.DwoReservationVO">
+		INSERT INTO TBL_HERE_FINISH ( 
+		SEQ , FK_RES_NUMBER , FINISH_ADDPOINT , FINISH_PAYMENTSTATUS )
+		VALUES ( 
+		seq_here_finish.nextval , #{res_number} , 
+		#{finish_addpoint} , 0 )
+	</insert>	
+		
 	<select id="selectResNumber" resultType="String">
-	
 		SELECT seq_tbl_here_hotelInfo.NEXTVAL FROM DUAL
 	</select>
+	
+	
+	<update id="updateMpoint" parameterType="com.project.dws.DwoReservationVO">
+		
+		update tbl_here_mpoint set mpointcash = mpointcash - #{mpointCash}
+		where fk_member_idx = #{fk_member_idx}
+		
+	</update>
+	
 	
 	
 	<resultMap type="HashMap" id="roomMap">

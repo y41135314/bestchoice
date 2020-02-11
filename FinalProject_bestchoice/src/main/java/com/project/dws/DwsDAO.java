@@ -28,8 +28,9 @@ public class DwsDAO {
 		sqlsession.update("dwsMapper.updateReservation",dwoReservation);
 	}
 	
-	public void insertFinish(DwoReservationVO dwoReservation) {
-		sqlsession.insert("dwsMapper.insertFinish",dwoReservation);
+	public int insertFinish(DwoReservationVO dwoReservation) {
+		int n = sqlsession.insert("dwsMapper.insertFinish",dwoReservation);
+		return n;
 	}
 
 	public void updatePayStatus(DwoReservationVO reservationVO) {
@@ -40,8 +41,10 @@ public class DwsDAO {
 		return sqlsession.selectOne("dwsMapper.selectMpointCash",meber_idx);
 	}
 
-	public void insertReservation(DwoReservationVO reservationVO){
-		sqlsession.insert("dwsMapper.insertReservation",reservationVO);
+	public int insertReservation(DwoReservationVO reservationVO){
+		
+		int n = sqlsession.insert("dwsMapper.insertReservation",reservationVO);
+		return n ;
 	}
 
 	public String selectResNumber() {
@@ -60,6 +63,12 @@ public class DwsDAO {
 	public List<HashMap<String, String>> getCouponList(String member_idx) {
 		// TODO Auto-generated method stub
 		return sqlsession.selectList("dwsMapper.getCouponList", member_idx);
+	}
+
+	
+	public int updateMpoint(DwoReservationVO reservationVO) {
+
+		return sqlsession.update("dwsMapper.updateMpoint", reservationVO);
 	}
 	
 	//커밋

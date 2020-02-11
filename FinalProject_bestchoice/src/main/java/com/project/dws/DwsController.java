@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONObject;
+import org.json.JSONString;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonObject;
+import com.project.common.MyUtil;
+import com.project.psb.AdminVO;
 import com.project.smh.SmhMemberVO;
 import com.project.smh.SmhRandom;
 
@@ -83,89 +87,28 @@ public class DwsController {
 	
 	
 	@RequestMapping(value="/pay/reserveSuccess.bc",method={RequestMethod.POST})
-	public String reserveSuccess(HttpServletRequest request, Model model , DwoReservationVO rvo  ) {
+	public String reserveSuccess(HttpServletRequest request, Model model , DwoReservationVO rvo  ) throws Throwable {
 		HttpSession session = request.getSession();
 		SmhMemberVO loginuser = (SmhMemberVO) session.getAttribute("loginuser"); 
 		
-		DwoReservationVO dwoReservation = new DwoReservationVO();
 		
-		//post 처리방식 ?
-		//reserve.bc  ---->
-		 
-	//	String
-		///결제 완료시
+		rvo.setFk_member_idx(String.valueOf(loginuser.getMember_idx() ));
 		
-        
+		int n = service.insertReservation(rvo);
 		
+		if( n==1 ) {
+			
+			
+			return "dws/success.tiles_dws";
+		}
+		else {
+			
+			request.setAttribute("msg", "결제에 실패했습니다.");
+			request.setAttribute("loc", "javascript:location.href='history.back();'");
+			
+			return "msg";
+		}
 		
-		String res_paymentstatus = request.getParameter("res_payment1Status"); //예약상태
-		String res_payment = request.getParameter("res_payment");//(0카드/신용 1카카오페이 2네이버)
-		String res_point = request.getParameter("res_point"); ///적립금 사용내역 
-		String res_number = request.getParameter("res_number"); ///적립금 사용내역 
-		String amount = request.getParameter("amount"); //적립금계산
-		String mpointCash = request.getParameter("mpointCash");
-		
-
- 		//방정보 조회 
- 		
-		//DwoReservationVO reservationVO = service.selectReservation(res_number);//예약정보 조회 
-		//현재 로그인이 아닌상태일시 loginuser 가존재 하지 않아 member_idx가 존재하지않음 
- 		//해서 TBL_HERE_RESERVATION 테이블 inset 시 member_idx 제거후 insert 작업수행
- 		//결제완료후 member_idx는 update 처리 
-		
-		
-		
-//		DwoReservationVO reservationVO = new DwoReservationVO();
-//		Calendar cal = Calendar.getInstance();
-//		int date = cal.get ( cal.DATE ) ;
-		
-//		String res_number = service.selectResNumber();
-//		reservationVO.setRes_number(res_number);
-//		/*reservationVO.setResstatus_in_day(resstatus_in_day);
-//		reservationVO.setResstatus_out_day(resstatus_out_day);*/
-//		
-//		reservationVO.setResstatus_in_day(startday);
-//		reservationVO.setResstatus_out_day(endday);
-//		reservationVO.setRoom_idx(room_idx);
-//		//reservationVO.setRes_totalprice(res_totalprice);
-//		reservationVO.setRes_paymentstatus("1");// 결제상태
-//		reservationVO.setHotel_idx(hotel_idx);
-//		reservationVO.setRes_point("0"); //혹시 몰라서 일단 박아둠 현재 상태에서 적립금사용액 없음 
-//		reservationVO.setRes_receipt(String.valueOf(date)+hotel_idx); //영수증 번호 생성 ( 날자+hotel_idx)
-//		service.insertReservation(reservationVO);
-//
-//		reservationVO = service.selectReservation(res_number);
-//		reservationVO.setMpointCash("0"); //디폴트값 세팅
-//		//insert 문 추가 
-//	/*	reservationVO.setResstatus_in_day(resstatus_in_day.substring(0, 4)+"년"+resstatus_in_day.substring(4, 6)+"월"+resstatus_in_day.substring(6, 8)+"일");
-//		reservationVO.setResstatus_out_day(resstatus_out_day.substring(0, 4)+"년"+resstatus_out_day.substring(4, 6)+"월"+resstatus_out_day.substring(6, 8)+"일");*/
-//		reservationVO.setResstatus_in_day(startday.substring(0, 4)+"년"+startday.substring(4, 6)+"월"+startday.substring(6, 8)+"일");
-//		reservationVO.setResstatus_out_day(endday.substring(0, 4)+"년"+endday.substring(4, 6)+"월"+endday.substring(6, 8)+"일");
-//		
-//		model.addAttribute("reservation", reservationVO );
-		
-		
-		
-		
-		
-		//추가 적립금 비워놨습니다 쿼리에 0 으로 하드코딩 
-		int point = Integer.valueOf(amount)/10;
-		
-		//적립금 차감 update 
-		dwoReservation.setMember_idx(String.valueOf(loginuser.getMember_idx()));
-		dwoReservation.setFk_member_idx(String.valueOf(loginuser.getMember_idx()));
-		dwoReservation.setMpointCash(mpointCash); //사용된 적립금 
-		dwoReservation.setRes_number(res_number);		 
-		dwoReservation.setRes_paymentstatus(res_paymentstatus);
-		dwoReservation.setRes_payment(res_payment);
-		dwoReservation.setRes_point(res_point);
-		dwoReservation.setRes_paymentstatus("1");
-		service.updateReservation(dwoReservation); //사용된 적립금  update 
-		dwoReservation.setFinish_addpoint(String.valueOf(point)); //추가 적립금 inset  
-		service.insertFinish(dwoReservation); //고객  추가 적립금 inset  
-		service.updateDeductionMpointCash(dwoReservation); //고객 마일리지 공제후 업데이트 
-		
-		return "dws/success.tiles_dws";
 	} 
 	
 	
@@ -199,6 +142,7 @@ public class DwsController {
 	  	    int dupCd = 1;
 	  	    String numStr = SmhRandom.numberGen(len, dupCd);
 	  	    
+	  	    System.out.println("인증 번호 : "+numStr);
 	  	    session.setAttribute("numStr", numStr);
 
 	    	//String api_key = "test"; //api key
@@ -230,6 +174,31 @@ public class DwsController {
 	          }
 	      }
 
+		@ResponseBody
+	    @RequestMapping(value = "/checkSms.bc", method= {RequestMethod.POST})
+		public String checkSms(String receiver, HttpServletRequest request)  {
+			
+			String jsonStr = "";
+			
+			HttpSession session = request.getSession();
+			String numStr = (String) session.getAttribute("numStr");
+			
+			JSONObject jsonObj = new JSONObject();
+			if( numStr !=null && numStr.equals(receiver) ) {
+				
+				jsonObj.put("msg", "인증에 성공했습니다.");
+				jsonStr = jsonObj.toString();
+			}
+			else {
+				
+				jsonObj.put("msg", "인증에 실패했습니다.");
+				jsonStr = jsonObj.toString();
+			}
+			return jsonStr;
+	      }
+		
+		
+		
 		////커밋테스입니다
 	
 	

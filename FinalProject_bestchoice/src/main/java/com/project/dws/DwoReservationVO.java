@@ -20,7 +20,7 @@ public class DwoReservationVO {
 	String resstatus_out_day; //퇴실일
 	String res_totalprice;//최종결제금액  
 	String res_point;//적립금 사용 또는 적립내역    
-	String res_paymentstatus; //예약상태
+	String res_paymentstatus; //예약상태 
 	String finish_paymentstatus;//결제 상태 (0:예약전  1: 결제 o )
 	String finish_addpoint;//추가적립금
 	String res_paymentDay; //결제일
@@ -116,7 +116,28 @@ public class DwoReservationVO {
 		this.finish_paymentstatus = finish_paymentstatus;
 	}
 	public String getFinish_addpoint() {
-		return finish_addpoint;
+		
+		try {
+			
+			int res_point = Integer.parseInt(mpointCash);
+			
+			if( res_point == 0) {
+				
+				int totalprice = Integer.parseInt(res_totalprice);
+				int point = totalprice/10*1;
+				
+				return String.valueOf(point);
+			}
+			else {
+				
+				return "0";
+			}
+			
+		} catch (Exception e) {
+		
+			return "0";
+		}
+		
 	}
 	public void setFinish_addpoint(String finish_addpoint) {
 		this.finish_addpoint = finish_addpoint;
