@@ -284,6 +284,7 @@
 		.hotel_price span:nth-child(1) {
 			color: #ff0000;
 			font-size: 9pt;
+			font-weight:bold;
 		}
 		
 		.hotel_price span:nth-child(3) {
@@ -571,6 +572,7 @@
 		.hotel_price span:nth-child(1) {
 			color: #ff0000;
 			font-size: 9pt;
+			font-weight:bold;
 		}
 		
 		.hotel_price span:nth-child(3) {
@@ -1522,7 +1524,14 @@
 								</li>
 								
 								<li class="hotel_price">
-									<span>${ hotelvo.gradePerHotel }</span><br>
+									<span>리뷰 평점 : 
+										<c:if test="${ hotelvo.gradePerHotel == null }">
+											0.0
+										</c:if>  
+										<c:if test="${ hotelvo.gradePerHotel != null }">
+											${hotelvo.gradePerHotel}
+										</c:if>  
+									</span><br>
 									<span><fmt:formatNumber value="${ hotelvo.roomprice }" pattern="#,###.##"/></span>
 									<span>원</span>
 								</li>
