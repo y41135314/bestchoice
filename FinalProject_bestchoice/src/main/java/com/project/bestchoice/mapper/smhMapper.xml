@@ -12,6 +12,14 @@
 	insert into tbl_here_member(member_idx, email, pwd, name, nickname, hp1, hp2, hp3, gender, birthday, registerday, lastLoginDate, lastpwdChangeDate)
 	values(seq_here_member.nextval, #{email}, #{pwd}, #{name}, #{nickname}, #{hp1}, #{hp2}, #{hp3},#{gender}, #{birthday}, sysdate, sysdate, sysdate)
 	</insert>
+	<!-- 카카오 회원가입 -->
+	<insert id="memberInsertForKakao" parameterType="com.project.smh.SmhMemberVO">
+	insert into tbl_here_member(member_idx, email, pwd, name, registerday, lastLoginDate, lastpwdChangeDate)
+	values(seq_here_member.nextval, #{email}, #{pwd}, #{name}, sysdate, sysdate, sysdate)
+	</insert>
+	
+	
+	
 	
 	<!--로그인처리   -->
 	<select id="getLoginMember" resultType="com.project.smh.SmhMemberVO" parameterType="HashMap">
@@ -23,8 +31,24 @@
 			 where mstatus = 1 and 
 		     email = #{email} and
 		     pwd = #{pwd}
+		     	
+	</select>
+	
+	<!--카카오 로그인처리   -->
+	<select id="getKakaoLoginMember" resultType="com.project.smh.SmhMemberVO" parameterType="HashMap">
+
+		     select member_idx,name,email,mstatus
+			  , trunc( months_between(sysdate, lastLoginDate) ) AS lastlogindategap 
+              , trunc( months_between(sysdate, lastpwdChangeDate) ) AS lastpwdChangeDate 
+			 from tbl_here_member 
+			 where mstatus = 1 and 
+		     email = #{email} and
+		     pwd = #{pwd}
 		     		
 	</select>
+	
+	
+	
 	<!-- 마지막으로 로그인한 날짜 변경하기  -->
 	<update id="setLastLoginDate" parameterType="HashMap">
 	 update tbl_here_member set lastLoginDate = sysdate
@@ -81,12 +105,51 @@
 	</update>
 	
 	<!-- 회원의 포인트 조회해 오기   -->
-	<select id="getUserPoint" parameterType="HashMap" resultType="String"     >
+	<select id="getUserPoint" parameterType="HashMap" resultType="String" >
 	select mpointcash
 	from   tbl_here_mpoint  
 	where fk_member_idx = #{memberidx}
 	</select>
 	
 	
+	<!-- 회원의 포인트 조회해 오기   -->
+	<resultMap type="HashMap" id="getUserCouponMap">
+	<result property="coupon_name" 		  column="coupon_name" 				javaType="String" />
+	<result property="coupon_discountMon" column="coupon_discountMon" 		javaType="String" />
+	<result property="coupon_startday" 	  column="coupon_startday" 			javaType="String" />
+	<result property="coupon_endday" 	  column="coupon_endday" 			javaType="String" />
+	<result property="coupon_useday" 	  column="coupon_useday" 			javaType="String" />
+	<result property="fk_idx" 			  column="fk_idx" 			javaType="String" />
+	</resultMap>
+	<select id="getUserCoupon" parameterType="HashMap" resultMap="getUserCouponMap">
+	SELECT b.coupon_name, b.coupon_discountMon, b.coupon_startday, b.coupon_endday, b.coupon_useday 
+	from tbl_here_member_coupon a
+	join tbl_here_admin_coupon b
+	on a.fk_coupon_code = b.coupon_code
+	where a.fk_idx = #{memberidx}
+	</select>
+	
+	<!-- 회원의 예약내역 조회해오기   -->
+	<resultMap type="HashMap" id="reservationMap">	
+	<result property="hotel_Name" 	column="hotel_Name" 		javaType="String" />
+	<result property="hotel_Addr1" 	column="hotel_Addr1" 		javaType="String" />
+	<result property="hotel_Addr2" 	column="hotel_Addr2" 		javaType="String" />
+	<result property="hotel_Addr3" 	column="hotel_Addr3" 		javaType="String" />
+	<result property="hotel_Post" 	column="hotel_Post" 		javaType="String" />
+	<result property="hotel_Phone" 	column="hotel_Phone" 		javaType="String" />
+	<result property="hotelImage_FileName" 	column="hotelImage_FileName" 		javaType="String" />
+	</resultMap>
+	<select id="reservationList" parameterType="HashMap" resultMap="reservationMap">
+	select  a.hotel_Name, a.hotel_Addr1, a.hotel_Addr2,a.hotel_Addr3,a.hotel_Post, a.hotel_Phone, b.hotelImage_FileName
+	from tbl_here_hotelInfo a join TBL_HERE_RESERVATION c 
+	on a.hotel_idx     =  c.fk_hotel_idx join tbl_here_hotelImage b
+	on c.fk_hotel_idx  =  b.fk_hotel_idx join tbl_here_member 
+	on c.fk_member_idx = member_idx
+	where member_idx = #{member_idx}
+	</select>
+		
+		
+		
+		
 </mapper>
 

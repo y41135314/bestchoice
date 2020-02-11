@@ -12,8 +12,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
+<link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet">
 <style type="text/css">
+
 .sidenav {
  display: inline-block;
 }
@@ -24,7 +25,6 @@
   padding-top: 15px;
   height: 100%;
   width: 238px;
-  position: fixed;
   z-index: 1;
   overflow-x: hidden;
   padding-left: 0;
@@ -34,27 +34,29 @@
 
 .sidenav a {
   display: block;
-  font-size: 18px;
+  font-size: 25px;
   color: rgba(0,0,0,0.56);
   text-decoration: none;
   height: 18px;
   margin: 15px;
- 
+ font-weight: bolder;
+ font-family: 'Do Hyeon', sans-serif;
 }
 
 
 .sidenav a:hover {
-  color: #f1f1f1;
+  color: #f7323f;
 }
 
  .sidenav {
  
-  font-size: 14px; /* Increased text to enable scrolling */
+  font-size: 25px;
   position: relative;
   padding: 100px 0px 50px;
   width: 238px;
-  border: solid 2px yellow;
   height: 1000px;
+
+  
   
 } 
 </style>
@@ -68,9 +70,9 @@
 <div class="sidenav sub_wrap my_wrap">
   <nav>
         <ul>
-            <li><a class="" href="<%=ctxPath%>/myPoint.bc">포인트</a></li>
-            <li><a class="" href="<%=ctxPath%>/my/coupon">쿠폰함</a></li>
-            <li><a class="" href="<%=ctxPath%>/my/reserveList">예약 내역</a></li>
+            <li><a href="<%=ctxPath%>/myPoint.bc">포인트</a></li>
+            <li><a class="" href="<%=ctxPath%>/myCoupon.bc">쿠폰함</a></li>
+            <li><a class="" href="<%=ctxPath%>/myReservation.bc">예약 내역</a></li>
             <li><a class="active" href="<%=ctxPath%>/myPage.bc">내 정보 관리</a></li>
             <!-- <li><a class="active" href="/my/mypage">내 정보 관리</a></li> -->
         </ul>
