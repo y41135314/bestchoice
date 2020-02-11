@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
@@ -149,10 +150,10 @@
 	     
 	     
 	     
-		<td width="6%"><a href="#">내주변</a></td>
+		<td width="6%"><a href="<%=ctxPath%>/search/main.bc">내주변</a></td>
 		
 		<c:if test="${sessionScope.loginuser != null or (sessionScope.loginuser == null && sessionScope.loginseller == null && sessionScope.loginadmin == null) }">
-			<td width="6%"><a href="#">호텔&nbsp;</a></td>
+			<td width="6%"><a href="<%=ctxPath%>/search/main.bc">호텔&nbsp;</a></td>
 		</c:if>
 		
 		<c:if test="${sessionScope.loginseller != null}">
