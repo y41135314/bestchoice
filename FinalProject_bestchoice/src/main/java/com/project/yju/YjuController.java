@@ -76,7 +76,7 @@ public class YjuController {
 		
 		// 호텔 정보 알아오기
 		KmtHotelInfoVO hotelInfoVO = service.getHotelInfo(hotel_idx);
-		String hotel_Addr = hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
+		String hotel_Addr = hotelInfoVO.getHotel_Addr1()+" "+hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
 		int hotel_Category = hotelInfoVO.getHotel_Category(); 
 		String str_hotel_Category = "";
 		
@@ -151,7 +151,7 @@ public class YjuController {
 		// 호텔 정보 알아오기
 		KmtHotelInfoVO hotelInfoVO = service.getHotelInfo(hotel_idx);
 		
-		String hotel_Addr = hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
+		String hotel_Addr = hotelInfoVO.getHotel_Addr1()+" "+hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
 		int hotel_Category = hotelInfoVO.getHotel_Category(); 
 		String str_hotel_Category = "";
 		
@@ -277,7 +277,7 @@ public class YjuController {
 		HashMap<String,Object> gradeMap = service.getreviewGrade(hotel_idx);
 		// 호텔 정보 알아오기
 		KmtHotelInfoVO hotelInfoVO = service.getHotelInfo(hotel_idx);
-		String hotel_Addr = hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
+		String hotel_Addr = hotelInfoVO.getHotel_Addr1()+" "+hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
 		int hotel_Category = hotelInfoVO.getHotel_Category(); 
 		String str_hotel_Category = "";
 		
@@ -671,7 +671,7 @@ public class YjuController {
     		// 호텔 정보 알아오기
     		KmtHotelInfoVO hotelInfoVO = service.getHotelInfo(hotel_idx);
     		
-    		String hotel_Addr = hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
+    		String hotel_Addr = hotelInfoVO.getHotel_Addr1()+" "+hotelInfoVO.getHotel_Addr2()+" "+hotelInfoVO.getHotel_Addr3();
 			
 			JSONArray jsonArr = new JSONArray();
 			
