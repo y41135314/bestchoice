@@ -780,10 +780,10 @@
             </c:if>
             <!-- room -->
             <c:if test="${roomInfoList.isEmpty()}">
-            	<div style="margin: 0 auto; margin-left: 200px; display: inline-block;"> 
+            	<div style="margin: 0 auto; margin: 0 100px; display: inline-block;"> 
        			<br/><br/>
        			<span style= "font-size: 50px; font-weight: bold; line-height: 300%; display: inline-block;">이용가능한 객실이 없습니다.</span>
-       			<img style= "width:28%; float: right; display: inline-block;" src="<%= ctxPath%>/resources/images/관리자헤더.png"/>
+       			<img style= "width:20%; float: right; display: inline-block;" src="<%= ctxPath%>/resources/images/리뷰.jpg"/>
        			<br/><br/>
      			</div>
             </c:if>
