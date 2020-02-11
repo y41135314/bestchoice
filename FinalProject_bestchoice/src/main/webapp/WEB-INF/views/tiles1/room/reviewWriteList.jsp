@@ -222,7 +222,7 @@
 		          				<c:if test="${seqList != null }">
 		          					<c:forEach var="seq" items="${seqList}">
 		          					<c:if test="${seq == useMyRoomMap.seq}">
-		          					<input class="seq seq${status.index} ${status.index}" type="text" value="${seq}"/>
+		          					<input class="seq seq${status.index} ${status.index}" type="hidden" value="${seq}"/>
 		          					</c:if>
 		          					</c:forEach>
 		          					<div class="btn${status.index}"></div>
@@ -241,7 +241,7 @@
             </div>
 			
 			<form name="gobackURLFrm">
-            <input class="count count${status.index} ${status.index}" type="text" value="${useMyRoomMap.seq}"/>
+            <input class="count count${status.index} ${status.index}" type="hidden" value="${useMyRoomMap.seq}"/>
             </form> 
             </c:forEach>
        		</c:if>
