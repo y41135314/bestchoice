@@ -222,7 +222,10 @@ button {
   text-decoration: none;
   cursor: pointer;
 }
+.fix_title{
+padding-bottom: 20px;
 
+}
 .fix_title strong {
     font-size: 24px;
     margin-bottom: 15px;
@@ -231,7 +234,8 @@ button {
 .cont b {
 padding-top: 0;
     font-size: 18px;
-    line-height: 26px;
+    line-height: 30px;
+    margin-bottom: 20px;
 }
 .btn_red_fill button{
 
@@ -281,6 +285,12 @@ margin-top: 16px;
 }
 .userOut{
  border: none;
+
+}
+.dot_txt{
+ list-style:none;
+ float: left;
+ line-height: 30px;
 
 }
 
@@ -568,10 +578,12 @@ $(document).ready(function(){
 			    <div class="fix_title">
 			     	<strong style="text-align: center;">회원탈퇴</strong>	
 			     	<span class="close">&times;</span>
-			    </div>	       
+			    </div>	   
+			       
 			    <div class="cont" >
-		            <b>주의사항</b>
-		            <strong style="display: block;">회원탈퇴 전 반드시 확인해주세요.</strong>
+		            <b style="margin-bottom: 20px;">주의사항</b>
+		        
+		            <strong style="display: block; padding-bottom: 20px;">회원탈퇴 전 반드시 확인해주세요.</strong>
 		            <ul class="dot_txt">
 		                <li>회원탈퇴 시 계정 정보는 복구가 불가하며 1일 이후 재가입 가능합니다.</li>
 		                <li>현재 보유 중인 포인트, 마일리지, 쿠폰은 모두 소멸되며 복구할 수 없습니다.</li>

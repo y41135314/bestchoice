@@ -203,11 +203,11 @@
 		 <div class="mySlides_2 fade">
 			  <div class="numbertext">1 / 3</div>
 			  <a href="<%= ctxPath%>/event/main.bc">
-			  	<img id="second_evetn_img" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event3.jpg">
+			  	<img id="second_evetn_img" style="width: 528px; height: 246px;" src="<%= ctxPath%>/resources/images/minha_images/main_scond_event8.png">
 			  </a>
 			  <div class="slider_event_title">
-				<strong>제주에서 가장 HOT한 호텔  </strong>
-				<span> 인피니트 풀에서 즐기는 제주여행  </span>
+				<strong>여기는어때 오픈 이벤트 </strong>
+				<span> 가입한 유저에게는 쿠폰을!!  </span>
 			</div>
 		 </div>
 		  	
