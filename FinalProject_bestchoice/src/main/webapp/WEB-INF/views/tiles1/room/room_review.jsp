@@ -301,11 +301,11 @@
 	*/
 	
 .star-rating { width:205px; text-align: left;}
-.star-rating,.star-rating span { display:inline-block; height:39px; overflow:hidden; background:url('/test_bestchoice/resources/images/star.png')no-repeat; }
+.star-rating,.star-rating span { display:inline-block; height:39px; overflow:hidden; background:url('/bestchoice/resources/images/star.png')no-repeat; }
 .star-rating span{ background-position:left bottom; line-height:0; vertical-align:top; }
 
 .mini-star-rating { width:123px; text-align: left;}
-.mini-star-rating,.mini-star-rating span { display:inline-block; height:24px; overflow:hidden; background:url('/test_bestchoice/resources/images/mini_star.png')no-repeat; }
+.mini-star-rating,.mini-star-rating span { display:inline-block; height:24px; overflow:hidden; background:url('/bestchoice/resources/images/mini_star.png')no-repeat; }
 .mini-star-rating span{ background-position:left bottom; line-height:0; vertical-align:top; }
 
 
