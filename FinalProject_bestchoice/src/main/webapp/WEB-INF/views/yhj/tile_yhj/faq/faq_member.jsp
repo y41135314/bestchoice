@@ -373,7 +373,7 @@
 			
 				<div id="myFaq" style="min-height:350px;">
 					
-					<c:if test="${ faqList != null }"> 
+					<c:if test="${ not empty faqList }"> 
 						<table>
 							<c:forEach var="vo" items="${ faqList }">  
 						
@@ -407,7 +407,7 @@
 						</table>
 					 </c:if>
 					
-					<c:if test="${ faqList == null }">  
+					<c:if test="${ empty faqList }">  
 						
 						<div style="text-align: center; padding-top: 50px;">
 							<div style="font-weight: bold; font-family: 'Nanum Gothic', sans-serif; font-size:16pt;">등록된 1:1 문의가 없습니다.</div>
