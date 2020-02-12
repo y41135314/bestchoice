@@ -24,10 +24,6 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <!--캘린더 -->
-<script type="text/javascript">
-
-</script>
-
 
 <body>
 
@@ -41,8 +37,10 @@
 	     <div class="main_input_keword" style="display: inline-block;">	 
 		     <div class="keword">검색></div> 
 		     <img src="<%= ctxPath%>/resources/images/minha_images/input_keword.jpg"/>		      
-			 <input type="hidden" name="smh_search" />
-			 <input class="input_keword" name="smh_search" id="smh_search" type="text" placeholder="호텔명 입력" value="" autocomplete="off"/>
+			 <form id="smh_hotel_search" >
+				 <input type="hidden" name="hotel_name" />
+				 <input class="input_keword" name="hotel_name" id="smh_search" type="text" placeholder="호텔명 입력" value="" autocomplete="off"/>
+	      	 </form>
 	      </div>
 	      
 	      <div class="schedule_calendar" >
@@ -61,6 +59,7 @@
 					  
 				    <div class="calendar_text" style="color: #909090;">
 				    	<img src="<%= ctxPath%>/resources/images/minha_images/main_calendar.png" alt="" />날짜선택</div>
+				    <input type="hidden" name=""  />
 				    <input class="input_calendar"type="text" placeholder="체크인 - 체크아웃" data-input style="width: 250px;"> <!-- input is mandatory -->
 	
 				    <a class="input-button" title="toggle" data-toggle>
@@ -320,13 +319,65 @@
 		}
 
 		$(document).ready(function(){
+			
+			var startdayStr = "${startday}";
+			var enddayStr = "${endday}";
+			
+			
+			if(!((startdayStr == null) && (enddayStr == null))){
+				var startdayArr = startdayStr.split("-");
+				var year1 = startdayArr[0];
+				var month1 = startdayArr[1]-1;
+				var day1 = startdayArr[2];
+				
+				var enddayArr = enddayStr.split("-");
+				var year2 = enddayArr[0];
+				var month2 = enddayArr[1]-1;
+				var day2 = enddayArr[2];
+				
+				var startday = new Date(year1, month1, day1);
+				var endday = new Date(year2, month2, day2); 
+			}
+			else {
+				var startday = new Date();
+				var endday = new Date().fp_incr(1);
+			}
+			
+			
+			
 			// 캘린더 
 			$(".input_calendar").flatpickr({
 			    mode: "range",
 			    dateFormat: "y-m-d",
 			    defaultDate: [new Date(), new Date().fp_incr(1)],
-				locale: { rangeSeparator: ' ~ ' }
+				locale: { rangeSeparator: ' ~ ' },
+				
+				saveButton: true,
+			    onChange: function (selectedDates, dateStr, instance) {
+			    	if(selectedDates.length==2) {
+			        	$('#roomDetailFrm').submit();
+			    	}
+			    }
+				 
+				    
 			}); 
+			
+			
+			//검색하기
+			$("#smh_search_btn").click(function(){
+				
+				var searchWord = $("#smh_search").val();
+				var calendarStr = $('.input_calendar').val();
+				var calendarArr = calendarStr.split("~");
+				var startday = "20"+calendarArr[0].trim();
+				var endday = "20"+calendarArr[1].trim();
+				
+				location.href="<%= request.getContextPath()%>/search/main.bc?searchWord="+searchWord+"&startday="+startday+"&endday="+endday;
+				
+			});
+			
+			
+			
 		});
 		
 		
