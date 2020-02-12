@@ -31,47 +31,24 @@
 <!-- 뷰단   -->
 
 
-<style>
-table, th, td {
-  border: 1px solid black;
-  border-collapse: collapse;
-}
-th, td {
-  padding: 5px;
-  text-align: left;    
-}
-</style>
+
 
 
 <body>
-    <div id="content">
+  <div id="content">
+
         <div class="reserve">
-		  
-		  
-     <h1>결제 완료</h1>
-	<p>결제 내역 확인.</p>
-	
-	<table style="width:100%">
-	  <tr>
-	    <th>숙소이름:</th>
-	    <td>  <p class="txt">${roomMap.hotel_name}</p></td>
-	  </tr>
-	  <tr>
-	    <th rowspan="2">객실타입</th>
-	    <td> <p class="txt">${roomMap.room_name}</p></td>
-	  </tr>
-	  <tr>
-	    <td>1박</td>
-	  </tr>
-	    <tr>
-	    <th>결제금액:</th>
-	    <td> <p class="txt">${roomMap.room_name}</p></td>
-	  </tr>
-	</table>
-		 <button><a href="<%=request.getContextPath()%>/main.bc" style="color: red;">홈으로</a></button>
-       
-       </div>
+        	결제 성공 
+        <span id="reserve">결제가 성공적으로 완료 되었습니다.</span><br/><br/>
+       <span style="font-size: 18pt;">이용해 주셔서 감사합니다.</span><br/><br/><br/>
         </div>
+
+
+           <div>
+      <span class="spanBtn homeBtn"><a href="<%= ctxPath%>/main.bc"; style="color: red;">홈으로 돌아가기</a></span>&nbsp;&nbsp;&nbsp;
+
+    </div>
+  
         
         
 
