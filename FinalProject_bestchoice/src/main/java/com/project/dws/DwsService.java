@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.smh.SmhMemberVO;
 
 
-///수정
+///커밋테스트
 @Service
 public class DwsService {
 

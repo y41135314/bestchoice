@@ -6,6 +6,7 @@
 %>    
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>    
 
+<!-- 확인용 -->
 <!DOCTYPE html>
 <html>
 <head>

@@ -86,6 +86,7 @@ public class DwsController {
 	
 	
 	
+	
 	@RequestMapping(value="/pay/reserveSuccess.bc",method={RequestMethod.POST})
 	public String reserveSuccess(HttpServletRequest request, Model model , DwoReservationVO rvo  ) throws Throwable {
 		HttpSession session = request.getSession();
@@ -147,14 +148,14 @@ public class DwsController {
 
 	    	//String api_key = "test"; //api key
 	        //String api_secret = "test";  //api secret
-	        String api_key = "NCSL0KA7LMSAAN6A"; //api key
-	        String api_secret ="BPH3ZWN9HQZR5CTOTSKUQ0X8JMQRUWZC";  //api secret
+	        String api_key = " NCSYJAH9R10MRKGZ"; //api key
+	        String api_secret ="1DKDYWLQWSFVT07C7M6KGECDSBYMANJV";  //api secret
 	        com.project.dws.sms.Coolsms coolsms = new com.project.dws.sms.Coolsms(api_key, api_secret);
 	         //com.project.dws.sms에서 정보를 받아오겟다
 	        HashMap<String, String> params = new HashMap<String, String>();
 	        params.put("to", receiver); // 받는번호
 
-	        params.put("from", "01045606752"); //보내는번호
+	        params.put("from", "01062745556"); //보내는번호
 	        params.put("text", "여기는어때 입니다. 인증번호 [" + numStr  + "] 를 화면에 입력해주세요."); 
 	        params.put("type", "sms");
 	        params.put("mode", "test");
@@ -174,6 +175,7 @@ public class DwsController {
 	          }
 	      }
 
+		//인증확인 
 		@ResponseBody
 	    @RequestMapping(value = "/checkSms.bc", method= {RequestMethod.POST})
 		public String checkSms(String receiver, HttpServletRequest request)  {

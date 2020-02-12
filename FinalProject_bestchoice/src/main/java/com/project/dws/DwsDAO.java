@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.project.smh.SmhMemberVO;
-
+///커밋 테스트
 @Repository
 public class DwsDAO {
 
