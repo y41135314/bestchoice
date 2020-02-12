@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
- 
+ //커밋테스트
 /*
  * Https.class
  * Https request, response를 관리하는 class 입니다.

@@ -5,7 +5,7 @@
 <%
 	String ctxPath = request.getContextPath();
 %>
-    
+<!--     확인용 -->
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -179,12 +179,12 @@
 				return false;	
 			}
 			
-			/*  if($("#phone").val() == '' || $("#phone").val() == null  ){
+		  if($("#phone").val() == '' || $("#phone").val() == null  ){
 				alert("휴대폰번호 확인해주세요.");
 				return false;	
 			}else if("인증체크 값" ){
 				alert("휴대폰인증을 진행해주세요");
-			}  */
+			}  
 			
 			
 			 if($("input[name=member_idx]").val() =='' || $("input[name=member_idx]").val() == null){
@@ -211,7 +211,7 @@
 	       //확인 (인증)
 			function sendCode(certification){
 				var  certification = $("#certification").val();
-			     
+			    var authCodehidden = $("#authCodehidden").val();
 				// var numStr = "${ sessionScope.numStr}";
 				// var numStr = sessionStorage.getItem("numStr");				
 
@@ -222,6 +222,11 @@
 					alert("인증에 실패하였습니다.");
 				} */ 
 				
+				if(certification == authCodehidden)
+					alert("인증번호가 일치합니다.");
+				else
+					alert("인증번호가 일치하지 않습니다.");
+				<%-- 
 				$.ajax({ 
 					url: "<%=request.getContextPath()%>/checkSms.bc", 
 					data: { receiver: certification }, 
@@ -231,7 +236,7 @@
 						alert(result.msg);
 					
 					} 
-				});  ///end of ajax
+				}); --%>  ///end of ajax
 				
 				
 			}
@@ -332,7 +337,8 @@
 									인증번호 전송
 									</button>
                     </div>
-                    <p class="txt-warning" style="visibility: hidden;" id="authCodehidden">휴대폰 번호를 확인해주세요.</p><!-- 개발 -->
+                    <!-- <p class="txt-warning" style="visibility: hidden;" id="authCodehidden">휴대폰 번호를 확인해주세요.</p> --><!-- 개발 -->
+                    <input type="hidden" id="authCodehidden" />
                 </div>
                 <!-- s:개발, 인증번호 전송시 보여지는 영역 -->
                 <div class="input-wrap">

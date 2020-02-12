@@ -7,7 +7,7 @@
 <%
 	String ctxPath = request.getContextPath();
 %>
-    
+    <!--  확인용 -->
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -30,21 +30,27 @@
 </head>
 <!-- 뷰단   -->
 
-<
+
+
+
 
 <body>
-    <div id="content">
+  <div id="content">
+
         <div class="reserve">
+        	결제 성공 
         <span id="reserve">결제가 성공적으로 완료 되었습니다.</span><br/><br/>
        <span style="font-size: 18pt;">이용해 주셔서 감사합니다.</span><br/><br/><br/>
         </div>
-        
-        
+
+
            <div>
-      <span class="spanBtn homeBtn"><a href="<%= ctxPath%>/main.bc"; style="color: white;">홈으로 돌아가기</a></span>&nbsp;&nbsp;&nbsp;
+      <span class="spanBtn homeBtn"><a href="<%= ctxPath%>/main.bc"; style="color: red;">홈으로 돌아가기</a></span>&nbsp;&nbsp;&nbsp;
 
     </div>
+  
+        
+        
 
 </body>
 </html>
-    
