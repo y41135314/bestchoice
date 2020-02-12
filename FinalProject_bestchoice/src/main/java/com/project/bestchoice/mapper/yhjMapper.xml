@@ -638,7 +638,7 @@
 	    left join
 	        (
 	            select  hotel_idx as fk_hotel_idx
-	            , round( avg(totalGradePerCount), 1 ) as gradePerHotel
+	            , nvl ( round( avg(totalGradePerCount), 1 ), 0 ) as gradePerHotel
 	            from 
 	            (
 	                select  a.hotel_idx, d.totalGradePerCount

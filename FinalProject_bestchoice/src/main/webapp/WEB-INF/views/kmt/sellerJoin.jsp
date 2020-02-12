@@ -381,7 +381,11 @@ $(document).ready(function(){
 				$("input[name=hotel_Addr1]").val(data.sido);    // 큰주소                        예> 서울특별시 종로구 인사로 17 
 			    $("input[name=hotel_Addr2]").val(data.sigungu+" "+data.query);
 			    $("input[name=hotel_Addr3]").focus();
-
+				
+			    console.log($("input[name=hotel_Addr1]"));
+			    console.log($("input[name=hotel_Addr2]"));
+			    console.log($("input[name=hotel_Addr3]"));
+			    
 			    const geocoder = new daum.maps.services.Geocoder();
 			    
 		        Promise.resolve(data).then(o => {

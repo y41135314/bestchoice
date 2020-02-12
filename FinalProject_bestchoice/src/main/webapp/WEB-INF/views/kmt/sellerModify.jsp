@@ -103,7 +103,6 @@ body, html {
   font-size: 17px;
 }
 <%-- ------------------------------------------------------------------------------------- --%>
-
 * {box-sizing: border-box;}
 ul {list-style-type: none;}
 body {font-family: Verdana, sans-serif;}
@@ -200,7 +199,6 @@ body {font-family: Verdana, sans-serif;}
 	color: #ccc;
 	text-decoration: none;
 }
-
 .footer a:hover {
 	cursor: pointer;
 }
@@ -216,9 +214,12 @@ body {font-family: Verdana, sans-serif;}
 
 <%-- ------------------------------------------------------------------------------------- --%>
 </style>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript">
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function openPage(pageName,elmnt,color) {
 	  var i, tabcontent, tablinks;
 	  tabcontent = document.getElementsByClassName("tabcontent");
@@ -241,21 +242,95 @@ function goRoomModify(){
 	
 	frm.action
 }
-////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $(document).ready(function(){
 	
-	$("#defaultOpen").trigger("click")
+	$("#defaultOpen").trigger("click");
 	
-	$('#inputStartDate').change(function (){
-		var startDate = $("#startDate").val();
-		$("#inputStartDate").val()=startDate;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	1. Home			
+//  Home에 오늘날짜 뿌려주기
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1;	//Jan is 0
+	var yyyy = today.getFullYear();
+	if(dd<10) {
+	    dd='0'+dd;
+	} 
+	if(mm<10) {
+	    mm='0'+mm;
+	}
+
+	today = yyyy + '-' + mm + '-' + dd;
+	document.getElementById("page1_date_span").innerHtml = today;
+	console.log(today);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+//  Home에 남은객실 체크인 체크아웃 재실중 들어온예약 취소된 예약 보여주기
+	
+	var emptyroom =0;
+	var checkin =0;
+	var checkout=0;
+	var usingRoom=0; 
+	var inreserv =0; 
+	var outreserv=0;
+	
+	// today = $("#page4_date_span").text();
+		
+	$.ajax({
+		url: "<%= request.getContextPath()%>/seller/modifyHome.bc",
+		type: "POST",
+		data: { 'emptyroom': emptyroom  ,
+				'checkin': checkin ,
+				'checkout': checkout,
+				'usingroom': usingRoom,
+				'inreserv': inreserv,
+				'outreserv': outreserv,
+				'today': today
+// 				'fk_hotel_idx': fk_hotel_idx
+		} ,
+		dataType: "json",
+		success: function(json){
+		
+				 $("#emptyroom").val(json.emptyroom);
+				 $("#checin").val(json.checin);
+				 $("#checkout").val(json.checkout);
+				 $("#usingroom").val(json.usingroom);
+				 $("#inreserv").val(json.inreserv);
+				 $("#outreserv").val(json.outreserv);
+
+		}, 
+		error: function(request, status, error){
+			alert("code: "+request.status+"\n"+"message: "+request.responseTest+"\n"+"error: "+error);
+		}
+	
 	});
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// page4 날짜 설정하기
+////////////////////////////////////////////////////////////////////////
+//	2. 예약목록		//////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+//	3. 객실달력		//////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+//	4. 객실요금조정		//////////////////////////////////////////////////////////////////////
+//  날짜뿌려주기
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1;	//Jan is 0
+	var yyyy = today.getFullYear();
+	if(dd<10) {
+	    dd='0'+dd;
+	} 
+	if(mm<10) {
+	    mm='0'+mm;	
+	}
+
+	today = yyyy + '-' + mm + '-' + dd;
+	document.getElementById("page4_date_span").innerHtml = today;
+//  page4 날짜 설정하기
 	var today = new Date();
 	$("#page4_date_span").text( today.getFullYear() +" 년 "+(today.getMonth()+1)+" 월 "+today.getDate()+" 일 ");
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// page4 요금 조정의 날짜 변환하기
+
+//  page4 요금 조정의 날짜 변환하기
 	$("#page4_date_prev").click(function(){
 		
 		var date_text = $("#page4_date_span").text().replace( /(\s*)/g, "");
@@ -296,79 +371,25 @@ $(document).ready(function(){
 		getRoomPriceQuant();
 	});
 	var count = 1;
-	$(".insertRoom2").hide();
-	$(".insertRoom3").hide();
-	$(".insertRoom4").hide();
-	$(".insertRoom5").hide();
-	$(".insertRoom6").hide();
-	$(".insertRoom7").hide();
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// page6 의 추가하기 버튼
-	$("#roomInsertBtn").click(function(){
-		
-		count++;
-		if(count == 8){
-			alert("더이상 추가할 수 없습니다.	");
-			return;
-		}
-		$(".insertRoom"+count).show();
-		
-	});
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Home에 오늘날짜 뿌려주기
-	var today = new Date();
-	var dd = today.getDate();
-	var mm = today.getMonth()+1;	//Jan is 0
-	var yyyy = today.getFullYear();
-	if(dd<10) {
-	    dd='0'+dd;
-	} 
-	if(mm<10) {
-	    mm='0'+mm;	
-	}
+	$("#insertRoom2").hide();
+	$("#insertRoom3").hide();
+	$("#insertRoom4").hide();
+	$("#insertRoom5").hide();
+	$("#insertRoom6").hide();
+	$("#insertRoom7").hide();
+////////////////////////////////////////////////////////////////////////
+//	5. 매출현황		//////////////////////////////////////////////////////////////////////
 
-	today = yyyy + '-' + mm + '-' + dd;
-	document.getElementById("page4_date_span").innerHtml = today;
-	document.getElementById("calendar_date_span").innerHtml = today;
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Home에 남은객실 체크인 체크아웃 재실중 들어온예약 취소된 예약 보여주기
-	
-	var emptyroom , checkin , checkout , usingRoom , inreserv , outreserv;
-	var today = $("#page4_date_span");
-	
-	$.ajax({
-			
-		url: "<%= request.getContextPath()%>/seller/modifyHome.bc",
-		type: "GET",
-		data: { 'emptyroom': emptyroom  ,
-				'checkin': checkin ,
-				'checkout': checkout,
-				'usingroom': usingroom,
-				'inreserv': inreserv,
-				'outreserv': outreserv,
-				'today' : today
-		} ,
-		dataType: "json",
-		success: function(json){
+////////////////////////////////////////////////////////////////////////
+//	6. 객실등록		//////////////////////////////////////////////////////////////////////
 
-			 $.each(json, function(index, item){
-				
-				 $("#emptyroom").val(item.emptyroom);
-				 $("#checin").val(item.checin);
-				 $("#checkout").val(item.checkout);
-				 $("#usingroom").val(item.usingroom);
-				 $("#inreserv").val(item.inreserv);
-				 $("#outreserv").val(item.outreserv);
-	 
-			});
-	
-		}, 
-		error: function(request, status, error){
-			alert("code: "+request.status+"\n"+"message: "+request.responseTest+"\n"+"error: "+error);
-		}
-	
-	});
-	
+////////////////////////////////////////////////////////////////////////
+//	7. 객실등록현황		//////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 오늘 남은 객실 보여주기 (객실조정요금)
 		var today = new Date();
@@ -398,6 +419,7 @@ $(document).ready(function(){
 				 $("form[name=roomPriceEditForm] input[name=roomprice_seqno"+index+"]").val(item.roomprice_seqno);
 				 $("form[name=roomPriceEditForm] input[name=roomprice"+index+"]").val(item.roomprice);
 				 $("form[name=roomPriceEditForm] input[name=roomprice_quantity"+index+"]").val(item.roomprice_quantity);
+				
 			});
 		}, 
 		error: function(request, status, error){
@@ -413,7 +435,7 @@ $(document).ready(function(){
 //	1,2,4 page       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	오늘날짜 변경 클릭하며 날짜 뿌려주기	
 
-function todayIs() {
+function todayIs1() {
 		var today = new Date();
 		var dd = today.getDate();
 		var mm = today.getMonth()+1;	//Jan is 0
@@ -431,6 +453,52 @@ function todayIs() {
 		
 		today = yyyy + '-' + mm + '-' + dd;
         //$('#date').text(today);
+		document.getElementById("page1_date_span").innerHtml = today;
+
+} 
+
+function todayIs2() {
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1;	//Jan is 0
+	var yyyy = today.getFullYear();
+	if(dd<10) {
+	    dd='0'+dd;
+	} 
+	if(mm<10) {
+	    mm='0'+mm;	
+	}
+	
+	console.log(dd);
+	console.log(mm);
+	console.log(yyyy);
+	
+	today = yyyy + '-' + mm + '-' + dd;
+    //$('#date').text(today);
+	document.getElementById("page2_date_span").innerHtml = today;
+
+} 
+
+function todayIs4() {
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1;	//Jan is 0
+	var yyyy = today.getFullYear();
+	if(dd<10) {
+	    dd='0'+dd;
+	} 
+	if(mm<10) {
+	    mm='0'+mm;	
+	}
+	
+	console.log(dd);
+	console.log(mm);
+	console.log(yyyy);
+	
+	today = yyyy + '-' + mm + '-' + dd;
+    //$('#date').text(today);
+	document.getElementById("page4_date_span").innerHtml = today;
+
 } 
 
 //	2,4 page       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -521,8 +589,8 @@ function reviseRoomPriceQuant(){
 	
 }
 
-//  6 page       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	객실 등록하기
+//  6. 객실 등록하기      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	저장하기
 function goSubmitRoom(){
 	
 	var frm = document.roomInsertForm;
@@ -531,6 +599,23 @@ function goSubmitRoom(){
 	frm.submit();
 
 }
+
+// 추가하기 버튼
+$("#roomInsertBtn").click(function(){
+	
+	count++;
+	if(count == 8){
+		alert("더이상 추가할 수 없습니다.	");
+		return;
+	}
+	else{
+		$("#insertRoom"+count).show();
+		$("#insertRoom"+count).appendTo(".insertRoom");
+		
+
+	}
+	
+});
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 </script>
 
@@ -570,7 +655,7 @@ function goSubmitRoom(){
 </div>
 
 <div class="main" style="width: 85%; min-height:600px; display: inline-block;">
-<%-- HOME ------------------------------------------------------------------------------------- --%>
+<%-- 1. HOME	 ------------------------------------------------------------------------------------- --%>
 
 <div id="page1" class="tabcontent page1">
 	<div class="bothside">
@@ -586,9 +671,9 @@ function goSubmitRoom(){
 			</div>
 			
 			<div style="display: inline-block; width: 50%; text-align: center;">
-				<span style="display: inline-block; width: 9%"><input type="button" id="page4_date_prev" onclick="todayIs();" value="&lt;" /></span>
-				<span style="display: inline-block; width: 80%" id="page4_date_span"></span>
-				<span style="display: inline-block; width: 9%"><input type="button" id="page4_date_next" onclick="todayIs();" value="&gt;" /></span>
+				<span style="display: inline-block; width: 9%"><input type="button" id="page1_date_prev" onclick="todayIs1();" value="&lt;" /></span>
+				<span style="display: inline-block; width: 80%" id="page1_date_span"></span>
+				<span style="display: inline-block; width: 9%"><input type="button" id="page1_date_next" onclick="todayIs1();" value="&gt;" /></span>
 			</div>
 			
 			<div style="display: inline-block; width:24%;">
@@ -670,7 +755,7 @@ function goSubmitRoom(){
 	</div>
 			
 </div>
-<%-- 예약 목록 ------------------------------------------------------------------------------------- --%>	
+<%-- 2. 예약 목록 	------------------------------------------------------------------------------------- --%>	
 <div id="page2" class="tabcontent page2">
 
 	<div class="bothside">
@@ -755,7 +840,7 @@ function goSubmitRoom(){
 	</div>
 
 </div>
-<%-- 객실 달력 ------------------------------------------------------------------------------------- --%>	
+<%-- 3. 객실 달력	 ------------------------------------------------------------------------------------- --%>	
 <div id="page3" class="tabcontent page3">
 
 	<div class="bothside"></div>
@@ -846,7 +931,7 @@ function goSubmitRoom(){
 	<div class="bothside"></div>
 
 </div>
-<%-- 요금조정 ------------------------------------------------------------------------------------- --%>	
+<%-- 4. 요금조정 	------------------------------------------------------------------------------------- --%>	
 <div id="page4" class="tabcontent page4">
 
 	<div class="bothside">
@@ -854,31 +939,21 @@ function goSubmitRoom(){
 	</div>
 	
 	<div class="mainside">
-		
-		<div style="width: 100%;">
-			<div style="width: 79%; height: 30px; display: inline-block;">요금 조정</div>
-			<div style="width: 19%; height: 30px; display: inline-block; float: right;"> 
-				<c:if test="${ not empty roomPriceList }">
-					<button type="button" onclick="reviseRoomPriceQuant();">수정 완료</button>  
-				</c:if>
-			</div>
-		</div>
-		
+	
 		<div style="width: 100%; height: 10px;"></div>
-		
+	
 		<div style="width: 100%;">
-			
-			<div style="display: inline-block; width:24%;"></div>
+			<div style="display: inline-block; width:24%;">
+			<span style="font-weight: bold; font-size:12pt;">&nbsp;&nbsp;Today</span>
+			</div>
 			
 			<div style="display: inline-block; width: 50%; text-align: center;">
-				<span style="display: inline-block; width: 9%"><button id="page4_date_prev">&lt;</button></span>
+				<span style="display: inline-block; width: 9%"><input type="button" id="page4_date_prev" onclick="todayIs4();" value="&lt;" /></span>
 				<span style="display: inline-block; width: 80%" id="page4_date_span"></span>
-				<span style="display: inline-block; width: 9%"><button  id="page4_date_next">&gt;</button></span> 
+				<span style="display: inline-block; width: 9%"><input type="button" id="page4_date_next" onclick="todayIs4();" value="&gt;" /></span>
 			</div>
-			
-			<div style="display: inline-block; width:24%;"></div>
-			
 		</div>
+			
 		
 		<div style="width: 100%; height: 20px;"></div>
 		
@@ -960,7 +1035,7 @@ function goSubmitRoom(){
 	</div>
 
 </div>
-<%-- 매출 현황 ------------------------------------------------------------------------------------- --%>	
+<%-- 5. 매출 현황 	------------------------------------------------------------------------------------- --%>	
 <div id="page5" class="tabcontent page5">
 
 	<div class="bothside">
@@ -976,7 +1051,7 @@ function goSubmitRoom(){
 	</div>
 
 </div>
-<%-- 객실 등록 ------------------------------------------------------------------------------------- --%>	
+<%-- 6. 객실 등록 	------------------------------------------------------------------------------------- --%>	
 <div id="page6" class="tabcontent page6">
 
 	<div class="bothside">
@@ -1171,7 +1246,988 @@ function goSubmitRoom(){
 				</div>
 				
 				<div style="width: 100%; height: 10px;"></div>
-
+				
+				
+				<%-- 2번째 --%>
+				<div style="width: 100%; border-bottom: solid 1px gray;" class="insertRoom2">
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<select name="fk_hotel_idx2">
+							<c:if test="${ not empty sellerHotelList }">
+								<c:forEach items="${sellerHotelList }" var="map">
+									<option value="${ map.hotel_idx }">${ map.hotel_name }</option>
+								</c:forEach>
+							</c:if>
+						</select>
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" name="room_name2" style="width:70%;" />
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKINTIME" name="ROOM_CHECKINTIME2" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKOUTTIME" name="ROOM_CHECKOUTTIME2" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_PERSON" name="ROOM_PERSON2" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_ADDPERSON" name="ROOM_ADDPERSON2" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" style="width:50%;" id="ROOM_ADDPERCHARGE" name="ROOM_ADDPERCHARGE2" />원
+					</div>
+					
+					<div style="width: 100%; height: 30px;"></div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							침대유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_SINGLE" name="BED_SINGLE2" value="1" />싱글
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_DOUBLE" name="BED_DOUBLE2" value="1" />더블
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_TWIN" name="BED_TWIN2" value="1" />트윈
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_ONDOL" name="BED_ONDOL2" value="1" />온돌
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							스파유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_WPOOL" name="SPA_WPOOL2" value="1" />월풀
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_SAUNA" name="SPA_SAUNA2" value="1" />사우나
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_MASSAGE" name="SPA_MASSAGE2" value="1" />마사지베드
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HINOKKI" name="SPA_HINOKKI2" value="1" />히노끼탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_OPENBATH" name="SPA_OPENBATH2" value="1" />노천탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HALFPOOL" name="SPA_HALFPOOL2" value="1" />반신욕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_TV" name="SPA_TV2" value="1" />욕실내TV
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							테마유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MOOIN" name="THEME_MOOIN2" value="1" />무인텔
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PARTY" name="THEME_PARTY2" value="1" />파티룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MIRROR" name="THEME_MIRROR2" value="1" />미러룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_DOUBLEFLOOR" name="THEME_DOUBLEFLOOR2" value="1" />복층룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PRINCESS" name="THEME_PRINCESS2" value="1" />공주룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_TERRAS" name="THEME_TERRAS2" value="1" />야외테라스
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_OCEAN" name="THEME_OCEAN2" value="1" />오션뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_LAKE" name="THEME_LAKE2" value="1" />호수뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_SKY" name="THEME_SKY2" value="1" />스카이뷰
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							내부객시설
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SPA" name="SERVICE_SPA2" value="1" />스파
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_MINIBAR" name="SERVICE_MINIBAR2" value="1" />미니바
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_WIFI" name="SERVICE_WIFI2" value="1" />와이파이
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TOWEL" name="SERVICE_TOWEL2" value="1" />욕실용품
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TV" name="SERVICE_TV2" value="1" />TV
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_AIRCONDITIONER" name="SERVICE_AIRCONDITIONER2" value="1" />에어컨
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_FRIDGE" name="SERVICE_FRIDGE2" value="1" />냉장고
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_IRON" name="SERVICE_IRON2" value="1" />다리미
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_BATHTUB" name="SERVICE_BATHTUB2" value="1" />욕조
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_HAIRDRYER" name="SERVICE_HAIRDRYER2" value="1" />드라이기
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_KITCHEN" name="SERVICE_KITCHEN2" value="1" />전기밥솥
+						</div>		
+						<div style="width: 9.9%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SHOWERROOM" name="SERVICE_SHOWERROOM2" value="1" />객실내샤워실
+						</div>			
+						<div style="width: 100%; height: 10px;"></div>
+					</div>				
+								
+					<div style="width: 100%; height: 20px;"></div>
+				</div>
+				
+				<div style="width: 100%; height: 10px;"></div>
+				
+				<%-- 3번째 --%>
+				<div style="width: 100%; border-bottom: solid 1px gray;" class="insertRoom3">
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<select name="fk_hotel_idx3">
+							<c:if test="${ not empty sellerHotelList }">
+								<c:forEach items="${sellerHotelList }" var="map">
+									<option value="${ map.hotel_idx }">${ map.hotel_name }</option>
+								</c:forEach>
+							</c:if>
+						</select>
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" name="room_name3" style="width:70%;" />
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKINTIME" name="ROOM_CHECKINTIME3" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKOUTTIME" name="ROOM_CHECKOUTTIME3" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_PERSON" name="ROOM_PERSON3" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_ADDPERSON" name="ROOM_ADDPERSON3" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" style="width:50%;" id="ROOM_ADDPERCHARGE" name="ROOM_ADDPERCHARGE3" />원
+					</div>
+					
+					<div style="width: 100%; height: 30px;"></div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							침대유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_SINGLE" name="BED_SINGLE3"  value="1"/>싱글
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_DOUBLE" name="BED_DOUBLE3"  value="1"/>더블
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_TWIN" name="BED_TWIN3"  value="1"/>트윈
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_ONDOL" name="BED_ONDOL3"  value="1"/>온돌
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							스파유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_WPOOL" name="SPA_WPOOL3" value="1" />월풀
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_SAUNA" name="SPA_SAUNA3" value="1" />사우나
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_MASSAGE" name="SPA_MASSAGE3" value="1" />마사지베드
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HINOKKI" name="SPA_HINOKKI3" value="1" />히노끼탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_OPENBATH" name="SPA_OPENBATH3" value="1" />노천탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HALFPOOL" name="SPA_HALFPOOL3" value="1" />반신욕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_TV" name="SPA_TV3" value="1" />욕실내TV
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							테마유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MOOIN" name="THEME_MOOIN3" value="1" />무인텔
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PARTY" name="THEME_PARTY3" value="1" />파티룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MIRROR" name="THEME_MIRROR3" value="1" />미러룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_DOUBLEFLOOR" name="THEME_DOUBLEFLOOR3" value="1" />복층룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PRINCESS" name="THEME_PRINCESS3" value="1" />공주룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_TERRAS" name="THEME_TERRAS3" value="1" />야외테라스
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_OCEAN" name="THEME_OCEAN3" value="1" />오션뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_LAKE" name="THEME_LAKE3" value="1" />호수뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_SKY" name="THEME_SKY3" value="1" />스카이뷰
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							내부객시설
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SPA" name="SERVICE_SPA3" value="1" />스파
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_MINIBAR" name="SERVICE_MINIBAR3" value="1" />미니바
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_WIFI" name="SERVICE_WIFI3" value="1" />와이파이
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TOWEL" name="SERVICE_TOWEL3" value="1" />욕실용품
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TV" name="SERVICE_TV3" value="1" />TV
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_AIRCONDITIONER" name="SERVICE_AIRCONDITIONER3" value="1" />에어컨
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_FRIDGE" name="SERVICE_FRIDGE3" value="1" />냉장고
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_IRON" name="SERVICE_IRON3" value="1" />다리미
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_BATHTUB" name="SERVICE_BATHTUB3" value="1" />욕조
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_HAIRDRYER" name="SERVICE_HAIRDRYER3" value="1" />드라이기
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_KITCHEN" name="SERVICE_KITCHEN3" value="1" />전기밥솥
+						</div>		
+						<div style="width: 9.9%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SHOWERROOM" name="SERVICE_SHOWERROOM3" value="1" />객실내샤워실
+						</div>			
+						<div style="width: 100%; height: 10px;"></div>
+					</div>				
+								
+					<div style="width: 100%; height: 20px;"></div>
+				</div>
+				
+				<div style="width: 100%; height: 10px;"></div>
+				<%-- 4번째 --%>
+				<div style="width: 100%; border-bottom: solid 1px gray;" class="insertRoom4">
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<select name="fk_hotel_idx4">
+							<c:if test="${ not empty sellerHotelList }">
+								<c:forEach items="${sellerHotelList }" var="map">
+									<option value="${ map.hotel_idx }">${ map.hotel_name }</option>
+								</c:forEach>
+							</c:if>
+						</select>
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" name="room_name4" style="width:70%;" />
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKINTIME" name="ROOM_CHECKINTIME4" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKOUTTIME" name="ROOM_CHECKOUTTIME4" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_PERSON" name="ROOM_PERSON4" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_ADDPERSON" name="ROOM_ADDPERSON4" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" style="width:50%;" id="ROOM_ADDPERCHARGE" name="ROOM_ADDPERCHARGE4" />원
+					</div>
+					
+					<div style="width: 100%; height: 30px;"></div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							침대유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_SINGLE" name="BED_SINGLE4"  value="1"/>싱글
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_DOUBLE" name="BED_DOUBLE4"  value="1"/>더블
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_TWIN" name="BED_TWIN4"  value="1"/>트윈
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_ONDOL" name="BED_ONDOL4" value="1" />온돌
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							스파유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_WPOOL" name="SPA_WPOOL4" value="1" />월풀
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_SAUNA" name="SPA_SAUNA4" value="1" />사우나
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_MASSAGE" name="SPA_MASSAGE4" value="1" />마사지베드
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HINOKKI" name="SPA_HINOKKI4" value="1" />히노끼탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_OPENBATH" name="SPA_OPENBATH4" value="1" />노천탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HALFPOOL" name="SPA_HALFPOOL4" value="1" />반신욕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_TV" name="SPA_TV4" value="1" />욕실내TV
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							테마유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MOOIN" name="THEME_MOOIN4" value="1" />무인텔
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PARTY" name="THEME_PARTY4" value="1" />파티룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MIRROR" name="THEME_MIRROR4" value="1" />미러룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_DOUBLEFLOOR" name="THEME_DOUBLEFLOOR4" value="1" />복층룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PRINCESS" name="THEME_PRINCESS4" value="1" />공주룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_TERRAS" name="THEME_TERRAS4" value="1" />야외테라스
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_OCEAN" name="THEME_OCEAN4" value="1" />오션뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_LAKE" name="THEME_LAKE4" value="1" />호수뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_SKY" name="THEME_SKY4" value="1" />스카이뷰
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							내부객시설
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SPA" name="SERVICE_SPA4" value="1" />스파
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_MINIBAR" name="SERVICE_MINIBAR4" value="1" />미니바
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_WIFI" name="SERVICE_WIFI4" value="1" />와이파이
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TOWEL" name="SERVICE_TOWEL4" value="1" />욕실용품
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TV" name="SERVICE_TV4" value="1" />TV
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_AIRCONDITIONER" name="SERVICE_AIRCONDITIONER4" value="1" />에어컨
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_FRIDGE" name="SERVICE_FRIDGE4" value="1" />냉장고
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_IRON" name="SERVICE_IRON4" value="1" />다리미
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_BATHTUB" name="SERVICE_BATHTUB4" value="1" />욕조
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_HAIRDRYER" name="SERVICE_HAIRDRYER4" value="1" />드라이기
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_KITCHEN" name="SERVICE_KITCHEN4" value="1" />전기밥솥
+						</div>		
+						<div style="width: 9.9%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SHOWERROOM" name="SERVICE_SHOWERROOM4" value="1" />객실내샤워실
+						</div>			
+						<div style="width: 100%; height: 10px;"></div>
+					</div>				
+								
+					<div style="width: 100%; height: 20px;"></div>
+				</div>
+				
+				<div style="width: 100%; height: 10px;"></div>
+				<%-- 5번째 --%>
+				<div style="width: 100%; border-bottom: solid 1px gray;" class="insertRoom5">
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<select name="fk_hotel_idx5">
+							<c:if test="${ not empty sellerHotelList }">
+								<c:forEach items="${sellerHotelList }" var="map">
+									<option value="${ map.hotel_idx }">${ map.hotel_name }</option>
+								</c:forEach>
+							</c:if>
+						</select>
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" name="room_name5" style="width:70%;" />
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKINTIME" name="ROOM_CHECKINTIME5" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKOUTTIME" name="ROOM_CHECKOUTTIME5" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_PERSON" name="ROOM_PERSON5" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_ADDPERSON" name="ROOM_ADDPERSON5" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" style="width:50%;" id="ROOM_ADDPERCHARGE" name="ROOM_ADDPERCHARGE5" />원
+					</div>
+					
+					<div style="width: 100%; height: 30px;"></div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							침대유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_SINGLE" name="BED_SINGLE5"  value="1"/>싱글
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_DOUBLE" name="BED_DOUBLE5" value="1" />더블
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_TWIN" name="BED_TWIN5" value="1" />트윈
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_ONDOL" name="BED_ONDOL5" value="1" />온돌
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							스파유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_WPOOL" name="SPA_WPOOL5" value="1" />월풀
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_SAUNA" name="SPA_SAUNA5" value="1" />사우나
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_MASSAGE" name="SPA_MASSAGE5" value="1" />마사지베드
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HINOKKI" name="SPA_HINOKKI5" value="1" />히노끼탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_OPENBATH" name="SPA_OPENBATH5" value="1" />노천탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HALFPOOL" name="SPA_HALFPOOL5" value="1" />반신욕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_TV" name="SPA_TV5" value="1" />욕실내TV
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							테마유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MOOIN" name="THEME_MOOIN5" value="1" />무인텔
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PARTY" name="THEME_PARTY5" value="1" />파티룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MIRROR" name="THEME_MIRROR5" value="1" />미러룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_DOUBLEFLOOR" name="THEME_DOUBLEFLOOR5" value="1" />복층룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PRINCESS" name="THEME_PRINCESS5" value="1" />공주룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_TERRAS" name="THEME_TERRAS5" value="1" />야외테라스
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_OCEAN" name="THEME_OCEAN5" value="1" />오션뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_LAKE" name="THEME_LAKE5" value="1" />호수뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_SKY" name="THEME_SKY5" value="1" />스카이뷰
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							내부객시설
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SPA" name="SERVICE_SPA5" value="1" />스파
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_MINIBAR" name="SERVICE_MINIBAR5" value="1" />미니바
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_WIFI" name="SERVICE_WIFI5" value="1" />와이파이
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TOWEL" name="SERVICE_TOWEL5" value="1" />욕실용품
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TV" name="SERVICE_TV5" value="1" />TV
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_AIRCONDITIONER" name="SERVICE_AIRCONDITIONER5" value="1" />에어컨
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_FRIDGE" name="SERVICE_FRIDGE5" value="1" />냉장고
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_IRON" name="SERVICE_IRON5" value="1" />다리미
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_BATHTUB" name="SERVICE_BATHTUB5" value="1" />욕조
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_HAIRDRYER" name="SERVICE_HAIRDRYER5" value="1" />드라이기
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_KITCHEN" name="SERVICE_KITCHEN5" value="1" />전기밥솥
+						</div>		
+						<div style="width: 9.9%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SHOWERROOM" name="SERVICE_SHOWERROOM5" value="1" />객실내샤워실
+						</div>			
+						<div style="width: 100%; height: 10px;"></div>
+					</div>				
+								
+					<div style="width: 100%; height: 20px;"></div>
+				</div>
+				
+				<div style="width: 100%; height: 10px;"></div>
+				<%-- 6번째 --%>
+				<div style="width: 100%; border-bottom: solid 1px gray;" class="insertRoom6">
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<select name="fk_hotel_idx6">
+							<c:if test="${ not empty sellerHotelList }">
+								<c:forEach items="${sellerHotelList }" var="map">
+									<option value="${ map.hotel_idx }">${ map.hotel_name }</option>
+								</c:forEach>
+							</c:if>
+						</select>
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" name="room_name6" style="width:70%;" />
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKINTIME" name="ROOM_CHECKINTIME6" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKOUTTIME" name="ROOM_CHECKOUTTIME6" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_PERSON" name="ROOM_PERSON6" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_ADDPERSON" name="ROOM_ADDPERSON6" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" style="width:50%;" id="ROOM_ADDPERCHARGE" name="ROOM_ADDPERCHARGE6" />원
+					</div>
+					
+					<div style="width: 100%; height: 30px;"></div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							침대유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_SINGLE" name="BED_SINGLE6" value="1" />싱글
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_DOUBLE" name="BED_DOUBLE6" value="1" />더블
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_TWIN" name="BED_TWIN6" value="1" />트윈
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_ONDOL" name="BED_ONDOL6" value="1" />온돌
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							스파유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_WPOOL" name="SPA_WPOOL6" value="1" />월풀
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_SAUNA" name="SPA_SAUNA6" value="1" />사우나
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_MASSAGE" name="SPA_MASSAGE6" value="1" />마사지베드
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HINOKKI" name="SPA_HINOKKI6" value="1" />히노끼탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_OPENBATH" name="SPA_OPENBATH6" value="1" />노천탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HALFPOOL" name="SPA_HALFPOOL6" value="1" />반신욕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_TV" name="SPA_TV6" value="1" />욕실내TV
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							테마유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MOOIN" name="THEME_MOOIN6" value="1" />무인텔
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PARTY" name="THEME_PARTY6" value="1" />파티룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MIRROR" name="THEME_MIRROR6" value="1" />미러룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_DOUBLEFLOOR" name="THEME_DOUBLEFLOOR6" value="1" />복층룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PRINCESS" name="THEME_PRINCESS6" value="1" />공주룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_TERRAS" name="THEME_TERRAS6" value="1" />야외테라스
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_OCEAN" name="THEME_OCEAN6" value="1" />오션뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_LAKE" name="THEME_LAKE6" value="1" />호수뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_SKY" name="THEME_SKY6" value="1" />스카이뷰
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							내부객시설
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SPA" name="SERVICE_SPA6" value="1" />스파
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_MINIBAR" name="SERVICE_MINIBAR6" value="1" />미니바
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_WIFI" name="SERVICE_WIFI6" value="1" />와이파이
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TOWEL" name="SERVICE_TOWEL6" value="1" />욕실용품
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TV" name="SERVICE_TV6" value="1" />TV
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_AIRCONDITIONER" name="SERVICE_AIRCONDITIONER6" value="1" />에어컨
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_FRIDGE" name="SERVICE_FRIDGE6" value="1" />냉장고
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_IRON" name="SERVICE_IRON6" value="1" />다리미
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_BATHTUB" name="SERVICE_BATHTUB6" value="1" />욕조
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_HAIRDRYER" name="SERVICE_HAIRDRYER6" value="1" />드라이기
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_KITCHEN" name="SERVICE_KITCHEN6" value="1" />전기밥솥
+						</div>		
+						<div style="width: 9.9%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SHOWERROOM" name="SERVICE_SHOWERROOM6" value="1" />객실내샤워실
+						</div>			
+						<div style="width: 100%; height: 10px;"></div>
+					</div>				
+								
+					<div style="width: 100%; height: 20px;"></div>
+				</div>
+				
+				<div style="width: 100%; height: 10px;"></div>
+				<%-- 7번째 --%>
+				<div style="width: 100%; border-bottom: solid 1px gray;" class="insertRoom7">
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<select name="fk_hotel_idx7">
+							<c:if test="${ not empty sellerHotelList }">
+								<c:forEach items="${sellerHotelList }" var="map">
+									<option value="${ map.hotel_idx }">${ map.hotel_name }</option>
+								</c:forEach>
+							</c:if>
+						</select>
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" name="room_name7" style="width:70%;" />
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKINTIME" name="ROOM_CHECKINTIME7" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="00" max="23" id="ROOM_CHECKOUTTIME" name="ROOM_CHECKOUTTIME7" style="width:25%;" />시
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_PERSON" name="ROOM_PERSON7" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="number" min="1" max="10" id="ROOM_ADDPERSON" name="ROOM_ADDPERSON7" style="width:25%;" />명
+					</div>
+					<div style="width: 11.5%; display: inline-block; font-size: 11pt; text-align: center;">
+						<input type="text" style="width:50%;" id="ROOM_ADDPERCHARGE" name="ROOM_ADDPERCHARGE7" />원
+					</div>
+					
+					<div style="width: 100%; height: 30px;"></div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							침대유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_SINGLE" name="BED_SINGLE7" value="1" />싱글
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_DOUBLE" name="BED_DOUBLE7" value="1" />더블
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_TWIN" name="BED_TWIN7" value="1" />트윈
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="BED_ONDOL" name="BED_ONDOL7" value="1" />온돌
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							스파유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_WPOOL" name="SPA_WPOOL7" value="1" />월풀
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_SAUNA" name="SPA_SAUNA7" value="1" />사우나
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_MASSAGE" name="SPA_MASSAGE7" value="1" />마사지베드
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HINOKKI" name="SPA_HINOKKI7" value="1" />히노끼탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_OPENBATH" name="SPA_OPENBATH7" value="1" />노천탕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_HALFPOOL" name="SPA_HALFPOOL7" value="1" />반신욕
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" class="TBL_HERE_SPA" id="SPA_TV" name="SPA_TV7" value="1" />욕실내TV
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							테마유형
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MOOIN" name="THEME_MOOIN7" value="1" />무인텔
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PARTY" name="THEME_PARTY7" value="1" />파티룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_MIRROR" name="THEME_MIRROR7" value="1" />미러룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_DOUBLEFLOOR" name="THEME_DOUBLEFLOOR7" value="1" />복층룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_PRINCESS" name="THEME_PRINCESS7" value="1" />공주룸
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_TERRAS" name="THEME_TERRAS7" value="1" />야외테라스
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_OCEAN" name="THEME_OCEAN7" value="1" />오션뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_LAKE" name="THEME_LAKE7" value="1" />호수뷰
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="THEME_SKY" name="THEME_SKY7" value="1" />스카이뷰
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+					</div>
+					
+					<div style="width: 100%;">
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+							내부객시설
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SPA" name="SERVICE_SPA7" value="1" />스파
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_MINIBAR" name="SERVICE_MINIBAR7" value="1" />미니바
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_WIFI" name="SERVICE_WIFI7" value="1" />와이파이
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TOWEL" name="SERVICE_TOWEL7" value="1" />욕실용품
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_TV" name="SERVICE_TV7" value="1" />TV
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_AIRCONDITIONER" name="SERVICE_AIRCONDITIONER7" value="1" />에어컨
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_FRIDGE" name="SERVICE_FRIDGE7" value="1" />냉장고
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_IRON" name="SERVICE_IRON7" value="1" />다리미
+						</div>
+						<div style="width: 100%; height: 10px;"></div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: center; border-right: solid 0.5px gray;">
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_BATHTUB" name="SERVICE_BATHTUB7" value="1" />욕조
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_HAIRDRYER" name="SERVICE_HAIRDRYER7" value="1" />드라이기
+						</div>
+						<div style="width: 9.3%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_KITCHEN" name="SERVICE_KITCHEN7" value="1" />전기밥솥
+						</div>		
+						<div style="width: 9.9%; display: inline-block; font-size: 9pt; text-align: left;">
+							<input type="checkbox" id="SERVICE_SHOWERROOM" name="SERVICE_SHOWERROOM7" value="1" />객실내샤워실
+						</div>			
+						<div style="width: 100%; height: 10px;"></div>
+					</div>				
+								
+					<div style="width: 100%; height: 20px;"></div>
+				</div>
+				
+				<div style="width: 100%; height: 10px;"></div>
+					
 			</form>
 		</div>
 	
@@ -1182,7 +2238,7 @@ function goSubmitRoom(){
 	</div>
 
 </div>
-<%-- 객실 등록현황 ------------------------------------------------------------------------------------- --%>	
+<%-- 7. 객실 등록현황 	------------------------------------------------------------------------------------- --%>	
 <div id="page7" class="tabcontent page7">
 
 	<div class="bothside">

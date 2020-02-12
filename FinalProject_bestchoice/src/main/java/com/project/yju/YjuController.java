@@ -203,7 +203,7 @@ public class YjuController {
       
         // 총 리뷰 건수 구하기
 	    tatalCount = service.getReviewCnt(hotel_idx);
-        totalPage = tatalCount/sizePerPage; 
+        totalPage = (int)Math.ceil((double)tatalCount/sizePerPage);
         
         // 게시판에 보여지는 초기화면
         if(str_currentShowPageNo == null) {
@@ -232,7 +232,7 @@ public class YjuController {
        
         // 리뷰목록 가져오기
  		List<HashMap<String, String>> reviewMapList = service.getreview(paraMap); 
-		
+ 		
 	    // 페이징바 만들기
 	    String pagebar = "<ul>";
 
@@ -248,18 +248,18 @@ public class YjuController {
 		if(!"?".equals(lastStr)) 
 			url += "?"; */
 	
+		
 			// *** [이전] 만들기 *** // 
 			if(pageNo != 1) {
 				pagebar += "&nbsp;<a href='"+url+"&currentShowPageNo="+(pageNo-1)+"&sizePerPage="+sizePerPage+"'>[이전]</a>&nbsp;";
 			}
 			
 			while(!(loop > blockSize || pageNo > totalPage)) {
-				
 				if(pageNo == currentShowPageNo) {
 					pagebar += "&nbsp;<span style='font-weight: bold; background-color:#efefef'>"+pageNo+"</span>&nbsp;";
 				}
 				else {
-					pagebar += "&nbsp;<a class='page-link' href='roomReview.bc?hotel_idx="+hotel_idx+"&startday="+startday+"&endday="+endday+"&currentShowPageNo="+pageNo+"'>"+pageNo+"</a>&nbsp;";	
+					pagebar += "&nbsp;<a class='page-link' href='roomReview.bc?hotel_idx="+hotel_idx+"&startday="+startday+"&endday="+endday+"&currentShowPageNo="+pageNo+"'>"+pageNo+"</a>&nbsp;";
 				}
 				pageNo++;	
 				loop++;		
@@ -271,7 +271,6 @@ public class YjuController {
 			}
 	    pagebar += "</ul>";
 	    
-    
 	    
 	    // 평점 알아오기
 		HashMap<String,Object> gradeMap = service.getreviewGrade(hotel_idx);

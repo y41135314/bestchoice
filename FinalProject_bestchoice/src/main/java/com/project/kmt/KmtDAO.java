@@ -123,13 +123,45 @@ public class KmtDAO {
 		int n = sqlsession.update("kmtMapper.updateRoomPrice", paraMap);
 		return n;
 	}
-	
-	
-	// Home 에 정보 뿌려주기
-	public List<HashMap<String, String>> getmodifyHome() {
-		
-		return null;
+	////////////////////////////////////////////////////////////////////////////////////////////
+	// Home 에 정보 넣어주기
+	// 1. Home - 남은객실
+	public String modifyHomeEmptyRoom(HashMap<String, String> paraMap) {
+		String emptyroom = sqlsession.selectOne("kmtMapper.modifyHomeEmptyRoom", paraMap);
+		return emptyroom;
 	}
+	// 2. Home - 체크인
+	public String modifyHomeCheckin(HashMap<String,String> paraMap) {
+		String checkin = sqlsession.selectOne("kmtMapper.modifyHomeCheckin", paraMap);
+		return checkin;
+	}
+	// 3. Home - 체크아웃
+	public String modifyHomeCheckout(HashMap<String,String> paraMap) {
+		String checkout = sqlsession.selectOne("kmtMapper.modifyHomeCheckout", paraMap);
+		return checkout;
+	}
+	// 4. Home - 사용중인객실
+	public String modifyHomeUsingroom(HashMap<String,String> paraMap) {
+		String usingroom = sqlsession.selectOne("kmtMapper.modifyHomeUsingroom", paraMap);
+		return usingroom;
+	}
+	// 5. Home - 들어온예약
+	public String modifyHomeInreserv(HashMap<String,String> paraMap) {
+		String inreserv = sqlsession.selectOne("kmtMapper.modifyHomeInreserv", paraMap);
+		return inreserv;
+	}
+	// 6. Home - 취소된객실
+	public String modifyHomeOutreserv(HashMap<String,String> paraMap) {
+		String outreserv = sqlsession.selectOne("kmtMapper.modifyHomeOutreserv", paraMap);
+		return outreserv;
+	}
+
+	
+
+	
+	
+	// Home 에 남은객실 정보 뿌려주기
+
 
 	
 	

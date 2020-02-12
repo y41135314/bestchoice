@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.annotation.Resource;
 
+import org.apache.poi.ss.formula.functions.Today;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -121,24 +122,37 @@ public class KmtService {
 		String roomprice_seqno = paraMap.get("roomprice_seqno");
 		
 		if(roomprice_seqno == null || "".equals(roomprice_seqno)) {		// insert 하기
-			
+	
 			n = dao.insertRoomPrice(paraMap);
 		}
 		else {		// update 하기
-			
 			n =dao.updateRoomPrice(paraMap);
 		}
-		
+
 		return n;
 	}
-
-	public String modifyHome(HashMap<String, String> paraMap) {
-		
-		return null;
-	}
-
-	// Home 에 정보 뿌려주기
+	//////////////////////////////////////////////////////////////////////////////////////////
+	// Home 에 정보 넣어주기
+	public HashMap<String, String> modifyHomeEmptyRoom(HashMap<String, String> paraMap) {
 	
+		String emptyroom = dao.modifyHomeEmptyRoom(paraMap);
+		String checkin = dao.modifyHomeCheckin(paraMap);
+		String checkout = dao.modifyHomeCheckout(paraMap);
+		String usingroom = dao.modifyHomeUsingroom(paraMap);
+		String inreserv = dao.modifyHomeInreserv(paraMap);
+		String outreserv = dao.modifyHomeOutreserv(paraMap);
+		
+		HashMap<String,String> emptyList = new HashMap<String,String>();
+		emptyList.put("emptyroom", emptyroom);
+		emptyList.put("checkin", checkin);
+		emptyList.put("checkout", checkout);
+		emptyList.put("usingroom", usingroom);
+		emptyList.put("inreserv", inreserv);
+		emptyList.put("outreserv", outreserv);
+		
+				
+		return emptyList;
+	}	
 	
 	
 	
