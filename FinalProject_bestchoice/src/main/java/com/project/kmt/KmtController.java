@@ -3,8 +3,11 @@ package com.project.kmt;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.project.common.FileManager;
 
 @Controller
@@ -30,20 +36,57 @@ public class KmtController {
 	
 	@Autowired
 	private FileManager fileManager;
-	
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	판매자 가입 페이지		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	@RequestMapping(value="/sellerJoin.bc")
 	public String joinSeller(HttpServletRequest request) {
 		return "kmt/sellerJoin";
 	}
 	
-	// 판매자관리 페이지
-	@RequestMapping(value="/sellerModify.bc")
-	public String modifySeller(HttpServletRequest request) {
+// 판매자 로그인 페이지
+	@RequestMapping(value="/seller/login.bc")
+	public String sellerLogin(HttpServletRequest request) {
 		
-		return "kmt/sellerModify";
+		
+		
+		
+		return "kmt/sellerLoginForm";
 	}
-	
-	// 판매자 아이디 중복확인
+
+// 판매자 로그인
+	@RequestMapping(value="/seller/loginEnd.bc", method= {RequestMethod.POST})
+	public String sellerLoginEnd(HttpServletRequest request) {
+		
+		String seller_id = request.getParameter("seller_id");
+		String seller_pwd = request.getParameter("seller_pwd");
+		HashMap<String,String> paraMap = new HashMap<String,String>();
+		paraMap.put("seller_id", seller_id );
+		paraMap.put("seller_pwd", seller_pwd );
+		
+		KmtSellerMemberVO loginseller = service.sellerLogin(paraMap);
+		
+		String msg = "";
+		String loc = "";
+		
+		if(loginseller != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("loginseller", loginseller);
+			
+			msg = loginseller.getSeller_RepName()+" 님 환영합니다.";
+			loc = request.getContextPath()+"/sellerModify.bc";
+		}
+		else {
+			msg = "로그인에 실패했습니다.";
+			loc = request.getContextPath()+"/seller/login.bc";
+		}
+		
+		request.setAttribute("msg", msg);
+		request.setAttribute("loc", loc);
+		
+		return "msg";
+	}	
+
+//	판매자 아이디 중복확인	
 	@ResponseBody
 	@RequestMapping(value="/seller/checkId.bc", produces="text/plain;charset=UTF-8")
 	public String checkSellerId(HttpServletRequest request) {
@@ -52,7 +95,7 @@ public class KmtController {
 		
 		String seller_Id = request.getParameter("seller_Id");
 		
-		System.out.println(seller_Id);
+		System.out.println("seller_ID : "+seller_Id);
 		
 		int n = service.checkSellerId(seller_Id);
 		
@@ -73,8 +116,87 @@ public class KmtController {
 		return jsonStr;
 		
 	}
+// 
 	
-	// 판매자 , 호텔, 호텔 이미지 등록하기
+// 판매자관리 페이지
+	@RequestMapping(value="/sellerModify.bc")
+	public String modifySeller(HttpServletRequest request) {
+
+		HttpSession session = request.getSession();
+		KmtSellerMemberVO loginseller = (KmtSellerMemberVO)session.getAttribute("loginseller");
+		
+		// 판매자 소유의 호텔 리스트 받아오기
+		List<HashMap<String,String>> sellerHotelList = service.getHotelListOfUser(loginseller.getSeller_Id());
+		request.setAttribute("sellerHotelList", sellerHotelList);
+		
+		// 판매자 소유의 호텔 중 제일 처음 등록한 것 가져오기
+		String fk_hotel_idx = service.getFk_hotel_idx(loginseller.getSeller_Id());
+		// System.out.println(fk_hotel_idx);
+		request.setAttribute("fk_hotel_idx",fk_hotel_idx);
+		System.out.println("판매자관리페이지 sellerModify 의 fk_hotel_idx : "+fk_hotel_idx);						
+		// 방, 특정 날짜의 가격 불러오기 
+		HashMap<String,String> paraMap = new HashMap<String,String>();
+		paraMap.put("fk_hotel_idx", fk_hotel_idx);
+		
+		List<HashMap<String,String>> roomPriceList = service.getRoomPriceList(paraMap);
+		request.setAttribute("roomPriceList", roomPriceList);
+		
+		return "kmt/sellerModify";
+	}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+// Home 에 정보 넣어주기
+@ResponseBody
+@RequestMapping(value="/seller/modifyHome.bc", method={RequestMethod.POST}, produces="text/plain;charset=UTF-8")
+	public String modifyHomeEmptyRoom(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		KmtSellerMemberVO loginseller = (KmtSellerMemberVO)session.getAttribute("loginseller");
+		String fk_hotel_idx = service.getFk_hotel_idx(loginseller.getSeller_Id());
+		request.setAttribute("fk_hotel_idx",fk_hotel_idx);
+		
+		HashMap<String,String> paraMap = new HashMap<String, String>();
+		
+//		fk_hotel_idx = request.getParameter("fk_hotel_idx");
+		String today = request.getParameter("today");
+		
+		System.out.println("Home 의 fk_hotel_idx : "+fk_hotel_idx);
+		System.out.println("today : "+today);
+		
+		paraMap.put("fk_hotel_idx", fk_hotel_idx);
+		paraMap.put("today", today);
+		
+		HashMap<String, String> emptyList = service.modifyHomeEmptyRoom(paraMap); 
+		
+		System.out.println("emptyList 사이즈 : "+emptyList.size());
+		// Json gson = new Gson();
+		// JSONArray jsonArr = new JSONArray();
+		String jsonStr = "";
+		
+		System.out.println("emptyList 의 emptyroom " + emptyList.get("emptyroom"));
+		System.out.println("emptyList 의 checkin " + emptyList.get("checkin"));
+		System.out.println("emptyList 의 checkout " + emptyList.get("checkout"));
+		System.out.println("emptyList 의 usingroom " + emptyList.get("usingroom"));
+		System.out.println("emptyList 의 inreserv " + emptyList.get("inreserv"));
+		System.out.println("emptyList 의 outreserv " + emptyList.get("outreserv"));
+		
+		if(emptyList != null) {
+			
+			JSONObject jsonObj = new JSONObject();
+				jsonObj.put("emptyroom", emptyList.get("emptyroom"));
+				jsonObj.put("checkin", emptyList.get("checkin"));
+				jsonObj.put("checkoust", emptyList.get("checkout"));
+				jsonObj.put("usingroom", emptyList.get("usingroom"));
+				jsonObj.put("inreserv", emptyList.get("inreserv"));
+				jsonObj.put("outreserv", emptyList.get("outreserv"));
+				
+				jsonStr = jsonObj.toString();
+		}
+
+	return jsonStr;
+
+}	
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+// 	판매자 , 호텔, 호텔 이미지 등록하기	
 	@RequestMapping(value="/seller/registerSeller.bc", method= {RequestMethod.POST})
 	public String registerSeller(MultipartHttpServletRequest mprequest , KmtSellerMemberVO mvo, KmtHotelInfoVO hvo) throws Throwable {
 		
@@ -137,49 +259,10 @@ public class KmtController {
 		mprequest.setAttribute("loc", loc);
 		
 		return "msg";
-	}
-	
-	// 판매자 로그인 페이지
-	@RequestMapping(value="/seller/login.bc")
-	public String sellerLogin(HttpServletRequest request) {
-		
-		return "kmt/sellerLoginForm";
-	}
-	
-	// 판매자 로그인
-	@RequestMapping(value="/seller/loginEnd.bc", method= {RequestMethod.POST})
-	public String sellerLoginEnd(HttpServletRequest request) {
-		
-		String seller_id = request.getParameter("seller_id");
-		String seller_pwd = request.getParameter("seller_pwd");
-		HashMap<String,String> paraMap = new HashMap<String,String>();
-		paraMap.put("seller_id", seller_id );
-		paraMap.put("seller_pwd", seller_pwd );
-		
-		KmtSellerMemberVO loginseller = service.sellerLogin(paraMap);
-		
-		String msg = "";
-		String loc = "";
-		
-		if(loginseller != null) {
-			HttpSession session = request.getSession();
-			session.setAttribute("loginseller", loginseller);
-			
-			msg = loginseller.getSeller_RepName()+" 님 환영합니다.";
-			loc = request.getContextPath()+"/sellerModify.bc";
-		}
-		else {
-			msg = "로그인에 실패했습니다.";
-			loc = request.getContextPath()+"/seller/login.bc";
-		}
-		
-		request.setAttribute("msg", msg);
-		request.setAttribute("loc", loc);
-		
-		return "msg";
-	}
-	
-	// 판매자 객실 등록
+	}	
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+// 판매자 객실 등록
 	@RequestMapping(value="/seller/roomRegister.bc",method= {RequestMethod.POST})
 	public String sellerRoomRegister(HttpServletRequest request) {
 		
@@ -292,62 +375,8 @@ public class KmtController {
 		
 		return "msg";
 	}
-/////////////////////////////////////////////////////////////////////////////	
-	// Home 에 뿌려주기
-	@ResponseBody
-	@RequestMapping(value="/seller/modifyHome.bc", method= {RequestMethod.GET})
-	public String modifyHome(HttpServletRequest request) {
-		
-		String seller_id = request.getParameter("seller_id");
-		String seller_pwd = request.getParameter("seller_pwd");
-		HashMap<String,String> paraMap = new HashMap<String,String>();
-		paraMap.put("seller_id", seller_id );
-		paraMap.put("seller_pwd", seller_pwd );
-		
-		KmtSellerMemberVO loginseller = service.sellerLogin(paraMap);
-		
-		String jsonStr = "";
-		String msg ="";
-		String loc ="";
-		
-		if(loginseller != null) {
-			String result = null;
-			msg = "";
-			loc = "";
-						
-			jsonStr  = "";
-			String emptyroom = request.getParameter("emptyroom");
-			String checkin = request.getParameter("checkin");
-			String checkout = request.getParameter("checkout");
-			String usingroom = request.getParameter("usingroom");
-			String inreserv = request.getParameter("inreserv");
-			String outreserv = request.getParameter("outreserv");
-			String today = request.getParameter("today");
-
-			
-			paraMap.put("emptyroom", emptyroom );
-			paraMap.put("checkin", checkin );
-			paraMap.put("checkout", checkout );
-			paraMap.put("usingroom", usingroom );
-			paraMap.put("inreserv", inreserv );
-			paraMap.put("outreserv", outreserv );
-			paraMap.put("today", today );
-			
-			result = service.modifyHome(paraMap);
-			return jsonStr;
-		}
-		else {
-			msg = "로그인을 하셔야 합니다 .";
-			loc = request.getContextPath()+"/seller/login.bc";
-			request.setAttribute("msg", msg);
-			request.setAttribute("loc", loc);
-			return "msg";
-		}
-
-
-	}
-//////////////////////////////////////////////////////////////////////////////	
-	// 요금 조정
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 요금 조정
 	@ResponseBody
 	@RequestMapping(value="/seller/adjustPrice.bc", method= {RequestMethod.POST})
 	public String adjustPrice(HttpServletRequest request) {
@@ -373,10 +402,10 @@ public class KmtController {
 			String roomprice = request.getParameter("roomprice"+i);
 			String roomprice_quantity = request.getParameter("roomprice_quantity"+i);
 			
-			System.out.println("fk_room_idx : "+fk_room_idx);
-			System.out.println("roomprice_seqno : "+roomprice_seqno);
-			System.out.println("roomprice : "+roomprice);
-			System.out.println("roomprice_quantity : "+roomprice_quantity);
+//			System.out.println("fk_room_idx : "+fk_room_idx);
+//			System.out.println("roomprice_seqno : "+roomprice_seqno);
+//			System.out.println("roomprice : "+roomprice);
+//			System.out.println("roomprice_quantity : "+roomprice_quantity);
 			
 			paraMap.put("fk_room_idx", fk_room_idx );
 			paraMap.put("roomprice_seqno", roomprice_seqno );
@@ -406,7 +435,7 @@ public class KmtController {
 	
 	
 	
-	// 특정 날짜의 방의 가격, 수량 받아오기
+// 특정 날짜의 방의 가격, 수량 받아오기
 	@ResponseBody
 	@RequestMapping(value="/seller/getPriceQuant.bc")
 	public String getPriceQuant(HttpServletRequest request) {
@@ -454,5 +483,5 @@ public class KmtController {
 	
 	
 	
-	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 } // end of class --------------------------------------------

@@ -196,7 +196,75 @@
 		update tbl_here_roomPrice set roomprice = #{roomprice} , roomprice_quantity = #{roomprice_quantity}
 		where roomprice_date = to_date(#{logdate},'yyyy-mm-dd') and roomprice_seqno = #{ roomprice_seqno }
 	</update> 
-
+	<!--  ===================================== 매출 통계 ==================================== -->
+	<select id="total_Price" resultType="int">
+		select sum(roomprice_quantity) as sumquant
+		from tbl_here_hotelInfo a
+		join tbl_here_roomInfo b
+		on a.hotel_idx = b.fk_hotel_idx
+		join
+		(select * from tbl_here_roomPrice where roomprice_date = to_date(#{date},'yyyy/mm/dd'))c
+		on b.room_idx = c.fk_room_idx
+	</select> 
 	
-</mapper>
+	<select id="last_yearPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
 
+	</select> 
+	
+	<select id="yearPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+
+	</select> 
+	
+	<select id="monthPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+		where to_char(RES_PAYMENTDAY,'yyyy-mm') = to_char(sysdate, 'yyyy-mm') 
+	</select> 
+	
+	<select id="dayPrice" resultType="int">
+		select nvl(sum(res_totalPrice),0)
+		from tbl_here_reservation
+
+	</select> 
+
+		<!--  ===================================== 판매자 관리 페이지 - 1. Home 에 정보 넣어주기 ==================================== -->
+	<select id="modifyHomeEmptyRoom" parameterType="HashMap" resultType="String">
+		select sum(roomprice_quantity) as emptyroom 
+		from tbl_here_hotelInfo a
+		join tbl_here_roomInfo b
+		on a.hotel_idx = b.fk_hotel_idx
+		join
+		(select * from tbl_here_roomPrice where roomprice_date = to_date(#{today},'yyyy-mm-dd'))c
+		on b.room_idx = c.fk_room_idx
+	</select>	
+	<select id="modifyHomeCheckin" parameterType="HashMap" resultType="String">
+		select count(res_number) 
+		from TBL_HERE_RESERVATION 
+		where fk_hotel_idx = #{fk_hotel_idx} and resstatus_in_day = to_date(#{today},'yyyy-mm-dd')
+	</select>		
+	<select id="modifyHomeCheckout" parameterType="HashMap" resultType="String">
+		select count(res_number) 
+		from TBL_HERE_RESERVATION 
+		where fk_hotel_idx = #{fk_hotel_idx} and resstatus_out_day = to_date(#{today},'yyyy-mm-dd')
+	</select>
+	<select id="modifyHomeUsingroom" parameterType="HashMap" resultType="String">
+		select count(res_number) 
+		from TBL_HERE_RESERVATION 
+		where fk_hotel_idx = #{fk_hotel_idx} and resstatus_in_day-1 &lt; to_date(#{today},'yyyy-mm-dd') and resstatus_out_day+1 &gt; to_date(#{today},'yyyy-mm-dd') 
+	</select>
+	<select id="modifyHomeInreserv" parameterType="HashMap" resultType="String">
+		select count(res_number) 
+		from TBL_HERE_RESERVATION
+		where fk_hotel_idx = #{fk_hotel_idx} and RES_PAYMENTDAY = to_date(#{today},'yyyy-mm-dd')
+	</select>
+	<select id="modifyHomeOutreserv" parameterType="HashMap" resultType="String">
+		select count(res_number) 
+		from TBL_HERE_RESERVATION 
+		where fk_hotel_idx = #{fk_hotel_idx} and RES_PAYMENTDAY = to_date(#{today},'yyyy-mm-dd')
+	</select>		
+		
+</mapper>
