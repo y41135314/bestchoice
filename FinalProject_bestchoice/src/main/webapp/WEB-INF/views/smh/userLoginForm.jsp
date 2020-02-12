@@ -249,7 +249,7 @@ function here_Login() {
             <button type="button" id="kakao_login_btn" class="btn_start btn_kakao" data-device-type="W">
             	<a href="${kakao_url}" style="text-decoration: none;"><span><i class="icon-ic_login_kakaotalk"><img  class="Logo_img" src="<%= ctxPath%>/resources/images/minha_images/kakao_ico.png"/></i>카카오톡으로 로그인</span></a>
             </button>
-            
+                   
             	<%@ page import="java.net.URLEncoder" %>
 				<%@ page import="java.security.SecureRandom" %>
 				<%@ page import="java.math.BigInteger" %>
@@ -265,13 +265,13 @@ function here_Login() {
 			  session.setAttribute("state", state);
 			%>
 			
-          <%--   <a  id="naver_id_login" class='btn_start btn_naver' href="<%=ctxPath %>/userNaverLogin.bc"  >
+              <%--   <a  id="naver_id_login" class='btn_start btn_naver' href="<%=ctxPath %>/userNaverLogin.bc"  >
             	<span><i class="icon-ic_login_naver"></i>
             		   <img class="Logo_img naveerLogo" src="<%= ctxPath%>/resources/images/minha_images/naver_ico.png" />네이버로 로그인
         	    </span>
             </a>
             --%>
-		  <center>
+		 
 		<script type = "text/javascript" src = "https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js" charset="utf-8"></script>
 		 
 		<div id = "naver_id_login"></div>
@@ -288,7 +288,7 @@ function here_Login() {
 		         naver_id_login.setPopup();
 		         naver_id_login.init_naver_id_login();
 		</script>
-		</center>
+		
             
             <p class="space_or"><span>또는</span></p>
             <div class="inp_type_1 ico_email form-errors">
@@ -300,10 +300,10 @@ function here_Login() {
                        data-msg-required="비밀번호를 입력해 주세요."/>
             </div> 
             <button class="here_login_btn" id="btnLOGIN"><span>로그인</span></button>
-             <button class="here_login_btn" style="background-color: "><span>판매자 로그인</span></button>
+             <button class="here_login_btn" onclick="location.href='<%=ctxPath%>/seller/login.bc'" style="background-color: "><span>판매자 로그인</span></button>
                <div class="link_half">
                     <div><span ><a id="findPwd" href="<%=ctxPath%>/userFindPwdForm.bc">비밀번호 재설정</a></span></div>
-                    <div><span><a href="#">판매자 회원가입</a></span></div>
+                    <div><span><a href="<%=ctxPath%>/sellerJoin.bc">판매자 회원가입</a></span></div>
                </div>
                
                 </form>
