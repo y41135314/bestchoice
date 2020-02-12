@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.apache.taglibs.standard.tag.common.fmt.RequestEncodingSupport;
 import org.codehaus.jackson.JsonNode;
-
+import com.github.scribejava.core.model.OAuth2AccessToken;
 
 import com.project.common.SHA256;
 import com.project.mail.SmhGoogleMail;
@@ -68,7 +68,106 @@ public class SmhController {
 		mav.addObject("kakao_url", kakaoUrl);
 		return mav;
 	}
-	
+	// 네이버 로그인 
+		@RequestMapping(value = "/userNaverLogin.bc")
+		public String userNaverLogin(HttpServletRequest request, HttpServletResponse response) throws Exception{
+			
+			return "smh/userNaverLogin";
+		}
+		
+		// 네이버 로그인 콜백 주소  
+		@RequestMapping(value = "/callbackNaverLogin.bc")
+		public String userNaverLoginCallback(HttpServletRequest request, HttpServletResponse response) throws Exception{
+			   
+			return "smh/callbackNaverLogin";
+		}
+			
+		
+		
+		// 자동입력 
+		@ResponseBody
+		@RequestMapping(value="/naverInsert.bc", method={RequestMethod.GET}, produces="text/plain;charset=UTF-8" )
+		public String naverInsert(HttpServletRequest request) {
+			
+			String email = request.getParameter("email");
+			String name = request.getParameter("name") + "(네이버)";
+			String nickname = request.getParameter("nickname");
+			String gender = request.getParameter("gender");
+			String ageStr = request.getParameter("age");
+		
+			String age = ageStr.substring(0, 2);
+			
+			int year = Calendar.getInstance().get(Calendar.YEAR);
+			
+			int birthyear = year - Integer.parseInt(age);
+			
+			String birthdayStr = request.getParameter("birthday");
+			
+			String birthday =  String.valueOf(birthyear) + birthdayStr.substring(0, 2) + birthdayStr.substring(3, 5);
+			
+			HashMap<String, String> paraMap = new HashMap<String, String>(); 
+		 	paraMap.put("email", email);
+			paraMap.put("pwd",  SHA256.encrypt("naver"));  
+			
+			SmhMemberVO loginuser = service.getLoginMember(paraMap); // 암호화가 되어진상태에서 mapper로 간다. 
+			
+			int m = 0;
+			if(loginuser == null) {
+				
+				// 비밀번호 암호화 		     
+				String encryPassword = SHA256.encrypt( "naver" );
+				
+				SmhMemberVO smhmbrvo = new SmhMemberVO();
+				
+				// 암호화 집어넣기 		 
+				smhmbrvo.setPwd(encryPassword);
+				smhmbrvo.setEmail(email);
+				smhmbrvo.setName(name);
+				smhmbrvo.setNickname(nickname);
+				
+				if(   "F".equals( gender)  ) {
+					smhmbrvo.setGender("2");
+				}else if ( "M".equals( gender) ) {
+					smhmbrvo.setGender("1");
+				}else {
+					smhmbrvo.setGender("");
+				}
+
+				smhmbrvo.setHp1("");
+				smhmbrvo.setHp2("");
+				smhmbrvo.setHp3("");
+				smhmbrvo.setBirthday(birthday);
+				
+				int n = service.memberInsert(smhmbrvo);
+				
+				if( n==1 ) {
+					
+					HashMap<String, String> paraMap2 = new HashMap<String, String>(); 
+				 	paraMap2.put("email", email);
+					paraMap2.put("pwd",  SHA256.encrypt("naver"));  
+					loginuser = service.getLoginMember(paraMap2); // 암호화가 되어진상태에서 mapper로 간다. 
+					
+					HttpSession session = request.getSession();
+					session.setAttribute("loginuser", loginuser);
+					
+					m=1;
+				}
+				
+			}	
+			else {
+				HttpSession session = request.getSession();
+				session.setAttribute("loginuser", loginuser);
+				m=1;
+			}
+		
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("result",m);
+			return jsonObj.toString();
+		}
+		
+	      
+	   
+	      
 	// 카카오 
 	@RequestMapping(value = "/kakaologin.bc",produces = "application/json", method=RequestMethod.GET)
 	public ModelAndView getKakaoSignIn(SmhMemberVO smhmbrvo, ModelAndView mav,ModelMap model,@RequestParam("code") String code, HttpSession session, HttpServletRequest request) throws Exception {
